@@ -1,0 +1,14 @@
+#! /bin/sh
+# Author     : Bas van Sisseren <bas@snt.utwente.nl>
+#
+# Description: Alleen 'rmt' mag uitgevoerd worden..
+
+if [ "_$SSH_ORIGINAL_COMMAND" = '_/etc/rmt' -o \
+	 "_$SSH_ORIGINAL_COMMAND" = '_/usr/libexec/rmt' ]
+then
+	cd "${HOME}/backups"
+	exec /backups/bin/rmt-server.pl
+	echo 'rmt exec failed..' >&2
+else
+	echo "'$SSH_ORIGINAL_COMMAND' exec not allowed.." >&2
+fi

@@ -1,0 +1,26 @@
+#! /bin/sh
+# Author     : Bas van Sisseren <bas@snt.utwente.nl>
+#
+# Description: Alleen 'rmt' mag uitgevoerd worden..
+
+if [ "_$#" = '_2' ]
+then
+	if [ "_$1" = '_-c' ]
+	then
+		if [ "_$2" = '_/etc/rmt' -o "_$2" = '_/usr/libexec/rmt' ]
+		then
+			cd "${HOME}/backups"
+			exec /backups/bin/rmt-server.pl
+			echo 'rmt exec failed..' >&2
+		elif [ "_$2" = '_/backups/bin/ssh_command' ]
+		then
+			exec /backups/bin/ssh_command
+		else
+			echo "'$2' exec not allowed.." >&2
+		fi
+	else
+		echo "Could not parse shell arguments: '$1' '$2'" >&2
+	fi
+else
+	echo "Not enough shell arguments.." >&2
+fi
