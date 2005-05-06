@@ -6,6 +6,7 @@ export DH_COMPAT=1
 #export DH_VERBOSE=1
 
 export DESTDIR=$(shell pwd)/debian/tmp
+export DESTDIR_SERVER=$(shell pwd)/debian/snt-backup-server
 export DESTDIR_FILES=$(shell pwd)/debian/snt-backup-files
 export DESTDIR_MYSQL=$(shell pwd)/debian/snt-backup-mysql
 export DESTDIR_LDAP=$(shell pwd)/debian/snt-backup-ldap
@@ -170,6 +171,19 @@ install: build
 	do \
 		install -o root -g root -m 0644 -p root/$$file $(DESTDIR_DEBIAN)/$$file; \
 	done
+
+
+	### snt-backup-server
+	install -o root -g root -m 0755 -d $(DESTDIR)/usr/lib/snt-backup/sbin
+
+	# executable scripts
+	for file in \
+		./usr/lib/snt-backup/sbin/cleanup.sh \
+		./usr/lib/snt-backup/sbin/cleanup.pl;
+	do \
+		install -o root -g root -m 0755 -p root/$$file $(DESTDIR)/$$file; \
+	done
+
 
 binary-indep: build install
 
