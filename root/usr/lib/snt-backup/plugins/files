@@ -1,0 +1,189 @@
+#! /bin/bash
+# (al is 't alleen maar om m'n syntax highlighting goed te krijgen.. [BvS])
+
+# lib_files			- files backuppen e.d.
+###############################################################################
+
+#
+# convert filename $dir
+#
+function conv_filename {
+	FROP="${1}"
+	echo "${FROP}" |
+		sed -e 's|^/||' -e 's|/$||' -e 's/[ 	]/_/g' -e 's|/|-|g'
+}
+
+#
+# filename $dir
+#
+function striplead {
+	FROP="${1}"
+	echo "${FROP}" |
+		sed -e 's|^/||'
+}
+
+#
+# checkbackup $dir
+# controleert of het mogelijk is om een incremental of een differential backup
+# te maken
+#
+function checkbackup {
+	BACKUPDIR="`striplead "${1}"`"
+	CONVNAME="`conv_filename "${BACKUPDIR}"`"
+	if [ ! -w "${SNAPSHOTDIR}/files/${CONVNAME}.snap" ] ; then
+		echo "false"
+	else 
+		echo "true"
+	fi
+}
+
+#
+# run_dump $type $dir
+#
+# full - volledig
+# incr - incremental
+# diff - incremental, maar dan zonder de snapshotfile te updaten
+#        ( verzoek van Jasper van der Neut )
+#
+
+function run_dump {
+	TYPE="${1}"
+
+	BACKUPDIR="`striplead "${2}"`"
+
+	if [ ! -d "/${BACKUPDIR}" ] ; then 
+		echo "Directory '${BACKUPDIR}' niet gevonden.." >&2
+		return
+	fi
+	
+	CONVNAME="`conv_filename "${BACKUPDIR}"`"
+
+	# .. de excludes..
+	if [ -f "${CONFDIR}/files/${CONVNAME}.exclude" ] ; then
+		EXCLUDE=" -X ${CONFDIR}/files/${CONVNAME}.exclude"
+	else
+		EXCLUDE=""
+	fi
+
+	SNAPFILE="${SNAPSHOTDIR}/files/${CONVNAME}.snap"
+
+	# pre dingen..
+	case "${TYPE}" in
+	full)
+		rm -f "${SNAPFILE}"
+		;;
+	incr)
+		;;
+	diff)
+		TMPFILE="`mktemp -q /tmp/${CONVNAME}.XXXXXXXXXX`"
+		cp "${SNAPFILE}" "${TMPFILE}"
+		SNAPFILE="${TMPFILE}"
+		;;
+	esac
+	
+	TARFILE="${TODIR}/files_${DATEFIX}_${CONVNAME}_${TYPE}.tar"
+
+	# het bouwen van de tar zelf
+
+	# nu vraag je je vast af.. waarom moet die './' nu weer zo nodig
+	# voor die BACKUPDIR?.. dit lijkt helaas de enige sane manier te
+	# zijn om je excludes goed werkend te krijgen. [BvS]
+	"${BASEDIR}/bin/rmt-client.pl" "${TARFILE}${C_TAG}${E_TAG}" \
+		tar ${EXCLUDE} -C / --listed-incremental "${SNAPFILE}" \
+			--ignore-failed-read --create --file - \
+			--blocking-factor=1 ./"${BACKUPDIR}" \
+		$COMPRESS $ENCRYPT
+
+	# post dingen..
+	case "${TYPE}" in
+	full)
+		;;
+	incr)
+		;;
+	diff)
+		rm -f "${TMPFILE}"
+		;;
+	esac
+}
+
+#
+# rm_snap $dir
+#
+function rm_snap {
+	BACKUPDIR="`striplead "${1}"`"
+	CONVNAME="`conv_filename "${BACKUPDIR}"`"
+	SNAPFILE="${SNAPSHOTDIR}/files/${CONVNAME}.snap"
+	rm -f "${SNAPFILE}"
+}
+
+#
+# files_backup
+#
+function files_backup {
+	{
+		cat "${CONFDIR}/files/DIRS"
+		echo
+	} | grep -v '^ *\(#.*\|\)$' | while read -r line ; do
+		echo "Creating Backup '$line'"
+
+		CONV="`conv_filename "${line}"`"
+		if [ -f "${CONFDIR}/files/${CONV}.conf" ] ; then
+			. "${CONFDIR}/files/${CONV}.conf"
+		else 
+			. "${CONFDIR}/files/Default.conf"
+		fi
+
+		AVAIL="`checkbackup "${line}"`"
+		if [ "_${AVAIL}" = "_false" ] ; then
+			# tja dan maar alles
+			run_dump full "${line}"
+		else
+			run_dump "${TYPE}" "${line}"
+		fi
+	done
+}
+
+#
+# clean_files weekly / clean_files monthly
+#
+function files_weekly {
+	{
+		cat "${CONFDIR}/files/DIRS"
+		echo
+	} | grep -v '^ *\(#.*\|\)$' | while read -r line ; do
+		echo "Cleaning Backup '$line'"
+
+		CONV="`conv_filename "${line}"`"
+		if [ -f "${CONFDIR}/files/${CONV}.conf" ] ; then
+			. "${CONFDIR}/files/${CONV}.conf"
+		else 
+			. "${CONFDIR}/files/Default.conf"
+		fi
+
+		AVAIL="`checkbackup "${line}"`"
+		if [ "_${AVAIL}" = "_true" -a "_${CYCLE}" = "_weekly" ] ; then
+			rm_snap "${line}"
+		fi
+	done
+}
+
+function files_monthly {
+	{
+		cat "${CONFDIR}/files/DIRS"
+		echo
+	} | grep -v '^ *\(#.*\|\)$' | while read -r line ; do
+		echo "Cleaning Backup '$line'"
+
+		CONV="`conv_filename "${line}"`"
+		if [ -f "${CONFDIR}/files/${CONV}.conf" ] ; then
+			. "${CONFDIR}/files/${CONV}.conf"
+		else 
+			. "${CONFDIR}/files/Default.conf"
+		fi
+
+		AVAIL="`checkbackup "${line}"`"
+		if [ "_${AVAIL}" = "_true" -a "_${CYCLE}" = "_monthly" ] ; then
+			rm_snap "${line}"
+		fi
+	done
+}

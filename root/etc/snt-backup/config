@@ -1,0 +1,27 @@
+# /etc/snt-backup/config
+#
+# Configuration file for snt-backup package
+
+export IDENTITY="${CONFDIR}/id_dsa"
+export SNAPSHOTDIR='/var/cache/snt-backup'
+export DATEFIX="`date +%Y-%m-%d_%H-%M-%S`"
+export TODIR='user@example.com:/'
+
+## Compression
+#(gzip)
+export COMPRESS='| /bin/gzip -9n'
+export C_TAG='.gz'
+
+#(bzip)
+#export COMPRESS='| /usr/bin/bzip2 -9'
+#export C_TAG='.bz2'
+
+## Encryption
+#(openssl wrapper)
+#export ENCRYPT='| /usr/lib/snt-backup/bin/data_enc.sh'
+#export E_TAG='.enc'
+
+## Hooks
+#(mysql pre and post scripts)
+#export PRE_mysql='/usr/local/lib/mysql_lock'
+#export POST_mysql='/usr/local/lib/mysql_unlock'

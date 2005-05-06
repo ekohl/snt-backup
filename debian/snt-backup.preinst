@@ -1,0 +1,54 @@
+#!/bin/sh
+
+set -e
+
+action=$1
+version=$2
+
+# todo: eigenlijk zou 'config' niet mogen schrijven, dus het is
+# netter om dit eens te verplaatsen naar de preinst
+if [ -d /etc/backups/conf ] && [ ! -d /etc/snt-backup ]; then
+  mkdir /etc/snt-backup
+
+  (
+    # load old config
+    export BASEDIR=/etc/backups
+    . /etc/backups/conf/config
+    
+#   cp -a /etc/backups/conf/id_dsa /etc/snt-backup/id_dsa
+    cp -a "$IDENTITY" /etc/snt-backup/id_dsa
+
+    {
+      echo "# /etc/snt-backup/config"
+      echo "#"
+      echo "# Configuration file for snt-backup package"
+      echo
+      echo "export IDENTITY='/etc/snt-backup/id_dsa'"
+      echo "export SNAPSHOTDIR='/var/cache/snt-backup'"
+      echo
+      echo "# imported from /etc/backups/conf/config"
+      grep '^export[ 	]\+\(BACKUPFILE\|DATEFIX\|TODIR\)=' \
+        /etc/backups/conf/config
+      echo
+      echo "## Compression"
+      echo "#(gzip)"
+      echo "export COMPRESS='| /bin/gzip -9n'"
+      echo "export C_TAG='.gz'"
+      echo
+      echo "#(bzip)"
+      echo "#export COMPRESS='| /usr/bin/bzip2 -9'"
+      echo "#export C_TAG='.bz2'"
+      echo
+      echo "## Encryption"
+      echo "#(openssl wrapper)"
+      echo "export ENCRYPT='| /usr/lib/snt-backup/bin/data_enc.sh'"
+      echo "export E_TAG='.enc'"
+      echo
+      echo "## Hooks"
+      echo "#(mysql pre and post scripts)"
+      echo "#export PRE_mysql='/usr/local/lib/mysql_lock'"
+      echo "#export POST_mysql='/usr/local/lib/mysql_unlock'"
+    } > /etc/snt-backup/config
+  )
+fi
+

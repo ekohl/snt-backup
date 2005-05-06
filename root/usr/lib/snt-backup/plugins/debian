@@ -1,0 +1,81 @@
+#! /bin/bash
+# (al is 't alleen maar om m'n syntax highlighting goed te krijgen.. [BvS])
+
+# lib_debian		- de backup-scripts voor de debian packagelist
+###############################################################################
+
+#
+# debian_backup - maak een backup van de package list
+#
+function debian_backup {
+	. "${CONFDIR}/debian/pkglist.conf"
+	
+	if [ -e "${SNAPSHOTDIR}/debian/pkglist" -a \
+		-e "${SNAPSHOTDIR}/debian/pkglist.full" -a \
+		\( "${rotate}" == "weekly" -o "${rotate}" == "monthly" \) ]
+	then
+		dpkg-dump | sort -u > "${SNAPSHOTDIR}/debian/pkglist.new"
+
+		if [ "${type}" == "diff" ]
+		then
+			TOFILE="debian_${DATEFIX}_pkglist_diff"
+			diff "${SNAPSHOTDIR}/debian/pkglist.full" \
+				"${SNAPSHOTDIR}/debian/pkglist.new" > \
+				"${SNAPSHOTDIR}/debian/${TOFILE}"
+		else
+			TOFILE="debian_${DATEFIX}_pkglist_incr"
+			diff "${SNAPSHOTDIR}/debian/pkglist" \
+				"${SNAPSHOTDIR}/debian/pkglist.new" > \
+				"${SNAPSHOTDIR}/debian/${TOFILE}"
+		fi
+
+		mv -f "${SNAPSHOTDIR}/debian/pkglist.new" \
+			"${SNAPSHOTDIR}/debian/pkglist"
+	else
+		dpkg-dump | sort -u > "${SNAPSHOTDIR}/debian/pkglist"
+
+		cp "${SNAPSHOTDIR}/debian/pkglist" \
+			"${SNAPSHOTDIR}/debian/pkglist.full"
+
+		TOFILE="debian_${DATEFIX}_pkglist_full"
+		cp "${SNAPSHOTDIR}/debian/pkglist" \
+			"${SNAPSHOTDIR}/debian/${TOFILE}"
+	fi
+
+#	if [ -s "${SNAPSHOTDIR}/debian/${TOFILE}" ]
+#	then
+		# verplaats dump van tijdelijke snapshot dir naar
+		# uiteindelijke locatie
+		"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
+			cat "${SNAPSHOTDIR}/debian/${TOFILE}" $COMPRESS $ENCRYPT
+#	fi
+
+	rm -f "${SNAPSHOTDIR}/debian/pkglist.old" \
+		"${SNAPSHOTDIR}/debian/pkglist.new" \
+		"${SNAPSHOTDIR}/debian/${TOFILE}" \
+		"${SNAPSHOTDIR}/debian/${TOFILE}.gz"
+}
+
+#
+# debian_weekly / debian_monthly - ruimt tijdelijke bestanden op.
+#								wordt eens per week of maand aangeroepen.
+#
+function debian_weekly {
+	. "${CONFDIR}/debian/pkglist.conf"
+
+	if [ "${rotate}" == "weekly" ]
+	then
+		rm -f "${SNAPSHOTDIR}/debian/pkglist" \
+			"${SNAPSHOTDIR}/debian/pkglist.full"
+	fi
+}
+
+function debian_monthly {
+	. "${CONFDIR}/debian/pkglist.conf"
+
+	if [ "${rotate}" == "monthly" ]
+	then
+		rm -f "${SNAPSHOTDIR}/debian/pkglist" \
+			"${SNAPSHOTDIR}/debian/pkglist.full"
+	fi
+}

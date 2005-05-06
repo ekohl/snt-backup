@@ -1,0 +1,68 @@
+Template: snt-backup/use_debconf
+Type: boolean
+Default: true
+Description: debconf voor configureren gebruiken?
+ De snt-backup package is het makkelijkst te gebruiken door het
+ configureren aan debconf over te laten. Voor het geval dat je
+ toch zelf de config volledig wilt schrijven, kun je hier aan-
+ geven dit niet te willen. De config is te vinden in
+ /etc/snt-backup/config
+
+Template: snt-backup/use_encryption
+Type: boolean
+Default: false
+Description: gebruik maken van extra encryptie?
+ Standaard stuurt de snt-backup package de data ge-encrypt over,
+ maar wordt de data niet-geencrypt bij SNT opgeslagen. Het is
+ mogelijk om deze data ook te encrypten.
+ .
+ Hier zit alleen een groot risico aan vast. SNT kan hoe dan ook
+ jouw belangrijke data niet decrypten, hier is namelijk een key
+ voor nodig. Deze key wordt (op dit systeem) standaard in de
+ homedir van root neergezet. Zorg ervoor dat dit ergens op een
+ veilige plaats neergezet wordt. (dat betekent dus NIET op dit
+ systeem, aangezien je de key nodig hebt om dit systeem te kunnen
+ herstellen na een crash!) Houd er ook rekening mee dat systeem-
+ beheerders na jou van deze key af weten.
+ .
+ Nogmaals: key kwijt, backups ook kwijt. Deze key is ook door ons
+           niet terug te halen!
+
+Template: snt-backup/use_mysql_locking
+Type: boolean
+Default: false
+Description: aanroepen van mysql-backup pre- en post-scripts?
+ Het is mogelijk om voor en na het backuppen van mysql een aantal
+ scripts aan te roepen. Dit zijn standaard /usr/local/lib/mysql_lock
+ voor het backuppen en /usr/local/lib/mysql_unlock na het backuppen.
+
+Template: snt-backup/use_compression
+Type: select
+Choices: gzip, bzip2, none
+Default: gzip
+Description: welke compressie-methode gebruiken?
+ snt-backup kan meerdere compressie-methoden gebruiken. Standaard
+ gebruikt het gzip, maar voor trage (kabel?) verbindingen is het
+ misschien interessanter om bzip compressie te gebruiken. Ook is
+ er de mogelijkheid om te kiezen voor geen compressie, maar dit
+ is sterk af te raden.
+
+Template: snt-backup/location
+Type: string
+Description: Waar moeten de backups heen
+ Hier geef je de locatie op waar de backups naar toe gestuurd
+ moeten worden. Dit is meestal in de vorm van:
+ .
+   <user>@<host>:<dir>
+ .
+ Voor de SNT backup server is dit meestal:
+ .
+   bk-<vereniging>@bonbon.snt.utwente.nl:/
+ .
+ .. ook is er de mogelijkheid om een lokale dir aan te geven,
+ zodat je bijvoorbeeld door gebruik van rsync over ssh de data
+ naar een ander systeem kunt overzetten. (aangezien er op dit
+ moment nog geen vraag geweest is naar het op deze manier
+ backuppen, biedt SNT dit nog niet aan. Mocht je dit wel willen,
+ laat het ons even weten)
+

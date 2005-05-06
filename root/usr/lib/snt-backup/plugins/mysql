@@ -1,0 +1,44 @@
+#! /bin/bash
+# (al is 't alleen maar om m'n syntax highlighting goed te krijgen.. [BvS])
+
+# lib_mysql			- de backup-scripts voor mysql
+###############################################################################
+
+#
+# mysql_backup - maak een backup van alle mysql databases
+#
+function mysql_backup {
+	# vraag de lijst met databases op
+	mysql --defaults-extra-file="${CONFDIR}/mysql/mysql.conf" --batch --exec='SHOW DATABASES;' | (
+		# lees de header van de tabel in..
+		read -r DUMMY
+
+		# lees een voor een de database namen in..
+		while read -r MYSQL_DB
+		do
+			if ! grep -Fxq "${MYSQL_DB}" "${CONFDIR}/mysql/mysql.exclude"
+			then
+				echo "Dumping mysql database: '${MYSQL_DB}'"
+				
+				TOFILE="mysql_${DATEFIX}_${MYSQL_DB}.sql"
+
+				"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
+					mysqldump --defaults-extra-file="${CONFDIR}/mysql/mysql.conf" \
+						--opt "${MYSQL_DB}" $COMPRESS $ENCRYPT \
+					|| { touch "${SNAPSHOTDIR}/error"; echo 'mysql backup failed.'; }
+			fi
+		done
+	)
+}
+
+#
+# clean_mysql - ruimt tijdelijke bestanden op. wordt eens per week of maand
+#               aangeroepen.
+#
+function mysql_weekly {
+	true
+}
+
+function mysql_monthly {
+	true
+}

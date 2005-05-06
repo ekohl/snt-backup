@@ -1,0 +1,200 @@
+#!/usr/bin/make -f
+
+package=snt-backup
+
+export DH_COMPAT=1
+#export DH_VERBOSE=1
+
+export DESTDIR=$(shell pwd)/debian/tmp
+export DESTDIR_FILES=$(shell pwd)/debian/snt-backup-files
+export DESTDIR_MYSQL=$(shell pwd)/debian/snt-backup-mysql
+export DESTDIR_LDAP=$(shell pwd)/debian/snt-backup-ldap
+export DESTDIR_PGSQL=$(shell pwd)/debian/snt-backup-pgsql
+export DESTDIR_DEBIAN=$(shell pwd)/debian/snt-backup-debian
+
+build: build-stamp
+build-stamp:
+	dh_testdir
+
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp
+
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+
+
+	### snt-backup
+	install -o root -g root -m 0755 -d $(DESTDIR)/etc/snt-backup
+	install -o root -g root -m 0755 -d $(DESTDIR)/usr/bin
+	install -o root -g root -m 0755 -d $(DESTDIR)/usr/lib/snt-backup/bin
+	install -o root -g root -m 0755 -d $(DESTDIR)/usr/lib/snt-backup/lib
+	install -o root -g root -m 0755 -d $(DESTDIR)/usr/lib/snt-backup/plugins
+	install -o root -g root -m 0755 -d $(DESTDIR)/var/cache/snt-backup
+
+	# executable scripts
+	for file in \
+		./usr/bin/dpkg-dump \
+		./usr/bin/lock.pl \
+		./usr/lib/snt-backup/bin/backup.sh \
+		./usr/lib/snt-backup/bin/rmt-client.pl \
+		./usr/lib/snt-backup/bin/build_key.sh \
+		./usr/lib/snt-backup/bin/data_enc.sh \
+		./usr/lib/snt-backup/bin/data_dec.sh; \
+	do \
+		install -o root -g root -m 0755 -p root/$$file $(DESTDIR)/$$file; \
+	done
+
+	# config files & libraries
+	for file in \
+		./etc/snt-backup/config \
+		./usr/lib/snt-backup/lib/base; \
+	do \
+		install -o root -g root -m 0644 -p root/$$file $(DESTDIR)/$$file; \
+	done
+
+
+	### snt-backup-files
+	install -o root -g root -m 0755 -d $(DESTDIR_FILES)/etc/snt-backup/files
+	install -o root -g root -m 0755 -d $(DESTDIR_FILES)/usr/lib/snt-backup/plugins
+	install -o root -g root -m 0755 -d $(DESTDIR_FILES)/var/cache/snt-backup/files
+
+	# executable scripts
+	for file in \
+		./usr/lib/snt-backup/plugins/files; \
+	do \
+		install -o root -g root -m 0755 -p root/$$file $(DESTDIR_FILES)/$$file; \
+	done
+
+	# config files & libraries
+	for file in \
+		./etc/snt-backup/files/DIRS \
+		./etc/snt-backup/files/Default.conf \
+		./etc/snt-backup/files/etc.conf \
+		./etc/snt-backup/files/var.exclude; \
+	do \
+		install -o root -g root -m 0644 -p root/$$file $(DESTDIR_FILES)/$$file; \
+	done
+
+
+	### snt-backup-ldap
+	install -o root -g root -m 0755 -d $(DESTDIR_LDAP)/etc/snt-backup/ldap
+	install -o root -g root -m 0755 -d $(DESTDIR_LDAP)/usr/lib/snt-backup/plugins
+	install -o root -g root -m 0755 -d $(DESTDIR_LDAP)/var/cache/snt-backup/ldap
+
+	# executable scripts
+	for file in \
+		./usr/lib/snt-backup/plugins/ldap; \
+	do \
+		install -o root -g root -m 0755 -p root/$$file $(DESTDIR_LDAP)/$$file; \
+	done
+
+	# config files & libraries
+	for file in \
+		./etc/snt-backup/ldap/ldap.conf; \
+	do \
+		install -o root -g root -m 0600 -p root/$$file $(DESTDIR_LDAP)/$$file; \
+	done
+
+
+
+	### snt-backup-mysql
+	install -o root -g root -m 0755 -d $(DESTDIR_MYSQL)/etc/snt-backup/mysql
+	install -o root -g root -m 0755 -d $(DESTDIR_MYSQL)/usr/lib/snt-backup/plugins
+	install -o root -g root -m 0755 -d $(DESTDIR_MYSQL)/var/cache/snt-backup/mysql
+
+	# executable scripts
+	for file in \
+		./usr/lib/snt-backup/plugins/mysql; \
+	do \
+		install -o root -g root -m 0755 -p root/$$file $(DESTDIR_MYSQL)/$$file; \
+	done
+
+	# config files & libraries
+	for file in \
+		./etc/snt-backup/mysql/mysql.exclude; \
+	do \
+		install -o root -g root -m 0644 -p root/$$file $(DESTDIR_MYSQL)/$$file; \
+	done
+
+	for file in \
+		./etc/snt-backup/mysql/mysql.conf; \
+	do \
+		install -o root -g root -m 0600 -p root/$$file $(DESTDIR_MYSQL)/$$file; \
+	done
+
+
+	### snt-backup-pgsql
+	install -o root -g root -m 0755 -d $(DESTDIR_PGSQL)/etc/snt-backup/pgsql
+	install -o root -g root -m 0755 -d $(DESTDIR_PGSQL)/usr/lib/snt-backup/plugins
+	install -o root -g root -m 0755 -d $(DESTDIR_PGSQL)/var/cache/snt-backup/pgsql
+
+	# executable scripts
+	for file in \
+		./usr/lib/snt-backup/plugins/pgsql; \
+	do \
+		install -o root -g root -m 0755 -p root/$$file $(DESTDIR_PGSQL)/$$file; \
+	done
+
+	# config files & libraries
+	for file in \
+		./etc/snt-backup/pgsql/pgsql.exclude; \
+	do \
+		install -o root -g root -m 0644 -p root/$$file $(DESTDIR_PGSQL)/$$file; \
+	done
+
+
+	### snt-backup-debian
+	install -o root -g root -m 0755 -d $(DESTDIR_DEBIAN)/etc/snt-backup/debian
+	install -o root -g root -m 0755 -d $(DESTDIR_DEBIAN)/usr/lib/snt-backup/plugins
+	install -o root -g root -m 0755 -d $(DESTDIR_DEBIAN)/var/cache/snt-backup/debian
+
+	# executable scripts
+	for file in \
+		./usr/lib/snt-backup/plugins/debian; \
+	do \
+		install -o root -g root -m 0755 -p root/$$file $(DESTDIR_DEBIAN)/$$file; \
+	done
+
+	# config files & libraries
+	for file in \
+		./etc/snt-backup/debian/pkglist.conf; \
+	do \
+		install -o root -g root -m 0644 -p root/$$file $(DESTDIR_DEBIAN)/$$file; \
+	done
+
+binary-indep: build install
+
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs
+	dh_installdocs
+	dh_installexamples
+	dh_installinit
+	dh_installcron
+	dh_installdebconf
+	dh_installman
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_perl -d $(DESTDIR)/usr/lib/snt-backup/bin/rmt-client.pl
+
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+
+.PHONY: build clean binary-indep binary-arch binary install

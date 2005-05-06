@@ -1,0 +1,42 @@
+#! /bin/bash
+# (al is 't alleen maar om m'n syntax highlighting goed te krijgen.. [BvS])
+
+# lib_base			- de basis-scripts voor 't backuppen
+###############################################################################
+
+#
+# Zijn de TODIR en SNAPSHOTDIR variabelen geset?
+#
+if [ -z "${TODIR}" ]
+then
+	echo "TODIR IS UNSET"
+	exit 2
+fi
+
+if [ -z "${SNAPSHOTDIR}" ]
+then
+	echo "SNAPSHOTDIR IS UNSET"
+	exit 2
+fi
+
+#
+# Bestaan de TODIR en SNAPSHOTDIR directories?
+# (zo niet, aanmaken)
+#
+if echo "${TODIR}" | grep -q '^[^/:@]\+@[^/:@]\+:'
+then
+	export TODIR_REMOTE='ja'
+else
+	export TODIR_REMOTE='nee'
+	if [ ! -d "${TODIR}" ]
+	then
+		echo "De 'TODIR' bestaat nog niet, directory ${TODIR} wordt aangemaakt."
+		mkdir -p "${TODIR}"
+	fi
+fi
+
+if [ ! -d "${SNAPSHOTDIR}" ]
+then
+	echo "De 'SNAPSHOTDIR' bestaat nog niet, directory ${SNAPSHOTDIR} wordt aangemaakt."
+	mkdir -p "${SNAPSHOTDIR}"
+fi

@@ -1,0 +1,44 @@
+#! /bin/bash
+# voor bas(h) z'n syntax highlighting
+
+
+#
+# backup postgres databases.
+#
+
+function pgsql_backup {
+	su postgres -c '/usr/bin/psql -t -d template1 -c "SELECT datname FROM pg_database ORDER BY datname"' | sed 's/^ *//;/^$/d' | (
+		while read -r PGSQL_DB
+		do
+			if ! grep -Fxq "${PGSQL_DB}" "${CONFDIR}/pgsql/pgsql.exclude"
+			then
+				echo "Dumping pgsql database: '${PGSQL_DB}'";
+				export PGSQL_DB
+
+				TOFILE="pgsql_${DATEFIX}_${PGSQL_DB}.sql"
+
+				"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
+					su postgres -c '/usr/bin/pg_dump "${PGSQL_DB}"' $COMPRESS $ENCRYPT \
+					|| { touch "${SNAPSHOTDIR}/error"; echo 'pgsql dump failed.'; }
+			fi
+		done
+	) 
+
+	TOFILE="pgsql_${DATEFIX}.sql"
+
+	"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
+		su postgres -c '/usr/lib/postgresql/bin/pg_dumpall -g' $COMPRESS $ENCRYPT \
+		|| { touch "${SNAPSHOTDIR}/error"; echo 'pgsql dump failed.'; }
+}
+
+#
+# clean_pgsql - ruimt tijdelijke bestanden op. wordt eens per week of maand
+#               aangeroepen.
+#
+function pgsql_weekly {
+	true
+}
+
+function pgsql_monthly {
+	true
+}

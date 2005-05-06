@@ -1,0 +1,45 @@
+Source: snt-backup
+Section: base
+Maintainer: Bas van Sisseren <bas@snt.utwente.nl>
+Priority: standard
+Uploaders: Bas van Sisseren <bas@snt.utwente.nl>
+Standards-Version: 3.5.7
+
+Package: snt-backup
+Architecture: all
+Depends: bash, tar, sed, debianutils, ${misc:Depends}
+Recommends: openssl, libdigest-md5-perl
+Suggests: snt-backup-files, snt-backup-debian, snt-backup-mysql, snt-backup-pgsql
+Description: SNT backup scripts
+ SNT backup scripts
+
+Package: snt-backup-files
+Architecture: all
+Depends: snt-backup
+Description: SNT backup scripts file
+ SNT backup script for dumping files
+
+Package: snt-backup-debian
+Architecture: all
+Depends: snt-backup
+Description: SNT backup scripts debian support
+ SNT backup script for dumping debian package list
+
+Package: snt-backup-mysql
+Architecture: all
+Depends: snt-backup, mysql-client
+Description: SNT backup scripts mysql support
+ SNT backup script for dumping mysql tables
+
+Package: snt-backup-ldap
+Architecture: all
+Depends: snt-backup, ldap-utils
+Description: SNT backup scripts ldap support
+ SNT backup script for dumping ldap databases
+
+Package: snt-backup-pgsql
+Architecture: all
+Depends: snt-backup, postgresql-client 
+Description: SNT backup scripts pgsql support
+ SNT backup script for dumping pgsql tables
+ 

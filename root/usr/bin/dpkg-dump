@@ -1,0 +1,131 @@
+#! /usr/bin/perl -w
+
+use strict;
+use Fcntl;
+use Data::Dumper;
+
+my $dpkgdir = '/var/lib/dpkg';
+
+# gecopypaste uit de dpkg package..
+my @statstr = (
+	{
+		'unknown'			=> 'u',		#  7
+		'install'			=> 'i',		#  7
+		'hold'				=> 'h',		#  4
+		'deinstall'			=> 'r',		#  9
+		'purge'				=> 'p',		#  5
+	}, {
+		'ok'				=> '',		#  2
+		'reinstreq'			=> 'R',		#  9
+		'hold'				=> '?',		#  4
+		'hold-reinstreq'	=> '#',		# 14
+	}, {
+		'not-installed'		=> 'n',		# 13
+		'unpacked'			=> 'U',		#  8
+		'half-configured'	=> 'F',		# 15
+		'installed'			=> 'i',		#  9
+		'half-installed'	=> 'H',		# 14
+		'config-files'		=> 'c',		# 12
+		'postinst-failed'	=> 'F',		# 15 * deprecated
+		'removal-failed'	=> 'H',		# 14 * deprecated
+	}
+);
+
+my $dpkgfile = "$dpkgdir/status";
+my $flag_src = 0;
+my $flag_tab = 0;
+my @packages;
+
+while (@ARGV && $ARGV[0] =~ /^-/) {
+	my $arg = shift;
+	if ($arg eq '-f') {
+		$dpkgfile = shift;
+	} elsif ($arg eq '-s') {
+		$flag_src = 1;
+	} elsif ($arg eq '-t') {
+		$flag_tab = 1;
+	} else {
+		die "Unknown parameter: '$arg'\n";
+	}
+}
+
+@packages = @ARGV;
+my $sep = $flag_tab ? "\t" : ' ';
+
+sysopen (F, $dpkgfile, O_RDONLY)
+	or die "Could not open dpkg status file!\n";
+
+sub parse_pkg {
+	my $pkg = shift;
+	return unless (%$pkg);
+
+	die "No package-name defined in block:\n" . Dumper($pkg)
+		unless exists $pkg->{'Package'};
+
+	my $package = $pkg->{'Package'};
+
+	die "No status defined for package $package.\n"
+		unless exists $pkg->{'Status'};
+
+	my @status = split / /, $pkg->{'Status'};
+
+	die "Status of package $package is in wrong format.\n"
+		unless (@status == 3);
+
+	for (my $i=0; $i<3; $i++) {
+		if (exists $statstr[$i]->{$status[$i]}) {
+			$status[$i] = $statstr[$i]->{$status[$i]};
+		} else {
+			warn "Unknown status item ($i) '$status[$i]' for ".
+					"package $package.\n";
+		}
+	}
+
+	return
+		if (($status[0] eq 'p') && ($status[1] eq '') && ($status[2] eq 'n'));
+
+	if (@packages) {
+		my $src = $pkg->{'Package'};
+		if ($flag_src && defined $pkg->{'Source'}) {
+			$src = $pkg->{'Source'};
+			$src =~ s/ \([^)]*\)/ /g;
+			$src =~ s/^\s+//;
+			$src =~ s/\s+$//;
+			$src =~ s/\s+/ /g;
+		}
+		return unless grep { $src eq $_ } @packages;
+	}
+
+	print $status[0] . $status[2] . $status[1] . $sep . $package .
+		((exists $pkg->{'Version'}) ? $sep . $pkg->{'Version'} : '') . "\n";
+}
+
+my %pkg = ();
+my $hdr = '';
+my $line = 1;
+
+while ($_ = <F>) {
+	chomp $_;
+	if (/^$/) {
+		parse_pkg(\%pkg);
+		%pkg = ();
+	} elsif (/^([A-Za-z-]+):\s*(.*)$/) {
+		$hdr = $1;
+		if (exists $pkg{$1}) {
+			die "Key '$hdr' redefined on line $line..\n";
+		} else {
+			$pkg{$1} = $2;
+		}
+	} elsif (/^ \.$/) {
+		$pkg{$hdr} .= "\n";
+	} elsif (/^ (.*?)$/) {
+		$pkg{$hdr} .= "\n" . $1;
+	} else {
+		die "Syntax error on line $line.. ('$_')\n";
+	}
+	$line++;
+}
+
+close (F);
+
+parse_pkg(\%pkg);
