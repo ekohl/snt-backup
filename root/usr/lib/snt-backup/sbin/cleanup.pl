@@ -40,12 +40,12 @@ foreach my $file (@list) {
 	my ($module, $date, $path) = ($1, $2, $3);
 	my $type = 'full';
 	if ($module eq 'files') {
-		($type) = ($path =~ /_([^_.]+)\.tar\.gz$/s);
-		$path =~ s/_([^_.]+)\.tar\.gz$//s;
+		($type) = ($path =~ /_([^_.]+)\.tar\.(gz|bz2)$/s);
+		$path =~ s/_([^_.]+)\.tar\.(bz2|gz)$//s;
 	} elsif ($module eq 'debian') {
-		($type) = ($path =~ /_([^_.]+)\.gz$/s);
+		($type) = ($path =~ /_([^_.]+)\.(bz2|gz)$/s);
 		$type = 'incr' if $type eq 'diff';
-		$path =~ s/_([^_.]+)\.gz$//s;
+		$path =~ s/_([^_.]+)\.(bz2|gz)$//s;
 	}
 	$data{$module}{$path}{$date} = {
 		file => $file,
