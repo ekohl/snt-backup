@@ -17,6 +17,21 @@ my @list = ();
 my %data = ();
 my $today = "";
 
+# flags
+my $flag_no_act = 0;
+my $flag_verbose = 0;
+
+while (@ARGV) {
+	my $param = shift;
+	if ($param eq '-d' || $param eq '--no-act') {
+		$flag_no_act = 1;
+	} elsif ($param eq '-v' || $param eq '--verbose') {
+		$flag_verbose = 1;
+	} else {
+		die "Usage: $0 [-d] [-v]\n";
+	}
+}
+
 # genereer "today"
 {
 	my @t = localtime();
@@ -35,17 +50,17 @@ close F;
 foreach my $file (@list) {
 	chomp $file;
 	$file =~ s|^\./||s;
-	next if ($file =~ /\.(report|list|errors)$/s);
+	next if ($file =~ /\.(report|list|error|errors)$/s);
 	next unless ($file =~ /^([^_]+)_([^_]+_[^_]+)_(.*)$/s);
 	my ($module, $date, $path) = ($1, $2, $3);
 	my $type = 'full';
 	if ($module eq 'files') {
-		($type) = ($path =~ /_([^_.]+)\.tar\.(gz|bz2)$/s);
-		$path =~ s/_([^_.]+)\.tar\.(bz2|gz)$//s;
+		($type) = ($path =~ /_([^_.]+)\.tar(\.(gz|bz2))?(\.enc)?$/s);
+		$path =~ s/_([^_.]+)\.tar(\.(gz|bz2))?(\.enc)?$//s;
 	} elsif ($module eq 'debian') {
-		($type) = ($path =~ /_([^_.]+)\.(bz2|gz)$/s);
+		($type) = ($path =~ /_([^_.]+)(\.(gz|bz2))?(\.enc)?$/s);
 		$type = 'incr' if $type eq 'diff';
-		$path =~ s/_([^_.]+)\.(bz2|gz)$//s;
+		$path =~ s/_([^_.]+)(\.(gz|bz2))?(\.enc)?$//s;
 	}
 	$data{$module}{$path}{$date} = {
 		file => $file,
@@ -72,7 +87,7 @@ foreach my $module (keys %data) {
 		my @dates = sort keys %{$data{$module}{$path}};
 
 		if ((@dates) && ($dates[-1] !~ /^$today/)) {
-			print STDERR "GEEN backup van vandaag voor $module $path! (laatste backup: ".$dates[-1].")\n";
+			print "GEEN backup van vandaag voor $module $path! (laatste backup: ".$dates[-1].")\n";
 		}
 
 		# zoek eerst de belangrijke files uit
@@ -109,8 +124,8 @@ foreach my $module (keys %data) {
 
 		# als er geen full backup is, PANIC!
 		unless (@full_backups) {
-			print STDERR "GEEN full backup van $module $path!\n";
-			last;
+			print "GEEN full backup van $module $path!\n";
+			next;
 		}
 
 		# bewaar alleen de laatste 3 full backups ...
@@ -139,12 +154,13 @@ foreach my $module (keys %data) {
 		# verwijder niet-interessante onderdelen
 		foreach my $date (sort keys %{$data{$module}{$path}}) {
 			print "rm " . $data{$module}{$path}{$date}{'file'} . "\n";
-			system("/usr/bin/chattr","-i",$data{$module}{$path}{$date}{'file'});
-			unlink $data{$module}{$path}{$date}{'file'};
-			unlink $data{$module}{$path}{$date}{'file'}.'.report';
-			unlink $data{$module}{$path}{$date}{'file'}.'.list';
-			unlink $data{$module}{$path}{$date}{'file'}.'.errors';
-			delete $data{$module}{$path}{$date};
+			if (! $flag_no_act) {
+				unlink $data{$module}{$path}{$date}{'file'};
+				unlink $data{$module}{$path}{$date}{'file'}.'.report';
+				unlink $data{$module}{$path}{$date}{'file'}.'.list';
+				unlink $data{$module}{$path}{$date}{'file'}.'.errors';
+				delete $data{$module}{$path}{$date};
+			}
 		}
 	}
 }

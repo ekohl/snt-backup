@@ -32,14 +32,8 @@ if (sysopen LOCK, $lockfile, O_CREAT | O_EXCL | O_WRONLY, 0600) {
 	print LOCK "$$\n";
 	close LOCK;
 
-	if (open MON, "| nc -q10 localhost 6667") {
-		sleep 1;
-		print MON "NICK firx_bk_\n";
-		print MON "USER firx 0 0 :firx\n";
-		sleep 4;
-		print MON "PRIVMSG tsd :disk vol?\n";
-		print MON "QUIT\n";
-		sleep 2;
+	if (open MON, "| nc -q10 localhost 12345") {
+		print MON "disk vol!\n";
 		close MON;
 	}
 
