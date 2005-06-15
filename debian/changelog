@@ -1,3 +1,9 @@
+snt-backup (2.1-14) stable; urgency=low
+
+  * Added svn backup support
+
+ -- Bas van Sisseren <bas@snt.utwente.nl>  Wed, 15 Jun 2005 12:58:21 +0200
+
 snt-backup (2.1-13) stable; urgency=low
 
   * Fix newline-filter bug in files plugin.

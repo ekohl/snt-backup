@@ -26,6 +26,12 @@ Depends: snt-backup
 Description: SNT backup scripts file
  SNT backup script for dumping files
 
+Package: snt-backup-svn
+Architecture: all
+Depends: snt-backup, subversion
+Description: SNT backup scripts svn
+ SNT backup script for dumping svn
+
 Package: snt-backup-debian
 Architecture: all
 Depends: snt-backup

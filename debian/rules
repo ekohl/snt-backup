@@ -12,6 +12,7 @@ export DESTDIR_MYSQL=$(shell pwd)/debian/snt-backup-mysql
 export DESTDIR_LDAP=$(shell pwd)/debian/snt-backup-ldap
 export DESTDIR_PGSQL=$(shell pwd)/debian/snt-backup-pgsql
 export DESTDIR_DEBIAN=$(shell pwd)/debian/snt-backup-debian
+export DESTDIR_SVN=$(shell pwd)/debian/snt-backup-svn
 
 build: build-stamp
 build-stamp:
@@ -83,6 +84,29 @@ install: build
 		./etc/snt-backup/files/var.exclude; \
 	do \
 		install -o root -g root -m 0644 -p root/$$file $(DESTDIR_FILES)/$$file; \
+	done
+
+
+	### snt-backup-svn
+	install -o root -g root -m 0755 -d $(DESTDIR_SVN)/etc/snt-backup/svn
+	install -o root -g root -m 0755 -d $(DESTDIR_SVN)/usr/lib/snt-backup/bin
+	install -o root -g root -m 0755 -d $(DESTDIR_SVN)/usr/lib/snt-backup/plugins
+	install -o root -g root -m 0755 -d $(DESTDIR_SVN)/var/cache/snt-backup/svn
+
+	# executable scripts
+	for file in \
+		./usr/lib/snt-backup/bin/svn-incdump.pl \
+		./usr/lib/snt-backup/plugins/svn; \
+	do \
+		install -o root -g root -m 0755 -p root/$$file $(DESTDIR_SVN)/$$file; \
+	done
+
+	# config files & libraries
+	for file in \
+		./etc/snt-backup/svn/repositories \
+		./etc/snt-backup/svn/Default.conf; \
+	do \
+		install -o root -g root -m 0644 -p root/$$file $(DESTDIR_SVN)/$$file; \
 	done
 
 
