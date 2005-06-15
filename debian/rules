@@ -203,7 +203,7 @@ install: build
 	# executable scripts
 	for file in \
 		./usr/lib/snt-backup/sbin/cleanup.sh \
-		./usr/lib/snt-backup/sbin/cleanup.pl;
+		./usr/lib/snt-backup/sbin/cleanup.pl; \
 	do \
 		install -o root -g root -m 0755 -p root/$$file $(DESTDIR)/$$file; \
 	done
