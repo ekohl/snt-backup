@@ -27,11 +27,11 @@ assert{ $last_rev <= $head_rev };
 my $next_rev = $last_rev + 1;
 if ($next_rev <= $head_rev) {
 	system("svnadmin", "dump", "--incremental", "--quiet",
-			"--revision", "$next_rev:$head_rev", $repos)
+			"--revision", "$next_rev:$head_rev", $repos) == 0
 				or die "svnadmin dump failed: $?\n";
 
 	if (open REV, "> $f_rev") {
-		print REV "$next_rev\n";
+		print REV "$head_rev\n";
 		close REV;
 	}
 }
