@@ -1,0 +1,156 @@
+#! /bin/bash
+# (al is 't alleen maar om m'n syntax highlighting goed te krijgen.. [BvS])
+
+# lib_svn			- svn backuppen
+###############################################################################
+
+#
+# convert filename $dir
+#
+function conv_filename {
+	FROP="${1}"
+	echo "${FROP}" |
+		sed -e 's|^/||' -e 's|/$||' -e 's/[ 	]/_/g' -e 's|/|-|g'
+}
+
+#
+# checkbackup $dir
+# controleert of het mogelijk is om een incremental backup te maken
+#
+function checkbackup {
+	CONVNAME="`conv_filename "${1}"`"
+	if [ ! -w "${SNAPSHOTDIR}/svn/${CONVNAME}.rev" ] ; then
+		echo "false"
+	else 
+		echo "true"
+	fi
+}
+
+#
+# run_dump $type $dir
+#
+# full - volledig
+# incr - incremental
+#
+
+function run_dump {
+	TYPE="${1}"
+	BACKUPDIR="${2}"
+
+	if [ ! -d "/${BACKUPDIR}" ] ; then 
+		echo "Directory '${BACKUPDIR}' niet gevonden.." >&2
+		return
+	fi
+	
+	CONVNAME="`conv_filename "${BACKUPDIR}"`"
+	REVFILE="${SNAPSHOTDIR}/svn/${CONVNAME}.rev"
+
+	# pre dingen..
+	case "${TYPE}" in
+	full)
+		rm -f "${REVFILE}"
+		;;
+	incr)
+		;;
+	esac
+	
+	SVNFILE="${TODIR}/svn_${DATEFIX}_${CONVNAME}_${TYPE}"
+
+	# het bouwen van de tar zelf
+
+	# nu vraag je je vast af.. waarom moet die './' nu weer zo nodig
+	# voor die BACKUPDIR?.. dit lijkt helaas de enige sane manier te
+	# zijn om je excludes goed werkend te krijgen. [BvS]
+	"${BASEDIR}/bin/rmt-client.pl" "${SVNFILE}${C_TAG}${E_TAG}" \
+		"${BASEDIR}/bin/svn-incdump.pl" "${BACKUPDIR}" "${REVFILE}" \
+		$COMPRESS $ENCRYPT
+
+	# post dingen..
+	case "${TYPE}" in
+	full)
+		;;
+	incr)
+		;;
+	esac
+}
+
+#
+# rm_rev $dir
+#
+function rm_rev {
+	CONVNAME="`conv_filename "${1}"`"
+	REVFILE="${SNAPSHOTDIR}/svn/${CONVNAME}.rev"
+	rm -f "${REVFILE}"
+}
+
+#
+# svn_backup
+#
+function svn_backup {
+	{
+		cat "${CONFDIR}/svn/repositories"
+		echo
+	} | grep -v '^ *\(#.*\|\)$' | while read -r line ; do
+		echo "Creating Backup '$line'"
+
+		CONV="`conv_filename "${line}"`"
+		if [ -f "${CONFDIR}/svn/${CONV}.conf" ] ; then
+			. "${CONFDIR}/svn/${CONV}.conf"
+		else 
+			. "${CONFDIR}/svn/Default.conf"
+		fi
+
+		AVAIL="`checkbackup "${line}"`"
+		if [ "_${AVAIL}" = "_false" ] ; then
+			# tja dan maar alles
+			run_dump full "${line}"
+		else
+			run_dump "${TYPE}" "${line}"
+		fi
+	done
+}
+
+#
+# clean_svn weekly / clean_svn monthly
+#
+function svn_weekly {
+	{
+		cat "${CONFDIR}/svn/repositories"
+		echo
+	} | grep -v '^ *\(#.*\|\)$' | while read -r line ; do
+		echo "Cleaning Backup '$line'"
+
+		CONV="`conv_filename "${line}"`"
+		if [ -f "${CONFDIR}/svn/${CONV}.conf" ] ; then
+			. "${CONFDIR}/svn/${CONV}.conf"
+		else 
+			. "${CONFDIR}/svn/Default.conf"
+		fi
+
+		AVAIL="`checkbackup "${line}"`"
+		if [ "_${AVAIL}" = "_true" -a "_${CYCLE}" = "_weekly" ] ; then
+			rm_rev "${line}"
+		fi
+	done
+}
+
+function svn_monthly {
+	{
+		cat "${CONFDIR}/svn/repositories"
+		echo
+	} | grep -v '^ *\(#.*\|\)$' | while read -r line ; do
+		echo "Cleaning Backup '$line'"
+
+		CONV="`conv_filename "${line}"`"
+		if [ -f "${CONFDIR}/svn/${CONV}.conf" ] ; then
+			. "${CONFDIR}/svn/${CONV}.conf"
+		else 
+			. "${CONFDIR}/svn/Default.conf"
+		fi
+
+		AVAIL="`checkbackup "${line}"`"
+		if [ "_${AVAIL}" = "_true" -a "_${CYCLE}" = "_monthly" ] ; then
+			rm_rev "${line}"
+		fi
+	done
+}
