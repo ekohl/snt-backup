@@ -2,7 +2,7 @@
 
 use strict;
 
-sub assert(&) { unless (&$_[0]) { die "assertion failed!\n" }
+sub assert(&) { unless ($_[0]()) { die "assertion failed!\n" } }
 
 die "Usage: $0 <svnrepospath> <svnincfile>\n"
 	unless @ARGV == 2;
@@ -31,7 +31,7 @@ if ($next_rev <= $head_rev) {
 				or die "svnadmin dump failed: $?\n";
 
 	if (open REV, "> $f_rev") {
-		print REV, "$next_rev\n";
+		print REV "$next_rev\n";
 		close REV;
 	}
 }
