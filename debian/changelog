@@ -1,3 +1,9 @@
+snt-backup (2.1-15) stable; urgency=low
+
+  * aantal foutjes verbeterd
+
+ -- Bas van Sisseren <bas@snt.utwente.nl>  Wed, 15 Jun 2005 13:24:36 +0200
+
 snt-backup (2.1-14) stable; urgency=low
 
   * Added svn backup support
