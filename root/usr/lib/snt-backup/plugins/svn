@@ -14,10 +14,10 @@ function conv_filename {
 }
 
 #
-# checkbackup $dir
+# svn_checkbackup $dir
 # controleert of het mogelijk is om een incremental backup te maken
 #
-function checkbackup {
+function svn_checkbackup {
 	CONVNAME="`conv_filename "${1}"`"
 	if [ ! -w "${SNAPSHOTDIR}/svn/${CONVNAME}.rev" ] ; then
 		echo "false"
@@ -27,13 +27,15 @@ function checkbackup {
 }
 
 #
-# run_dump $type $dir
+# svn_run_dump $type $dir
 #
 # full - volledig
 # incr - incremental
+# diff - incremental, maar dan zonder de snapshotfile te updaten
+#        ( verzoek van Jasper van der Neut )
 #
 
-function run_dump {
+function svn_run_dump {
 	TYPE="${1}"
 	BACKUPDIR="${2}"
 
@@ -51,6 +53,11 @@ function run_dump {
 		rm -f "${REVFILE}"
 		;;
 	incr)
+		;;
+	diff)
+		TMPFILE="`mktemp -q /tmp/${CONVNAME}.XXXXXXXXXX`"
+		cp "${REVFILE}" "${TMPFILE}"
+		REVFILE="${TMPFILE}"
 		;;
 	esac
 	
@@ -70,6 +77,9 @@ function run_dump {
 	full)
 		;;
 	incr)
+		;;
+	diff)
+		rm -f "${TMPFILE}"
 		;;
 	esac
 }
@@ -100,12 +110,12 @@ function svn_backup {
 			. "${CONFDIR}/svn/Default.conf"
 		fi
 
-		AVAIL="`checkbackup "${line}"`"
+		AVAIL="`svn_checkbackup "${line}"`"
 		if [ "_${AVAIL}" = "_false" ] ; then
 			# tja dan maar alles
-			run_dump full "${line}"
+			svn_run_dump full "${line}"
 		else
-			run_dump "${TYPE}" "${line}"
+			svn_run_dump "${TYPE}" "${line}"
 		fi
 	done
 }
@@ -127,7 +137,7 @@ function svn_weekly {
 			. "${CONFDIR}/svn/Default.conf"
 		fi
 
-		AVAIL="`checkbackup "${line}"`"
+		AVAIL="`svn_checkbackup "${line}"`"
 		if [ "_${AVAIL}" = "_true" -a "_${CYCLE}" = "_weekly" ] ; then
 			rm_rev "${line}"
 		fi
@@ -148,7 +158,7 @@ function svn_monthly {
 			. "${CONFDIR}/svn/Default.conf"
 		fi
 
-		AVAIL="`checkbackup "${line}"`"
+		AVAIL="`svn_checkbackup "${line}"`"
 		if [ "_${AVAIL}" = "_true" -a "_${CYCLE}" = "_monthly" ] ; then
 			rm_rev "${line}"
 		fi
