@@ -57,6 +57,9 @@ foreach my $file (@list) {
 	if ($module eq 'files') {
 		($type) = ($path =~ /_([^_.]+)\.tar(\.(gz|bz2))?(\.enc)?$/s);
 		$path =~ s/_([^_.]+)\.tar(\.(gz|bz2))?(\.enc)?$//s;
+	} elsif ($module eq 'svn') {
+		($type) = ($path =~ /_([^_.]+)\.(gz|bz2)(\.enc)?$/s);
+		$path =~ s/_([^_.]+)\.(gz|bz2)(\.enc)?$//s;
 	} elsif ($module eq 'debian') {
 		($type) = ($path =~ /_([^_.]+)(\.(gz|bz2))?(\.enc)?$/s);
 		$type = 'incr' if $type eq 'diff';
@@ -107,7 +110,7 @@ foreach my $module (keys %data) {
 				my ($str) = ($date =~ /^(\d\d\d\d-\d\d-)/);
 				next if ((defined $last_month) && ($str eq $last_month));
 				push @month_backup, $date;
-#				print "First_of_month: $module $path $date\n";
+				print "First_of_month: $module $path $date\n" if($flag_verbose);
 				$last_month = $str;
 			}
 
@@ -117,7 +120,7 @@ foreach my $module (keys %data) {
 				$str =~ s/^(\d\d\d\d)-(0[7-9]|1[0-2])-$/$1_07/;
 				next if ((defined $last_hyear) && ($str eq $last_hyear));
 				push @hyear_backup, $date;
-#				print "First_of_hyear: $module $path $date\n";
+				print "First_of_hyear: $module $path $date\n" if($flag_verbose);
 				$last_hyear = $str;
 			}
 		}
@@ -132,7 +135,7 @@ foreach my $module (keys %data) {
 		@full_backups = (@full_backups > 2) ? splice @full_backups, -2 : @full_backups;
 
 		my $only_delete_before = ((@full_backups > 2) ? splice @full_backups, -2 : @full_backups)[0];
-#		print "Only_delete_before: $only_delete_before\n";
+		print "Only_delete_before: $only_delete_before\n" if($flag_verbose);
 
 		# ... de laatste 3 maandelijkse full backups
 		@month_backup = (@month_backup > 3) ? splice @month_backup, -3 : @month_backup;
@@ -147,7 +150,7 @@ foreach my $module (keys %data) {
 		foreach my $date (@dates) {
 			next if (($date lt $only_delete_before) && (! is_in_array($date, @keep_backups)));
 
-#			print "keep " . $data{$module}{$path}{$date}{'file'} . "\n";
+			print "keep " . $data{$module}{$path}{$date}{'file'} . "\n" if($flag_verbose);
 			delete $data{$module}{$path}{$date};
 		}
 
