@@ -1,0 +1,48 @@
+#!/bin/sh
+
+set -e
+
+action=$1
+oldversion=$2
+
+export sntbackuppostinstisrunning=true
+# Source debconf library.
+. /usr/share/debconf/confmodule
+db_version 2.0
+
+# use debconf
+db_get snt-backup/use_debconf
+
+if [ "_$RET" = "_true" ]; then
+  {
+      db_get snt-backup-slapd/ldap_host
+      echo "LDAP_HOST='$RET'"
+      db_get snt-backup-slapd/ldap_port
+      echo "LDAP_PORT='$RET'"
+      db_get snt-backup-slapd/ldap_base
+      echo "LDAP_BASE='$RET'"
+      db_get snt-backup-slapd/ldap_binddn
+      echo "LDAP_BINDDN='$RET'"
+  } > /etc/snt-backup/slapd/slapd.conf.new
+
+  {
+      db_get snt-backup-slapd/ldap_bindpw
+      echo "LDAP_BINDPW='$RET'"
+  } > /etc/snt-backup/slapd/slapd.secret.new
+
+  # forget the bind password
+  db_reset snt-backup-slapd/ldap_bindpw
+
+  if [ -f /etc/snt-backup/slapd/slapd.conf ]; then
+    mv -f /etc/snt-backup/slapd/slapd.conf /etc/snt-backup/slapd/slapd.conf.old
+  fi
+  mv -f /etc/snt-backup/slapd/slapd.conf.new /etc/snt-backup/slapd/slapd.conf
+
+  if [ -f /etc/snt-backup/slapd/slapd.secret ]; then
+    mv -f /etc/snt-backup/slapd/slapd.secret /etc/snt-backup/slapd/slapd.secret.old
+    chmod 600 /etc/snt-backup/slapd/slapd.secret.old
+  fi
+  mv -f /etc/snt-backup/slapd/slapd.secret.new /etc/snt-backup/slapd/slapd.secret
+  chmod 600 /etc/snt-backup/slapd/slapd.secret
+
+fi

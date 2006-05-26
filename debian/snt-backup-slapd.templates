@@ -1,0 +1,32 @@
+Template: snt-backup-slapd/ldap_host
+Type: string
+Default: localhost
+Description: Wat is het adres van de LDAP server?
+ Geef hier het IP adres of de hostname van de LDAP server die je 
+ wilt backuppen op.
+
+Template: snt-backup-slapd/ldap_port
+Type: string
+Default: 389
+Description: Wat is de poort van de LDAP server?
+ Geef hier de poort op waar de LDAP server op luistert
+
+Template: snt-backup-slapd/ldap_base
+Type: string
+Default: dc=example,dc=com
+Description: Wat is het base DN?
+ Geef hier het base DN op van de directory die je wilt backuppen
+
+Template: snt-backup-slapd/ldap_binddn
+Type: string
+Default: cn=backupoperator,dc=example,dc=com
+Description: Met welk DN wil je aan de LDAP binden?
+ Geef hier het DN op waarmee je met de LDAP wilt binden. Om complete
+ backups te maken moet deze volledige leestoegang hebben tot de gehele
+ ldap
+
+Template: snt-backup-slapd/ldap_bindpw
+Type: password
+Default: 
+Description: Wat is het password?
+ Geef hier het password op waarmee aan de LDAP gebind moet worden.

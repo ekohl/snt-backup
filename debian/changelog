@@ -1,6 +1,12 @@
+snt-backup (2.1-16) stable; urgency=low
+
+  * Added slapd plugin
+
+ -- Rien Broekstra <rien@rename-it.nl>  Thu, 25 May 2006 22:43:00 +0200
+
 snt-backup (2.1-15) stable; urgency=low
 
-  * aantal foutjes verbeterd
+  * Fixed a few bugs
 
  -- Bas van Sisseren <bas@snt.utwente.nl>  Wed, 15 Jun 2005 13:24:36 +0200
 

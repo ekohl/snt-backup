@@ -1,0 +1,33 @@
+#! /bin/bash
+#
+# slapd          snt-backup plugin for the slapd ldap server
+# 
+# Author:        Rien Broekstra <rien@rename-it.nl>
+#
+# Version:       0.2 28-May-2006
+#
+
+. "${CONFDIR}/slapd/slapd.conf"
+. "${CONFDIR}/slapd/slapd.secret"
+
+function slapd_backup {
+
+    echo "Dumping LDAP directory: ${LDAP_BASE}";
+
+    TOFILE="slapd_${DATEFIX}.ldif"
+    
+    # FIXME: Allow for sasl authentication
+    # The binddn needs read access to everything you want to backup from the LDAP directory
+    "${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
+	/usr/bin/ldapsearch -h ${LDAP_HOST} -p ${LDAP_PORT} -b ${LDAP_BASE} -s sub "(objectClass=top)" -x -D ${LDAP_BINDDN} -w ${LDAP_BINDPW} $COMPRESS $ENCRYPT \
+	|| { touch "${SNAPSHOTDIR}/error"; echo 'slapd dump failed.'; }
+
+}
+
+function slapd_weekly {
+    true
+}
+
+function slapd_monthly {
+    true
+}

@@ -13,6 +13,7 @@ export DESTDIR_LDAP=$(shell pwd)/debian/snt-backup-ldap
 export DESTDIR_PGSQL=$(shell pwd)/debian/snt-backup-pgsql
 export DESTDIR_DEBIAN=$(shell pwd)/debian/snt-backup-debian
 export DESTDIR_SVN=$(shell pwd)/debian/snt-backup-svn
+export DESTDIR_SLAPD=$(shell pwd)/debian/snt-backup-slapd
 
 build: build-stamp
 build-stamp:
@@ -208,6 +209,32 @@ install: build
 		install -o root -g root -m 0755 -p root/$$file $(DESTDIR)/$$file; \
 	done
 
+
+
+	### snt-backup-slapd
+	install -o root -g root -m 0755 -d $(DESTDIR_SLAPD)/etc/snt-backup/slapd
+	install -o root -g root -m 0755 -d $(DESTDIR_SLAPD)/usr/lib/snt-backup/plugins
+	install -o root -g root -m 0755 -d $(DESTDIR_SLAPD)/var/cache/snt-backup/slapd
+
+	# executable scripts
+	for file in \
+		./usr/lib/snt-backup/plugins/slapd; \
+	do \
+		install -o root -g root -m 0755 -p root/$$file $(DESTDIR_SLAPD)/$$file; \
+	done
+
+	# config files & libraries
+	for file in \
+		./etc/snt-backup/slapd/slapd.conf; \
+	do \
+		install -o root -g root -m 0644 -p root/$$file $(DESTDIR_SLAPD)/$$file; \
+	done
+
+	for file in \
+		./etc/snt-backup/slapd/slapd.secret; \
+	do \
+		install -o root -g root -m 0600 -p root/$$file $(DESTDIR_SLAPD)/$$file; \
+	done
 
 binary-indep: build install
 

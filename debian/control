@@ -9,7 +9,7 @@ Package: snt-backup
 Architecture: all
 Depends: bash, tar, sed, debianutils, ${misc:Depends}
 Recommends: openssl, libdigest-md5-perl
-Suggests: snt-backup-files, snt-backup-debian, snt-backup-mysql, snt-backup-pgsql
+Suggests: snt-backup-files, snt-backup-debian, snt-backup-mysql, snt-backup-pgsql, snt-backup-slapd
 Description: SNT backup scripts
  SNT backup scripts
 
@@ -52,7 +52,13 @@ Description: SNT backup scripts ldap support
 
 Package: snt-backup-pgsql
 Architecture: all
-Depends: snt-backup, postgresql-client 
+Depends: snt-backup, postgresql-client
 Description: SNT backup scripts pgsql support
  SNT backup script for dumping pgsql tables
- 
+
+Package: snt-backup-slapd
+Architecture: all
+Depends: snt-backup, ldap-utils
+Description: SNT backup scripts slapd support
+ SNT backup script for dumping slapd directories
+
