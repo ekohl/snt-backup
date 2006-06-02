@@ -52,7 +52,7 @@ Description: SNT backup scripts ldap support
 
 Package: snt-backup-pgsql
 Architecture: all
-Depends: snt-backup, postgresql-client
+Depends: snt-backup, postgresql-client | postgresql-client-8.1
 Description: SNT backup scripts pgsql support
  SNT backup script for dumping pgsql tables
 
