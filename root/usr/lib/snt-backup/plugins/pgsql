@@ -26,9 +26,15 @@ function pgsql_backup {
 
 	TOFILE="pgsql_${DATEFIX}.sql"
 
-	"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
-		su postgres -c '/usr/lib/postgresql/bin/pg_dumpall -g' $COMPRESS $ENCRYPT \
-		|| { touch "${SNAPSHOTDIR}/error"; echo 'pgsql dump failed.'; }
+	if [ -x '/usr/lib/postgresql/bin/pg_dumpall' ]; then
+		"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
+			su postgres -c '/usr/lib/postgresql/bin/pg_dumpall -g' $COMPRESS $ENCRYPT \
+			|| { touch "${SNAPSHOTDIR}/error"; echo 'pgsql dump failed.'; }
+	elif [ -x '/usr/lib/postgresql/8.1/bin/pg_dumpall' ]; then
+		"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
+			su postgres -c '/usr/lib/postgresql/8.1/bin/pg_dumpall -g' $COMPRESS $ENCRYPT \
+			|| { touch "${SNAPSHOTDIR}/error"; echo 'pgsql dump failed.'; }
+	fi
 }
 
 #

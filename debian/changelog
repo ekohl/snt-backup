@@ -1,3 +1,10 @@
+snt-backup (2.1-18) stable; urgency=low
+
+  * postgresql-8.1 has its binaries in /usr/lib/postgresql/8.1/bin.
+    Added extra check.
+
+ -- Bas van Sisseren <bas@champignon.inhetmidden.nl>  Tue,  6 Jun 2006 09:14:19 +0200
+
 snt-backup (2.1-17) stable; urgency=low
 
   * Fixed postgres dependencies.
