@@ -1,0 +1,7 @@
+Template: snt-backup-server/backup_location
+Type: string
+Default: /backups
+Description: Waar worden de backups neergezet?
+ Om netjes oude backups weg te kunnen gooien moet het script
+ wel weten waar clients hun backups neerpoten.
+

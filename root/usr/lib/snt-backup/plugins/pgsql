@@ -15,7 +15,11 @@ function pgsql_backup {
 				echo "Dumping pgsql database: '${PGSQL_DB}'";
 				export PGSQL_DB
 
-				TOFILE="pgsql_${DATEFIX}_${PGSQL_DB}.sql"
+				if [ "${HOSTNAME_TAG}x" == "x" ]; then 
+				    TOFILE="pgsql_${DATEFIX}_${PGSQL_DB}.sql"
+				else
+				    TOFILE="pgsql_${DATEFIX}_${HOSTNAME_TAG}_${PGSQL_DB}.sql"
+				fi
 
 				"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
 					su postgres -c '/usr/bin/pg_dump "${PGSQL_DB}"' $COMPRESS $ENCRYPT \
@@ -24,7 +28,11 @@ function pgsql_backup {
 		done
 	) 
 
-	TOFILE="pgsql_${DATEFIX}.sql"
+	if [ "${HOSTNAME_TAG}x" == "x" ]; then 
+	    TOFILE="pgsql_${DATEFIX}.sql"
+	else
+	    TOFILE="pgsql_${DATEFIX}_${HOSTNAME_TAG}.sql"
+	fi
 
 	if [ -x '/usr/lib/postgresql/bin/pg_dumpall' ]; then
 		"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \

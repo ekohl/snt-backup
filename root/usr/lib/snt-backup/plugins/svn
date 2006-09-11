@@ -61,7 +61,12 @@ function svn_run_dump {
 		;;
 	esac
 	
-	SVNFILE="${TODIR}/svn_${DATEFIX}_${CONVNAME}_${TYPE}"
+	if [ "${HOSTNAME_TAG}x" == "x" ]; then
+	    SVNFILE="${TODIR}/svn_${DATEFIX}_${CONVNAME}_${TYPE}"
+	else	
+	    SVNFILE="${TODIR}/svn_${DATEFIX}_${HOSTNAME_TAG}_${CONVNAME}_${TYPE}"
+	fi
+
 
 	# het bouwen van de tar zelf
 

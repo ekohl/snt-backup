@@ -9,7 +9,6 @@ export DESTDIR=$(shell pwd)/debian/tmp
 export DESTDIR_SERVER=$(shell pwd)/debian/snt-backup-server
 export DESTDIR_FILES=$(shell pwd)/debian/snt-backup-files
 export DESTDIR_MYSQL=$(shell pwd)/debian/snt-backup-mysql
-export DESTDIR_LDAP=$(shell pwd)/debian/snt-backup-ldap
 export DESTDIR_PGSQL=$(shell pwd)/debian/snt-backup-pgsql
 export DESTDIR_DEBIAN=$(shell pwd)/debian/snt-backup-debian
 export DESTDIR_SVN=$(shell pwd)/debian/snt-backup-svn
@@ -111,27 +110,6 @@ install: build
 	done
 
 
-	### snt-backup-ldap
-	install -o root -g root -m 0755 -d $(DESTDIR_LDAP)/etc/snt-backup/ldap
-	install -o root -g root -m 0755 -d $(DESTDIR_LDAP)/usr/lib/snt-backup/plugins
-	install -o root -g root -m 0755 -d $(DESTDIR_LDAP)/var/cache/snt-backup/ldap
-
-	# executable scripts
-	for file in \
-		./usr/lib/snt-backup/plugins/ldap; \
-	do \
-		install -o root -g root -m 0755 -p root/$$file $(DESTDIR_LDAP)/$$file; \
-	done
-
-	# config files & libraries
-	for file in \
-		./etc/snt-backup/ldap/ldap.conf; \
-	do \
-		install -o root -g root -m 0600 -p root/$$file $(DESTDIR_LDAP)/$$file; \
-	done
-
-
-
 	### snt-backup-mysql
 	install -o root -g root -m 0755 -d $(DESTDIR_MYSQL)/etc/snt-backup/mysql
 	install -o root -g root -m 0755 -d $(DESTDIR_MYSQL)/usr/lib/snt-backup/plugins
@@ -197,19 +175,31 @@ install: build
 		install -o root -g root -m 0644 -p root/$$file $(DESTDIR_DEBIAN)/$$file; \
 	done
 
-
 	### snt-backup-server
-	install -o root -g root -m 0755 -d $(DESTDIR)/usr/lib/snt-backup/sbin
+	install -o root -g root -m 0755 -d $(DESTDIR_SERVER)/usr/lib/snt-backup/sbin
+	install -o root -g root -m 0755 -d $(DESTDIR_SERVER)/etc/snt-backup/server
 
 	# executable scripts
 	for file in \
+		./usr/lib/snt-backup/sbin/checkfile.sh \
+		./usr/lib/snt-backup/sbin/clean_md5.sh \
 		./usr/lib/snt-backup/sbin/cleanup.sh \
-		./usr/lib/snt-backup/sbin/cleanup.pl; \
+		./usr/lib/snt-backup/sbin/cleanup.pl \
+		./usr/lib/snt-backup/sbin/disk_full.pl \
+		./usr/lib/snt-backup/sbin/list_md5.sh \
+		./usr/lib/snt-backup/sbin/rmt-server.pl \
+		./usr/lib/snt-backup/sbin/sh \
+		./usr/lib/snt-backup/sbin/ssh_command; \
 	do \
-		install -o root -g root -m 0755 -p root/$$file $(DESTDIR)/$$file; \
+		install -o root -g root -m 0755 -p root/$$file $(DESTDIR_SERVER)/$$file; \
 	done
 
-
+	# config files & libraries
+	for file in \
+		./etc/snt-backup/server/server.conf; \
+	do \
+		install -o root -g root -m 0644 -p root/$$file $(DESTDIR_SERVER)/$$file; \
+	done
 
 	### snt-backup-slapd
 	install -o root -g root -m 0755 -d $(DESTDIR_SLAPD)/etc/snt-backup/slapd

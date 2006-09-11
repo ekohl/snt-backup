@@ -48,23 +48,31 @@ close F;
 
 # voer deze lijst in..
 foreach my $file (@list) {
-	chomp $file;
+    	chomp $file;
 	$file =~ s|^\./||s;
 	next if ($file =~ /\.(report|list|error|errors)$/s);
-	next unless ($file =~ /^([^_]+)_([^_]+_[^_]+)_(.*)$/s);
-	my ($module, $date, $path) = ($1, $2, $3);
-	my $type = 'full';
-	if ($module eq 'files') {
-		($type) = ($path =~ /_([^_.]+)\.tar(\.(gz|bz2))?(\.enc)?$/s);
-		$path =~ s/_([^_.]+)\.tar(\.(gz|bz2))?(\.enc)?$//s;
-	} elsif ($module eq 'svn') {
-		($type) = ($path =~ /_([^_.]+)\.(gz|bz2)(\.enc)?$/s);
-		$path =~ s/_([^_.]+)\.(gz|bz2)(\.enc)?$//s;
-	} elsif ($module eq 'debian') {
-		($type) = ($path =~ /_([^_.]+)(\.(gz|bz2))?(\.enc)?$/s);
-		$type = 'incr' if $type eq 'diff';
-		$path =~ s/_([^_.]+)(\.(gz|bz2))?(\.enc)?$//s;
+       
+	my ($module, $date, $path, $type);
+	$path = "unset";
+	$type = 'full';
+	
+	if ($file =~ /^([^_]+)_(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})\..*$/s) {
+		($module, $date) = ($1, $2);
 	}
+	elsif ($file =~ /^([^_]+)_(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})_([^.]+)\..*$/s) {
+		($module, $date) = ($1, $2);
+		$path = $3;
+	}
+	else {
+#		print STDERR "Warning: $file does not match naming convention; skipped\n"
+		next;
+	}
+	
+	# Destilleer een eventueel backup type
+	if ($path =~ /(.*)_(full|incr|diff)$/) {
+		($path, $type) = ($1, $2);
+	}
+
 	$data{$module}{$path}{$date} = {
 		file => $file,
 		type => $type,

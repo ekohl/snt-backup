@@ -4,8 +4,10 @@
 # 
 # Author:        Rien Broekstra <rien@rename-it.nl>
 #
-# Version:       0.2 28-May-2006
+# Version:       0.21 28-May-2006
 #
+# Changelog:     0.21 -- Rien Broekstra 08-Sep-2006 
+#                The slapd plugin now includes a path and type specification in the backup filename
 
 . "${CONFDIR}/slapd/slapd.conf"
 . "${CONFDIR}/slapd/slapd.secret"
@@ -14,8 +16,22 @@ function slapd_backup {
 
     echo "Dumping LDAP directory: ${LDAP_BASE}";
 
-    TOFILE="slapd_${DATEFIX}.ldif"
-    
+    if [ "${LDAP_BASE}x" = "x" ]; then
+	touch "${SNAPSHOTDIR}/error"; 
+	echo 'Error: LDAP_BASE is not set.';
+        echo 'slapd dump failed.';
+        return;
+    fi;
+
+    local LDAP_BASE_FILENAME=`echo ${LDAP_BASE} | tr _ - `;
+
+    local TOFILE
+    if [ "${HOSTNAME_TAG}x" == "x" ]; then
+	TOFILE="slapd_${DATEFIX}_${LDAP_BASE_FILENAME}_full.ldif"
+    else
+	TOFILE="slapd_${DATEFIX}_${HOSTNAME_TAG}_${LDAP_BASE_FILENAME}_full.ldif"
+    fi
+
     # FIXME: Allow for sasl authentication
     # The binddn needs read access to everything you want to backup from the LDAP directory
     "${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \

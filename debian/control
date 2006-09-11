@@ -44,12 +44,6 @@ Depends: snt-backup, mysql-client
 Description: SNT backup scripts mysql support
  SNT backup script for dumping mysql tables
 
-Package: snt-backup-ldap
-Architecture: all
-Depends: snt-backup, ldap-utils
-Description: SNT backup scripts ldap support
- SNT backup script for dumping ldap databases
-
 Package: snt-backup-pgsql
 Architecture: all
 Depends: snt-backup, postgresql-client | postgresql-client-8.1

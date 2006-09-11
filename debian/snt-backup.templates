@@ -66,3 +66,25 @@ Description: Waar moeten de backups heen
  backuppen, biedt SNT dit nog niet aan. Mocht je dit wel willen,
  laat het ons even weten)
 
+Template: snt-backup/hostname_tag
+Type: string
+Description: Hostname tag
+ Indien je nu of in de toekomst meerdere systemen wilt backuppen,
+ maar slechts beschikt over 1 backup account, kun je snt-backup 
+ een tag aan de bestandsnamen laten toevoegen. Dit zorgt er voor 
+ dat je aan de bestandsnaam kunt herkennen van welk systeem de 
+ backup afkomstig is.
+
+Template: snt-backup/explicit_plugin_activation
+Type: multiselect
+Choices: debian, files, ldap, mysql, pgsql, slapd, svn
+Description: Plugins expliciet activeren?
+ Je kunt bepaalde plugins expliciet activeren. Als je een of meer
+ plugins expliciet activeert, zal snt-backup alleen die plugins 
+ gaan uitvoeren. Indien expliciet geactiveerde plugins niet 
+ geinstalleerd zijn wordt dan een foutmelding gegenereerd.
+ .
+ Indien je geen plugins expliciet activeert, dan zal snt-backup
+ automatisch detecteren welke plugins beschikbaar zijn, en alle
+ beschikbare plugins uitvoeren. 
+ 

@@ -6,6 +6,10 @@ export IDENTITY="${CONFDIR}/id_dsa"
 export SNAPSHOTDIR='/var/cache/snt-backup'
 export DATEFIX="`date +%Y-%m-%d_%H-%M-%S`"
 export TODIR='user@example.com:/'
+export HOSTNAME_TAG=''
+
+## Explicit plugin activation (None==autodetect)
+export LOAD_PLUGINS=''
 
 ## Compression
 #(gzip)

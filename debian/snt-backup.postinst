@@ -37,6 +37,14 @@ if [ "_$RET" = "_true" ]; then
     echo "export DATEFIX=\"\`date +%Y-%m-%d_%H-%M-%S\`\""
     db_get snt-backup/location
     echo "export TODIR='$RET'"
+    db_get snt-backup/hostname_tag
+    echo "export HOSTNAME_TAG='$RET'"
+    echo
+    echo "## Explicit plugin activation (None==autodetect)"
+    db_get snt-backup/explicit_plugin_activation
+    PLUGINS=`echo $RET | sed 's/, / /g'`
+    echo "export LOAD_PLUGINS='$PLUGINS'"
+    echo
     echo
     echo "## Compression"
     db_get snt-backup/use_compression

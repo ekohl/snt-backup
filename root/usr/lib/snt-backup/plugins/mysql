@@ -20,7 +20,11 @@ function mysql_backup {
 			then
 				echo "Dumping mysql database: '${MYSQL_DB}'"
 				
-				TOFILE="mysql_${DATEFIX}_${MYSQL_DB}.sql"
+				if [ "${HOSTNAME_TAG}x" == "x" ]; then
+				    TOFILE="mysql_${DATEFIX}_${MYSQL_DB}.sql"
+				else
+				    TOFILE="mysql_${DATEFIX}_${HOSTNAME_TAG}_${MYSQL_DB}.sql"
+				fi
 
 				"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
 					mysqldump --defaults-extra-file="${CONFDIR}/mysql/mysql.conf" \

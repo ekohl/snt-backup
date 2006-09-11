@@ -18,12 +18,20 @@ function debian_backup {
 
 		if [ "${type}" == "diff" ]
 		then
-			TOFILE="debian_${DATEFIX}_pkglist_diff"
+		        if [ "${HOSTNAME_TAG}x" == "x" ]; then 
+			        TOFILE="debian_${DATEFIX}_pkglist_diff" 
+			else 
+			        TOFILE="debian_${DATEFIX}_${HOSTNAME_TAG}_pkglist_diff" 
+			fi
 			diff "${SNAPSHOTDIR}/debian/pkglist.full" \
 				"${SNAPSHOTDIR}/debian/pkglist.new" > \
 				"${SNAPSHOTDIR}/debian/${TOFILE}"
 		else
-			TOFILE="debian_${DATEFIX}_pkglist_incr"
+			if [ "${HOSTNAME_TAG}x" == "x" ]; then 
+			        TOFILE="debian_${DATEFIX}_pkglist_incr" 
+			else 
+			        TOFILE="debian_${DATEFIX}_${HOSTNAME_TAG}_pkglist_incr" 
+			fi
 			diff "${SNAPSHOTDIR}/debian/pkglist" \
 				"${SNAPSHOTDIR}/debian/pkglist.new" > \
 				"${SNAPSHOTDIR}/debian/${TOFILE}"
@@ -37,7 +45,12 @@ function debian_backup {
 		cp "${SNAPSHOTDIR}/debian/pkglist" \
 			"${SNAPSHOTDIR}/debian/pkglist.full"
 
-		TOFILE="debian_${DATEFIX}_pkglist_full"
+		if [ "${HOSTNAME_TAG}x" == "x" ]; then 
+		        TOFILE="debian_${DATEFIX}_pkglist_full" 
+		else 
+		        TOFILE="debian_${DATEFIX}_${HOSTNAME_TAG}_pkglist_full" 
+		fi
+
 		cp "${SNAPSHOTDIR}/debian/pkglist" \
 			"${SNAPSHOTDIR}/debian/${TOFILE}"
 	fi

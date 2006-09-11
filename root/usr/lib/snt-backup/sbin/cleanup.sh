@@ -1,29 +1,20 @@
 #! /bin/sh
 
-cd /backups || exit 1
+export BASEDIR='/usr/lib/snt-backup'
+export CONFDIR='/etc/snt-backup'
 
-cat << _EOF_
-Voor degenen die dit lezen,
+. ${CONFDIR}/server/server.conf
 
-Ik heb een script geschreven dat oude backup files weggooit.
-Output van dit script wordt nu via deze cron-mail naar jou,
-root, toe gestuurd, om te kunnen controleren of de backup
-cleanups naar behoren draaien.
+if [ "${BACKUP_LOCATION}x" = "x" ]; then BACKUP_LOCATION='/backups'; fi
 
-Bas van Sisseren
-------------------------------------------------------------
-_EOF_
+cd ${BACKUP_LOCATION} || exit 1
 
 for i in */backups
 do
 	(
-		echo "Cleaning $i..."
-		cd "$i" &&
-		/backups/bin/cleanup.pl
+	        if [ ! -e "${i}/CLEANUP_DISABLE" ]; then 
+  		        #echo "Cleaning $i..."
+		        cd "$i" && /backups/bin/cleanup.pl
+		fi
 	)
 done
-echo '------------------------------------------------------------'
-echo
-echo '-- '
-echo 'Real men don'\''t use backups, they post their stuff on a public'
-echo 'ftp server and let the rest of the world make copies.'

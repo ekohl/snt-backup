@@ -1,3 +1,13 @@
+snt-backup (2.1-19) stable; urgency=low
+  
+  * Added option to explicitly activate backup plugins (as alternative to autodetection)
+  * Added option to add hostname tag to backup filenames
+  * slapd plugin now specifies the ldap tree name in the filename
+  * Modified cleanup.pl: it now understands all filenames produced by all backup plugins
+  * location where the cleanup cleans is now configurable
+	
+ -- Rien Broekstra <rien@rename-it.nl>  Mon,  11 Sep 2006 13:21:22 +0200
+	
 snt-backup (2.1-18) stable; urgency=low
 
   * postgresql-8.1 has its binaries in /usr/lib/postgresql/8.1/bin.

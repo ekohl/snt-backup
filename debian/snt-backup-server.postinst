@@ -1,0 +1,27 @@
+#!/bin/sh
+
+set -e
+
+action=$1
+oldversion=$2
+
+export sntbackuppostinstisrunning=true
+# Source debconf library.
+. /usr/share/debconf/confmodule
+db_version 2.0
+
+# use debconf
+db_get snt-backup/use_debconf
+
+if [ "_$RET" = "_true" ]; then
+  {
+      db_get snt-backup-server/backup_location
+      echo "BACKUP_LOCATION='$RET'"
+  } > /etc/snt-backup/server/server.conf.new
+
+  if [ -f /etc/snt-backup/server/server.conf ]; then
+    mv -f /etc/snt-backup/server/server.conf /etc/snt-backup/server/server.conf.old
+  fi
+  mv -f /etc/snt-backup/server/server.conf.new /etc/snt-backup/server/server.conf
+
+fi

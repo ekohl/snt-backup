@@ -81,8 +81,12 @@ function run_dump {
 		;;
 	esac
 	
-	TARFILE="${TODIR}/files_${DATEFIX}_${CONVNAME}_${TYPE}.tar"
-
+	if [ "${HOSTNAME_TAG}x" = "x" ]; then 
+	    TARFILE="${TODIR}/files_${DATEFIX}_${CONVNAME}_${TYPE}.tar"
+	else 
+	    TARFILE="${TODIR}/files_${DATEFIX}_${HOSTNAME_TAG}_${CONVNAME}_${TYPE}.tar"
+	fi
+	    
 	# het bouwen van de tar zelf
 
 	# nu vraag je je vast af.. waarom moet die './' nu weer zo nodig
