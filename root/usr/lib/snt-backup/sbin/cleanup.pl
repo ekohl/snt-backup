@@ -64,7 +64,7 @@ foreach my $file (@list) {
 		$path = $3;
 	}
 	else {
-#		print STDERR "Warning: $file does not match naming convention; skipped\n"
+#		print STDERR "Warning: $file does not match naming convention; skipped\n";
 		next;
 	}
 	

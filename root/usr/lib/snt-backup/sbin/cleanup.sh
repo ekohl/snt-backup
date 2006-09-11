@@ -14,7 +14,7 @@ do
 	(
 	        if [ ! -e "${i}/CLEANUP_DISABLE" ]; then 
   		        #echo "Cleaning $i..."
-		        cd "$i" && /backups/bin/cleanup.pl
+		        cd "$i" && ${BASEDIR}/sbin/cleanup.pl
 		fi
 	)
 done
