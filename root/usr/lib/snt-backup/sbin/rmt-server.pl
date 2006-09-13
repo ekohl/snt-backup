@@ -86,7 +86,7 @@ sub deviceWrite {
 
 		unless (defined $len) {
 			# tijdelijk disk vol?
-			system "/backups/bin/disk_full.pl";
+			system "/usr/lib/snt-backup/sbin/disk_full.pl";
 			sleep 5;
 			next;
 		}
@@ -220,7 +220,7 @@ foreach my $file (@files) {
 		sysopen STDIN, "/dev/null", O_RDONLY;
 		sysopen STDOUT, "/dev/null", O_WRONLY;
 		sysopen STDERR, "/dev/null", O_WRONLY;
-		system("/backups/bin/checkfile.sh", $file);
+		system("/usr/lib/snt-backup/sbin/checkfile.sh", $file);
 	}
 }
 

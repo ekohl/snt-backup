@@ -1,3 +1,9 @@
+snt-backup (2.1-20) stable; urgency=low
+  
+  * rmt-server.pl, sh and ssh_command now work from /usr/lib/snt-backup/sbin
+
+ -- Rien Broekstra <rien@rename-it.nl>  Mon,  13 Sep 2006 14:38:02 +0200
+
 snt-backup (2.1-19) stable; urgency=low
   
   * Added option to explicitly activate backup plugins (as alternative to autodetection)
