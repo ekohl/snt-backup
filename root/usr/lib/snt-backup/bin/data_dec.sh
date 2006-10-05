@@ -17,7 +17,7 @@ dd bs=$(( $KEYSIZE / 8 )) count=1 2> /dev/null |
 	openssl rsautl -inkey "$RSAKEY" -decrypt > "$BF_KEY"
 
 # decrypt data
-openssl dec -d -bf-cbc -pass file:"$BF_KEY" -salt
+openssl enc -d -bf-cbc -pass file:"$BF_KEY" -salt
 
 # cleanup
 rm -f "$BF_KEY"
