@@ -4,9 +4,11 @@
 # 
 # Author:        Rien Broekstra <rien@rename-it.nl>
 #
-# Version:       0.21 28-May-2006
+# Version:       0.22 07-Oct-2006
 #
-# Changelog:     0.21 -- Rien Broekstra 08-Sep-2006 
+# Changelog:     0.22 -- Rien Broekstra 07-Oct-2006
+#                Bugfix: filename now no longer includes = , and _ in the wrong place
+#                0.21 -- Rien Broekstra 08-Sep-2006 
 #                The slapd plugin now includes a path and type specification in the backup filename
 
 . "${CONFDIR}/slapd/slapd.conf"
@@ -23,9 +25,12 @@ function slapd_backup {
         return;
     fi;
 
-    local LDAP_BASE_FILENAME=`echo ${LDAP_BASE} | tr _ - `;
-
     local TOFILE
+    # Even wat tekentjes vervangen waarvan we in de war raken als ze in een filename staan
+    local LDAP_BASE_FILENAME=`echo ${LDAP_BASE} | tr _ - `;
+    LDAP_BASE_FILENAME=`echo ${LDAP_BASE_FILENAME} | tr = - `;
+    LDAP_BASE_FILENAME=`echo ${LDAP_BASE_FILENAME} | tr , - `;
+
     if [ "${HOSTNAME_TAG}x" == "x" ]; then
 	TOFILE="slapd_${DATEFIX}_${LDAP_BASE_FILENAME}_full.ldif"
     else

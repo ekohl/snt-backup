@@ -77,7 +77,7 @@ Description: Hostname tag
 
 Template: snt-backup/explicit_plugin_activation
 Type: multiselect
-Choices: debian, files, ldap, mysql, pgsql, slapd, svn
+Choices: debian, files, mysql, pgsql, slapd, svn
 Description: Plugins expliciet activeren?
  Je kunt bepaalde plugins expliciet activeren. Als je een of meer
  plugins expliciet activeert, zal snt-backup alleen die plugins 

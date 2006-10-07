@@ -164,7 +164,7 @@ foreach my $module (keys %data) {
 
 		# verwijder niet-interessante onderdelen
 		foreach my $date (sort keys %{$data{$module}{$path}}) {
-			print "rm " . $data{$module}{$path}{$date}{'file'} . "\n";
+#			print "rm " . $data{$module}{$path}{$date}{'file'} . "\n";
 			if (! $flag_no_act) {
 				unlink $data{$module}{$path}{$date}{'file'};
 				unlink $data{$module}{$path}{$date}{'file'}.'.report';

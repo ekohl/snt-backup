@@ -1,3 +1,11 @@
+snt-backup (2.1-21) stable; urgency=low
+  
+  * fixed a bug in slapd plugin
+  * Removed the useless choice 'ldap' from debconf 'explicit plugin activation' dialog
+  * cleanup.pl no longer prints 'rm blah'. I.e. it only prints when something goes wrong.
+	
+ -- Rien Broekstra <rien@rename-it.nl>  Sat,  07 Oct 2006 14:07:51 +0200
+
 snt-backup (2.1-20) stable; urgency=low
   
   * rmt-server.pl, sh and ssh_command now work from /usr/lib/snt-backup/sbin
