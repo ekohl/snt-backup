@@ -1,0 +1,29 @@
+#! /bin/bash
+# (al is 't alleen maar om m'n syntax highlighting goed te krijgen.. [BvS])
+
+# lib_ldap			- de backup-scripts voor ldap
+###############################################################################
+
+#
+# ldap_backup - maak een backup van alle ldap databases
+#
+function slapcat_backup {
+	echo "Dumping ldap database"
+	TOFILE="ldap_${DATEFIX}.ldap"
+
+	"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
+		echo "${ldap_passwd}" \| /usr/sbin/slapcat -d 0 $COMPRESS $ENCRYPT \
+		|| { touch "${SNAPSHOTDIR}/error"; echo 'ldap backup failed.'; }
+}
+
+#
+# clean_ldap - ruimt tijdelijke bestanden op. wordt eens per week of maand
+#               aangeroepen.
+#
+function slapcat_weekly {
+	true
+}
+
+function slapcat_monthly {
+	true
+}
