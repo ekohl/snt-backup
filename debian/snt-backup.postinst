@@ -58,12 +58,22 @@ if [ "_$RET" = "_true" ]; then
     fi
     echo
     echo "#(bzip)"
-    if [ "_$RET" = "_bzip2" ]; then
-      echo "export COMPRESS='| /usr/bin/bzip2 -9'"
-      echo "export C_TAG='.bz2'"
+    if [ -x '/usr/bin/bzip2' ]; then
+      if [ "_$RET" = "_bzip2" ]; then
+        echo "export COMPRESS='| /usr/bin/bzip2 -9'"
+        echo "export C_TAG='.bz2'"
+      else
+        echo "#export COMPRESS='| /usr/bin/bzip2 -9'"
+        echo "#export C_TAG='.bz2'"
+      fi
     else
-      echo "#export COMPRESS='| /usr/bin/bzip2 -9'"
-      echo "#export C_TAG='.bz2'"
+      if [ "_$RET" = "_bzip2" ]; then
+        echo "export COMPRESS='| /bin/bzip2 -9'"
+        echo "export C_TAG='.bz2'"
+      else
+        echo "#export COMPRESS='| /bin/bzip2 -9'"
+        echo "#export C_TAG='.bz2'"
+      fi
     fi
     echo
     echo "## Encryption"

@@ -36,8 +36,13 @@ if [ -d /etc/backups/conf ] && [ ! -d /etc/snt-backup ]; then
       echo "export C_TAG='.gz'"
       echo
       echo "#(bzip)"
-      echo "#export COMPRESS='| /usr/bin/bzip2 -9'"
-      echo "#export C_TAG='.bz2'"
+      if [ -x '/usr/bin/bzip2' ]; then
+        echo "#export COMPRESS='| /usr/bin/bzip2 -9'"
+        echo "#export C_TAG='.bz2'"
+      else
+        echo "#export COMPRESS='| /bin/bzip2 -9'"
+        echo "#export C_TAG='.bz2'"
+      fi
       echo
       echo "## Encryption"
       echo "#(openssl wrapper)"

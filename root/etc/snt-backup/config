@@ -17,7 +17,7 @@ export COMPRESS='| /bin/gzip -9n'
 export C_TAG='.gz'
 
 #(bzip)
-#export COMPRESS='| /usr/bin/bzip2 -9'
+#export COMPRESS='| /bin/bzip2 -9'
 #export C_TAG='.bz2'
 
 ## Encryption
