@@ -1,3 +1,9 @@
+snt-backup (2.1-22) stable; urgency=low
+  
+  * cleanup.pl now has the --report option, which will output the report of every new backup to stdout
+		
+ -- Rien Broekstra <rien@rename-it.nl>  Sat,  07 Oct 2006 14:07:51 +0200
+
 snt-backup (2.1-21) stable; urgency=low
   
   * fixed a bug in slapd plugin
