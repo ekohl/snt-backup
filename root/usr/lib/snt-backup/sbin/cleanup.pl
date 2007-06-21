@@ -20,6 +20,7 @@ my $today = "";
 # flags
 my $flag_no_act = 0;
 my $flag_verbose = 0;
+my $flag_report = 0;
 
 while (@ARGV) {
 	my $param = shift;
@@ -27,6 +28,8 @@ while (@ARGV) {
 		$flag_no_act = 1;
 	} elsif ($param eq '-v' || $param eq '--verbose') {
 		$flag_verbose = 1;
+	} elsif ($param eq '-r' || $param eq '--report') {
+		$flag_report = 1;
 	} else {
 		die "Usage: $0 [-d] [-v]\n";
 	}
@@ -97,9 +100,18 @@ foreach my $module (keys %data) {
 		# keys, sorted..
 		my @dates = sort keys %{$data{$module}{$path}};
 
-		if ((@dates) && ($dates[-1] !~ /^$today/)) {
-			print "GEEN backup van vandaag voor $module $path! (laatste backup: ".$dates[-1].")\n";
-		}
+                if ((@dates) && ($dates[-1] !~ /^$today/)) {
+                    print "----------------------------------------------------------------------------\n";
+                    print "Backup rapport voor $module $path ".$dates[-1].":\n";
+                    print "GEEN backup van vandaag voor $module $path! (laatste backup: ".$dates[-1].")\n";
+                }
+                elsif ($flag_report) {
+                    print "----------------------------------------------------------------------------\n";
+                    print "Backup rapport voor $module $path ".$dates[-1].":\n";
+                    open REPORT, $data{$module}{$path}{$dates[-1]}{'file'}.'.report';
+                    my @report = <REPORT>;
+                    print @report;
+                }
 
 		# zoek eerst de belangrijke files uit
 		my @full_backups = ();
