@@ -59,8 +59,8 @@ function mysql_backup {
 
     fi
 
-    LOG_BIN_BASENAME=`mysqld --verbose --help | egrep ^'log-bin ' | tr -s ' ' | cut -d' ' -f 2`
-    DATA_DIR=`mysqld --verbose --help | egrep ^'datadir ' | tr -s ' ' | cut -d' ' -f 2`
+    LOG_BIN_BASENAME=`/usr/sbin/mysqld --verbose --help | egrep ^'log-bin ' | tr -s ' ' | cut -d' ' -f 2`
+    DATA_DIR=`/usr/sbin/mysqld --verbose --help | egrep ^'datadir ' | tr -s ' ' | cut -d' ' -f 2`
 
     # Mysqld outputs '(No default value)' if log-bin is not set. Since
     # we cut on spaces we match with '(No' to check whether log-bin is
@@ -72,7 +72,7 @@ function mysql_backup {
     # basename, and log-bin as an absolute path.
     # FIXME: mysqld forgets the extension if it is specified. So
     # should we.
-    if [ "${LOG_BIN_BASENAME}x" != '(Nox' ]; then
+    if [ "${LOG_BIN_BASENAME}x" != '(Nox' -a "${LOG_BIN_BASENAME}x" != 'x' ]; then
 	
 	# Binary logging is enabled; Backup all binary logs.
 	
@@ -82,7 +82,7 @@ function mysql_backup {
 	    TARFILE="${TODIR}/mysql_${DATEFIX}_${HOSTNAME_TAG}_binlogs.tar"
 	fi
 	
-	echo "Dumping mysql binary logs: "	
+	echo "Dumping mysql binary logs"	
         "${BASEDIR}/bin/rmt-client.pl" "${TARFILE}${C_TAG}${E_TAG}" tar -C / --ignore-failed-read --create --file - --blocking-factor=1 -P "${DATA_DIR}/${LOG_BIN_BASENAME}"* $COMPRESS $ENCRYPT || { touch "${SNAPSHOTDIR}/error"; echo 'mysql backup failed.'; }
 	
     fi
