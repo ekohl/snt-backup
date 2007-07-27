@@ -96,16 +96,23 @@ rm -f "${SNAPSHOTDIR}/error"
 	2> "${SNAPSHOTDIR}/${DATEFIX}-stderr"
 
 # is de error-flag geset?
-if [ -e "${SNAPSHOTDIR}/error" -o -s "${SNAPSHOTDIR}/${DATEFIX}-stderr" ]
+if [ -e "${SNAPSHOTDIR}/error" -o -s "${SNAPSHOTDIR}/${DATEFIX}-stderr" -o "`echo ${REPORT_ALWAYS} | tr A-Z a-z`x" = "yesx" ]
 then
-	echo "Stdout:"
+        EXITVALUE=1
+
+        echo "Stdout:"
 	cat "${SNAPSHOTDIR}/${DATEFIX}-stdout"
 	echo
 	echo "Stderr:"
 	cat "${SNAPSHOTDIR}/${DATEFIX}-stderr"
+else
+    EXITVALUE=0
 fi
 
 # ruim wat troep op...
 rm -f	"${SNAPSHOTDIR}/${DATEFIX}-stdout" \
 		"${SNAPSHOTDIR}/${DATEFIX}-stderr" \
 		"${SNAPSHOTDIR}/error"
+
+# Zorg dat we kunnen detecteren als het backuppen mis is gegaan
+exit $EXITVALUE

@@ -1,8 +1,18 @@
+snt-backup (2.1-23) stable; urgency=low
+  
+  * Modified mysql plugin to allow for a dump with --all-database flag
+  * Modified mysql plugin to enable backup of binary log if they are enabled on the server
+  * Modified mysql plugin; removed explicit --opt in option list
+  * Modified lock.pl to exit with the exit value of the executed program when locking succeeded
+  * Modified /etc/cron.d/snt-backup to allow for more descriptive subjects in the report e-mails	
+	
+ -- Rien Broekstra <rien@rename-it.nl>  Sat,  27 Jul 2007 14:07:51 +0200
+
 snt-backup (2.1-22) stable; urgency=low
   
   * cleanup.pl now has the --report option, which will output the report of every new backup to stdout
 		
- -- Rien Broekstra <rien@rename-it.nl>  Sat,  07 Oct 2006 14:07:51 +0200
+ -- Rien Broekstra <rien@rename-it.nl>  Sat,  30 Jun 2007 14:07:51 +0200
 
 snt-backup (2.1-21) stable; urgency=low
   

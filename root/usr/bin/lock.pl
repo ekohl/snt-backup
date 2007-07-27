@@ -74,6 +74,9 @@ close LOCK;
 
 # call command..
 system(@ARGV);
+my $exit_value = $? >> 8;
 
 # unlock
 unlink $lockfile;
+
+exit $exit_value;
