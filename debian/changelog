@@ -1,3 +1,10 @@
+snt-backup (2.1-24) stable; urgency=low
+
+  * Add duplicity support
+  * Split snt-backup file: move binaries to snt-backup-utils
+
+ -- Bas van Sisseren <bas@snt.utwente.nl>  Fri, 28 Sep 2007 14:24:15 +0200
+
 snt-backup (2.1-23) stable; urgency=low
   
   * Modified mysql plugin to allow for a dump with --all-database flag
