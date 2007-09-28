@@ -2,9 +2,6 @@
 
 use strict;
 
-#my $backup_host  = 'apt@10.100.0.101';
-#my $backup_path  = 'backups/';
-
 my $sftp_command = '/usr/lib/snt-backup/bin/sftp';
 my $scp_command  = '/usr/lib/snt-backup/bin/scp';
 
@@ -16,6 +13,8 @@ my $debug        = 0;
 	or die "Environment variable TODIR not set (correctly).\n";
 
 my ($backup_host, $backup_path) = ($1, $2);
+$backup_path =~ s/^\/+//;
+$backup_path = 'backups_duplicity/' . $backup_path;
 
 
 #use List::MoreUtils qw/ any /;

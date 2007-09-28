@@ -1,8 +1,16 @@
+snt-backup (2.1-26) stable; urgency=low
+
+  * more bugfixes:
+    - added duplicity dependency on snt-backup-duplicity
+    - more specifically specify the destination path
+
+ -- Bas van Sisseren <bas@snt.utwente.nl>  Fri, 28 Sep 2007 15:16:44 +0200
+
 snt-backup (2.1-25) stable; urgency=low
 
   * bugfixes in the duplicity backups
 
- -- Bas van Sisseren <bas@pundit-bas.office.quarantainenet.nl>  Fri, 28 Sep 2007 14:41:47 +0200
+ -- Bas van Sisseren <bas@snt.utwente.nl>  Fri, 28 Sep 2007 14:41:47 +0200
 
 snt-backup (2.1-24) stable; urgency=low
 
@@ -18,13 +26,13 @@ snt-backup (2.1-23) stable; urgency=low
   * Modified mysql plugin; removed explicit --opt in option list
   * Modified lock.pl to exit with the exit value of the executed program when locking succeeded
   * Modified /etc/cron.d/snt-backup to allow for more descriptive subjects in the report e-mails	
-	
+
  -- Rien Broekstra <rien@rename-it.nl>  Sat,  27 Jul 2007 14:07:51 +0200
 
 snt-backup (2.1-22) stable; urgency=low
   
   * cleanup.pl now has the --report option, which will output the report of every new backup to stdout
-		
+
  -- Rien Broekstra <rien@rename-it.nl>  Sat,  30 Jun 2007 14:07:51 +0200
 
 snt-backup (2.1-21) stable; urgency=low
@@ -32,7 +40,7 @@ snt-backup (2.1-21) stable; urgency=low
   * fixed a bug in slapd plugin
   * Removed the useless choice 'ldap' from debconf 'explicit plugin activation' dialog
   * cleanup.pl no longer prints 'rm blah'. I.e. it only prints when something goes wrong.
-	
+
  -- Rien Broekstra <rien@rename-it.nl>  Sat,  07 Oct 2006 14:07:51 +0200
 
 snt-backup (2.1-20) stable; urgency=low
@@ -48,9 +56,9 @@ snt-backup (2.1-19) stable; urgency=low
   * slapd plugin now specifies the ldap tree name in the filename
   * Modified cleanup.pl: it now understands all filenames produced by all backup plugins
   * location where the cleanup cleans is now configurable
-	
+
  -- Rien Broekstra <rien@rename-it.nl>  Mon,  11 Sep 2006 13:21:22 +0200
-	
+
 snt-backup (2.1-18) stable; urgency=low
 
   * postgresql-8.1 has its binaries in /usr/lib/postgresql/8.1/bin.

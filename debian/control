@@ -35,7 +35,7 @@ Description: SNT backup scripts file
 
 Package: snt-backup-duplicity
 Architecture: all
-Depends: snt-backup
+Depends: snt-backup, duplicity
 Description: SNT backup scripts duplicity
  SNT backup script for dumping files with duplicity
 
