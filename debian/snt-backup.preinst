@@ -57,3 +57,6 @@ if [ -d /etc/backups/conf ] && [ ! -d /etc/snt-backup ]; then
   )
 fi
 
+if [ ! -f /etc/snt-backup/id_dsa -a -x /usr/bin/ssh-keygen ]; then
+	/usr/bin/ssh-keygen -C "backup key `hostname`" -f /etc/snt-backup/id_dsa -N '' -t dsa -v
+fi
