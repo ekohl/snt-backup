@@ -9,6 +9,7 @@ export DESTDIR=$(shell pwd)/debian/tmp
 export DESTDIR_UTILS=$(shell pwd)/debian/snt-backup-utils
 export DESTDIR_SERVER=$(shell pwd)/debian/snt-backup-server
 export DESTDIR_FILES=$(shell pwd)/debian/snt-backup-files
+export DESTDIR_DUPL=$(shell pwd)/debian/snt-backup-duplicity
 export DESTDIR_MYSQL=$(shell pwd)/debian/snt-backup-mysql
 export DESTDIR_PGSQL=$(shell pwd)/debian/snt-backup-pgsql
 export DESTDIR_DEBIAN=$(shell pwd)/debian/snt-backup-debian
@@ -93,6 +94,35 @@ install: build
 	done
 
 
+	### snt-backup-duplicity
+	install -o root -g root -m 0755 -d $(DESTDIR_DUPL)/etc/snt-backup/duplicity/backup_points.d
+	install -o root -g root -m 0755 -d $(DESTDIR_DUPL)/etc/snt-backup/duplicity/excludes.d
+	install -o root -g root -m 0755 -d $(DESTDIR_DUPL)/usr/lib/snt-backup/bin
+	install -o root -g root -m 0755 -d $(DESTDIR_DUPL)/usr/lib/snt-backup/plugins
+
+	# executable scripts
+	for file in \
+		./usr/lib/snt-backup/bin/duplicity.pl \
+		./usr/lib/snt-backup/plugins/duplicity; \
+	do \
+		install -o root -g root -m 0755 -p root/$$file $(DESTDIR_DUPL)/$$file; \
+	done
+
+	# config files & libraries
+	for file in \
+		./etc/snt-backup/duplicity/backup_points.d/snt-backup-duplicity.root_user \
+		./etc/snt-backup/duplicity/backup_points.d/snt-backup-duplicity.var \
+		./etc/snt-backup/duplicity/backup_points.d/snt-backup-duplicity.base \
+		./etc/snt-backup/duplicity/backup_points.d/snt-backup-duplicity.homes \
+		./etc/snt-backup/duplicity/backup_points.d/snt-backup-duplicity.opt \
+		./etc/snt-backup/duplicity/backup_points.d/snt-backup-duplicity.usr \
+		./etc/snt-backup/duplicity/backup_points.d/snt-backup-duplicity.usr_local \
+		./etc/snt-backup/duplicity/excludes.d/snt-backup-duplicity.default; \
+	do \
+		install -o root -g root -m 0644 -p root/$$file $(DESTDIR_DUPL)/$$file; \
+	done
+
+
 	### snt-backup-svn
 	install -o root -g root -m 0755 -d $(DESTDIR_SVN)/etc/snt-backup/svn
 	install -o root -g root -m 0755 -d $(DESTDIR_SVN)/usr/lib/snt-backup/bin
@@ -118,12 +148,14 @@ install: build
 
 	### snt-backup-mysql
 	install -o root -g root -m 0755 -d $(DESTDIR_MYSQL)/etc/snt-backup/mysql
+	install -o root -g root -m 0755 -d $(DESTDIR_MYSQL)/etc/snt-backup/duplicity/excludes.d
 	install -o root -g root -m 0755 -d $(DESTDIR_MYSQL)/usr/lib/snt-backup/plugins
 	install -o root -g root -m 0755 -d $(DESTDIR_MYSQL)/var/cache/snt-backup/mysql
 
 	# executable scripts
 	for file in \
-		./usr/lib/snt-backup/plugins/mysql; \
+		./usr/lib/snt-backup/plugins/mysql \
+		./etc/snt-backup/duplicity/excludes.d/snt-backup-mysql; \
 	do \
 		install -o root -g root -m 0755 -p root/$$file $(DESTDIR_MYSQL)/$$file; \
 	done
@@ -144,12 +176,14 @@ install: build
 
 	### snt-backup-pgsql
 	install -o root -g root -m 0755 -d $(DESTDIR_PGSQL)/etc/snt-backup/pgsql
+	install -o root -g root -m 0755 -d $(DESTDIR_PGSQL)/etc/snt-backup/duplicity/excludes.d
 	install -o root -g root -m 0755 -d $(DESTDIR_PGSQL)/usr/lib/snt-backup/plugins
 	install -o root -g root -m 0755 -d $(DESTDIR_PGSQL)/var/cache/snt-backup/pgsql
 
 	# executable scripts
 	for file in \
-		./usr/lib/snt-backup/plugins/pgsql; \
+		./usr/lib/snt-backup/plugins/pgsql \
+		./etc/snt-backup/duplicity/excludes.d/snt-backup-pgsql; \
 	do \
 		install -o root -g root -m 0755 -p root/$$file $(DESTDIR_PGSQL)/$$file; \
 	done
@@ -180,6 +214,7 @@ install: build
 	do \
 		install -o root -g root -m 0644 -p root/$$file $(DESTDIR_DEBIAN)/$$file; \
 	done
+
 
 	### snt-backup-server
 	install -o root -g root -m 0755 -d $(DESTDIR_SERVER)/usr/lib/snt-backup/sbin

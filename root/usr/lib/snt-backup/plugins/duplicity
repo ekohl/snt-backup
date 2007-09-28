@@ -1,0 +1,24 @@
+#! /bin/bash
+# (al is 't alleen maar om m'n syntax highlighting goed te krijgen.. [BvS])
+
+# lib_duplicity - de backup-scripts voor duplicity
+###############################################################################
+
+#
+# duplicity_backup - maak een backup via duplicity
+#
+function duplicity_backup {
+	/usr/lib/snt-backup/bin/duplicity.pl
+}
+
+#
+# clean_duplicity - ruimt tijdelijke bestanden op. wordt eens per week of maand
+#                   aangeroepen.
+#
+function duplicity_weekly {
+	true
+}
+
+function duplicity_monthly {
+	true
+}

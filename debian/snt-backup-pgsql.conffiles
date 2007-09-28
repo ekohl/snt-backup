@@ -1,1 +1,2 @@
 /etc/snt-backup/pgsql/pgsql.exclude
+/etc/snt-backup/duplicity/excludes.d/snt-backup-pgsql

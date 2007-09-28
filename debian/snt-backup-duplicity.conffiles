@@ -1,0 +1,8 @@
+/etc/snt-backup/duplicity/backup_points.d/snt-backup-duplicity.root_user
+/etc/snt-backup/duplicity/backup_points.d/snt-backup-duplicity.var
+/etc/snt-backup/duplicity/backup_points.d/snt-backup-duplicity.base
+/etc/snt-backup/duplicity/backup_points.d/snt-backup-duplicity.homes
+/etc/snt-backup/duplicity/backup_points.d/snt-backup-duplicity.opt
+/etc/snt-backup/duplicity/backup_points.d/snt-backup-duplicity.usr
+/etc/snt-backup/duplicity/backup_points.d/snt-backup-duplicity.usr_local
+/etc/snt-backup/duplicity/excludes.d/snt-backup-duplicity.default
