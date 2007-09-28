@@ -1,0 +1,8 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+my $rmt_id_dsa  = $ENV{'HOME'}.'/.ssh/id_dsa';
+$rmt_id_dsa     = $ENV{'IDENTITY'} if defined $ENV{'IDENTITY'};
+
+exec ('/usr/bin/scp', '-i', $rmt_id_dsa, @ARGV);
