@@ -8,6 +8,8 @@ use strict;
 my $sftp_command = '/usr/lib/snt-backup/bin/sftp';
 my $scp_command  = '/usr/lib/snt-backup/bin/scp';
 
+my $conf_path    = '/etc/snt-backup/duplicity';
+
 my $debug        = 0;
 
 ($ENV{TODIR} || '') =~ /\A([^:@]+\@[^:@]+):\/(.*)\z/
@@ -171,7 +173,7 @@ sub read_dir_d {
 
 my %backup_points;
 sub read_backup_points {
-	my @files = read_dir_d 'backup_points.d';
+	my @files = read_dir_d $conf_path.'/backup_points.d';
 
 	foreach my $f_d (@files) {
 		my ($file, $data) = @$f_d;
@@ -359,7 +361,7 @@ sub read_backup_points {
 
 my %excludes;
 sub read_excludes {
-	my @files = read_dir_d 'excludes.d';
+	my @files = read_dir_d $conf_path.'/excludes.d';
 
 	foreach my $f_d (@files) {
 		my ($file, $data) = @$f_d;
