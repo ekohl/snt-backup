@@ -1,0 +1,27 @@
+# path to backup
+path           = /
+
+
+# when to backup, and when a full backup?
+#backup_every   = 1d
+#full_every     = 7d
+#day_skew       = 0d
+
+
+# duplicity volume size in MB
+#volsize        = 5
+
+
+# duplicity flags
+#exclude-device-files
+#exclude-other-filesystems
+
+#print-statistics
+#verbosity      = 3
+
+
+# encryption and signing
+#gpg-passphrase = <phrase>
+#gpg-options    = opt1=parm1 opt2=parm2
+#encrypt-key    = <key-id>
+#sign-key       = <key-id>
