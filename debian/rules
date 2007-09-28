@@ -6,6 +6,7 @@ export DH_COMPAT=1
 #export DH_VERBOSE=1
 
 export DESTDIR=$(shell pwd)/debian/tmp
+export DESTDIR_UTILS=$(shell pwd)/debian/snt-backup-utils
 export DESTDIR_SERVER=$(shell pwd)/debian/snt-backup-server
 export DESTDIR_FILES=$(shell pwd)/debian/snt-backup-files
 export DESTDIR_MYSQL=$(shell pwd)/debian/snt-backup-mysql
@@ -36,11 +37,22 @@ install: build
 
 	### snt-backup
 	install -o root -g root -m 0755 -d $(DESTDIR)/etc/snt-backup
-	install -o root -g root -m 0755 -d $(DESTDIR)/usr/bin
-	install -o root -g root -m 0755 -d $(DESTDIR)/usr/lib/snt-backup/bin
 	install -o root -g root -m 0755 -d $(DESTDIR)/usr/lib/snt-backup/lib
 	install -o root -g root -m 0755 -d $(DESTDIR)/usr/lib/snt-backup/plugins
 	install -o root -g root -m 0755 -d $(DESTDIR)/var/cache/snt-backup
+
+	# config files & libraries
+	for file in \
+		./etc/snt-backup/config \
+		./usr/lib/snt-backup/lib/base; \
+	do \
+		install -o root -g root -m 0644 -p root/$$file $(DESTDIR)/$$file; \
+	done
+
+
+	### snt-backup-utils
+	install -o root -g root -m 0755 -d $(DESTDIR_UTILS)/usr/bin
+	install -o root -g root -m 0755 -d $(DESTDIR_UTILS)/usr/lib/snt-backup/bin
 
 	# executable scripts
 	for file in \
@@ -50,17 +62,11 @@ install: build
 		./usr/lib/snt-backup/bin/rmt-client.pl \
 		./usr/lib/snt-backup/bin/build_key.sh \
 		./usr/lib/snt-backup/bin/data_enc.sh \
-		./usr/lib/snt-backup/bin/data_dec.sh; \
+		./usr/lib/snt-backup/bin/data_dec.sh \
+		./usr/lib/snt-backup/bin/sftp \
+		./usr/lib/snt-backup/bin/scp; \
 	do \
-		install -o root -g root -m 0755 -p root/$$file $(DESTDIR)/$$file; \
-	done
-
-	# config files & libraries
-	for file in \
-		./etc/snt-backup/config \
-		./usr/lib/snt-backup/lib/base; \
-	do \
-		install -o root -g root -m 0644 -p root/$$file $(DESTDIR)/$$file; \
+		install -o root -g root -m 0755 -p root/$$file $(DESTDIR_UTILS)/$$file; \
 	done
 
 

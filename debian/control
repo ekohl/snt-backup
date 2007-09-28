@@ -7,11 +7,18 @@ Standards-Version: 3.5.7
 
 Package: snt-backup
 Architecture: all
-Depends: bash, tar, sed, debianutils, ${misc:Depends}
+Depends: snt-backup-utils, bash, tar, sed, debianutils, ${misc:Depends}
 Recommends: openssl, libdigest-md5-perl
 Suggests: snt-backup-files, snt-backup-debian, snt-backup-mysql, snt-backup-pgsql, snt-backup-slapd
 Description: SNT backup scripts
  SNT backup scripts
+
+Package: snt-backup-utils
+Architecture: all
+Depends: bash, tar, sed
+Suggests: bzip2, snt-backup
+Description: SNT backup utilities
+ SNT backup utilities
 
 Package: snt-backup-server
 Architecture: all

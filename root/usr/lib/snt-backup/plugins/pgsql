@@ -34,15 +34,22 @@ function pgsql_backup {
 	    TOFILE="pgsql_${DATEFIX}_${HOSTNAME_TAG}.sql"
 	fi
 
-	if [ -x '/usr/lib/postgresql/bin/pg_dumpall' ]; then
-		"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
-			su postgres -c '/usr/lib/postgresql/bin/pg_dumpall -g' $COMPRESS $ENCRYPT \
-			|| { touch "${SNAPSHOTDIR}/error"; echo 'pgsql dump failed.'; }
-	elif [ -x '/usr/lib/postgresql/8.1/bin/pg_dumpall' ]; then
-		"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
-			su postgres -c '/usr/lib/postgresql/8.1/bin/pg_dumpall -g' $COMPRESS $ENCRYPT \
-			|| { touch "${SNAPSHOTDIR}/error"; echo 'pgsql dump failed.'; }
+	PG_BIN=''
+	if [ -d '/usr/lib/postgresql/bin' ]; then
+		PG_BIN='/usr/lib/postgresql/bin'
+	elif [ -d '/usr/lib/postgresql/8.1/bin' ]; then
+		PG_BIN='/usr/lib/postgresql/8.1/bin'
+	elif [ -d '/usr/lib/postgresql/7.4/bin' ]; then
+		PG_BIN='/usr/lib/postgresql/7.4/bin'
+	else
+		touch "${SNAPSHOTDIR}/error"
+		echo "/usr/lib/postgresql/bin path not found!"
+		false
 	fi
+
+	"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
+		su postgres -c "$PG_BIN/pg_dumpall -g" $COMPRESS $ENCRYPT \
+		|| { touch "${SNAPSHOTDIR}/error"; echo 'pgsql dump failed.'; }
 }
 
 #
