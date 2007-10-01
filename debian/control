@@ -17,6 +17,7 @@ Package: snt-backup-utils
 Architecture: all
 Depends: bash, tar, sed
 Suggests: bzip2, snt-backup
+Conflicts: snt-backup (< 2.1-26)
 Description: SNT backup utilities
  SNT backup utilities
 
@@ -35,7 +36,7 @@ Description: SNT backup scripts file
 
 Package: snt-backup-duplicity
 Architecture: all
-Depends: snt-backup, duplicity
+Depends: snt-backup, snt-backup-utils, duplicity (>= 0.4.3-1)
 Description: SNT backup scripts duplicity
  SNT backup script for dumping files with duplicity
 
