@@ -459,7 +459,8 @@ if ($debug) {
 # set up master ssh
 system('/usr/bin/ssh',
 		'-o', 'ControlMaster yes',
-		'-o', "ControlPath $tmpdir/%h_%p_%r",
+		'-o', 'ControlPath '.$tmpdir.'/%h_%p_%r',
+		'-o', 'IdentityFile '.$ENV{IDENTITY},
 		'-N', '-f',
 		$backup_host);
 
@@ -583,7 +584,8 @@ foreach my $root (@roots) {
 
 # exit master ssh
 system('/usr/bin/ssh',
-		'-o', "ControlPath $tmpdir/%h_%p_%r",
+		'-o', 'ControlPath '.$tmpdir.'/%h_%p_%r',
+		'-o', 'IdentityFile '.$ENV{IDENTITY},
 		'-O', 'exit',
 		$backup_host);
 
