@@ -583,10 +583,17 @@ foreach my $root (@roots) {
 }
 
 # exit master ssh
-system('/usr/bin/ssh',
-		'-o', 'ControlPath '.$tmpdir.'/%h_%p_%r',
-		'-o', 'IdentityFile '.$ENV{IDENTITY},
-		'-O', 'exit',
-		$backup_host);
+{
+	open my $olderr, ">&STDERR";
+	open STDERR, ">> /dev/null"; # suppress message 'Exit request sent.'
+
+	system('/usr/bin/ssh',
+			'-o', 'ControlPath '.$tmpdir.'/%h_%p_%r',
+			'-o', 'IdentityFile '.$ENV{IDENTITY},
+			'-O', 'exit',
+			$backup_host);
+
+	open STDERR, ">&", $olderr;
+}
 
 rmdir($tmpdir);
