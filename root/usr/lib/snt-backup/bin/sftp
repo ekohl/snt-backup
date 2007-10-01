@@ -2,7 +2,14 @@
 
 use strict;
 
+my @opts = ();
+
 my $rmt_id_dsa  = $ENV{'HOME'}.'/.ssh/id_dsa';
 $rmt_id_dsa     = $ENV{'IDENTITY'} if defined $ENV{'IDENTITY'};
+push @opts, '-o', 'IdentityFile '.$rmt_id_dsa;
 
-exec ('/usr/bin/sftp', '-o', "IdentityFile $rmt_id_dsa", @ARGV);
+if (defined $ENV{'SSH_CONTROL_PATH'}) {
+	push @opts, '-o', 'ControlPath '.$ENV{'SSH_CONTROL_PATH'};
+}
+
+exec ('/usr/bin/sftp', @opts, @ARGV);

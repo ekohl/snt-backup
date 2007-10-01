@@ -436,6 +436,19 @@ my $day_num;
 	$day_num = int($t / 86400) + 5; # day_skew 0 triggers full backup on saturday
 }
 
+# create tmpdir for ssh control path
+my $tmpdir;
+{
+	my $tmpbase = '/tmp';
+
+	my $x = 1;
+	while (!mkdir($tmpdir = $tmpbase.'/'.sprintf('tmp%05u.%u',$$,$x), 0700)) {
+		die "Failed to create temp dir in $tmpbase: $!\n" if $x++ > 100;
+	}
+	warn "  ssh_control_path = '$tmpdir/%h_%p_%r'\n" if $debug;
+	$ENV{SSH_CONTROL_PATH} = $tmpdir.'/%h_%p_%r';
+}
+
 if ($debug) {
 	warn "  Backup dest '$backup_host'\n";
 	warn "  Backup path '$backup_path'\n";
@@ -443,6 +456,12 @@ if ($debug) {
 	warn "\n";
 }
 
+# set up master ssh
+system('/usr/bin/ssh',
+		'-o', 'ControlMaster yes',
+		'-o', "ControlPath $tmpdir/%h_%p_%r",
+		'-N', '-f',
+		$backup_host);
 
 foreach my $root (@roots) {
 	my $root_name = array_to_path $root;
@@ -561,3 +580,11 @@ foreach my $root (@roots) {
 
 	warn "\n" if $debug;
 }
+
+# exit master ssh
+system('/usr/bin/ssh',
+		'-o', "ControlPath $tmpdir/%h_%p_%r",
+		'-O', 'exit',
+		$backup_host);
+
+rmdir($tmpdir);
