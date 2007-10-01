@@ -1,3 +1,9 @@
+snt-backup (2.1-29) stable; urgency=low
+
+  * duplicity.pl is now more quiet
+
+ -- Bas van Sisseren <bas@snt.utwente.nl>  Mon, 01 Oct 2007 11:31:54 +0200
+
 snt-backup (2.1-28) stable; urgency=low
 
   * added identity-file option to ssh master creation command
