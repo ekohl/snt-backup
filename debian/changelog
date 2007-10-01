@@ -1,3 +1,10 @@
+snt-backup (2.1-27) stable; urgency=low
+
+  * Add depends and conflicts on older versions for easier upgrading
+  * Let the duplicity plugin use a master ssh channel
+
+ -- Bas van Sisseren <bas@snt.utwente.nl>  Mon, 01 Oct 2007 10:13:48 +0200
+
 snt-backup (2.1-26) stable; urgency=low
 
   * more bugfixes:
