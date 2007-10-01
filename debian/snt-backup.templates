@@ -57,7 +57,7 @@ Description: Waar moeten de backups heen
  .
  Voor de SNT backup server is dit meestal:
  .
-   bk-<vereniging>@bonbon.snt.utwente.nl:/
+   bk-<vereniging>@mintnop.snt.utwente.nl:/
  .
  .. ook is er de mogelijkheid om een lokale dir aan te geven,
  zodat je bijvoorbeeld door gebruik van rsync over ssh de data

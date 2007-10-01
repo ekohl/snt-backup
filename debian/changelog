@@ -1,3 +1,12 @@
+snt-backup (2.1-28) stable; urgency=low
+
+  * added identity-file option to ssh master creation command
+  * added suggest on snt-backup-hostkey
+  * current default hostname is now mintnop.snt.utwente.nl
+  * added public key of hostname mintnop.snt.utwente.nl
+
+ -- Bas van Sisseren <bas@snt.utwente.nl>  Mon, 01 Oct 2007 10:46:47 +0200
+
 snt-backup (2.1-27) stable; urgency=low
 
   * Add depends and conflicts on older versions for easier upgrading

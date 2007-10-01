@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+action=$1
+oldversion=$2
+
+if [ ! -e /etc/ssh/ssh_known_hosts ]; then
+	touch /etc/ssh/ssh_known_hosts
+fi
+
+while read -r LINE; do
+	if ! grep -qx "$LINE" /etc/ssh/ssh_known_hosts; then
+		echo "$LINE" >> /etc/ssh/ssh_known_hosts
+	fi
+done < /etc/snt-backup/known_hosts
