@@ -11,7 +11,7 @@ export sntbackuppostinstisrunning=true
 db_version 2.0
 
 # use debconf
-db_get snt-backup/use_debconf
+db_get snt-backup-server/use_debconf
 
 if [ "_$RET" = "_true" ]; then
   {
