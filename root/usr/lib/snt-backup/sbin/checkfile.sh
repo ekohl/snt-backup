@@ -11,9 +11,13 @@ CNT_BYTES="`ls -ald "$file" | sed 's/  */ /g' | cut -d' ' -f5`"
 echo "Bestandsgrootte   : $CNT_BYTES"
 echo
 
+if [ "$CNT_BYTES" = 0 ]; then
+	echo "Empty ?" 2>> "$file".errors
+fi
+
 case "$file" in
 	*.tar.gz | *.tgz)
-		tar --blocking-factor=1 -ztvf "$file" > "$file".list 2> "$file".errors
+		tar --blocking-factor=1 -ztvf "$file" > "$file".list 2>> "$file".errors
 
 		CNT_DIRS="`grep -c '/$' "$file".list`"
 		CNT_FILES="`grep -vc '/$' "$file".list`"
@@ -25,7 +29,7 @@ case "$file" in
 		;;
 
 	*.tar.bz2)
-		tar --blocking-factor=1 -jtvf "$file" > "$file".list 2> "$file".errors
+		tar --blocking-factor=1 -jtvf "$file" > "$file".list 2>> "$file".errors
 
 		CNT_DIRS="`grep -c '/$' "$file".list`"
 		CNT_FILES="`grep -vc '/$' "$file".list`"
@@ -37,11 +41,11 @@ case "$file" in
 		;;
 
 	*.gz)
-		gzip -t "$file" 2> "$file".errors
+		gzip -t "$file" 2>> "$file".errors
 		;;
 
 	*.bz2)
-		bzip2 -t "$file" 2> "$file".errors
+		bzip2 -t "$file" 2>> "$file".errors
 		;;
 esac
 
