@@ -77,7 +77,8 @@ install: build
 		./usr/lib/snt-backup/bin/data_enc.sh \
 		./usr/lib/snt-backup/bin/data_dec.sh \
 		./usr/lib/snt-backup/bin/sftp \
-		./usr/lib/snt-backup/bin/scp; \
+		./usr/lib/snt-backup/bin/scp \
+		./usr/lib/snt-backup/bin/snapshot-wrapper.pl; \
 	do \
 		install -o root -g root -m 0755 -p root/$$file $(DESTDIR_UTILS)/$$file; \
 	done

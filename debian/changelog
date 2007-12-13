@@ -1,3 +1,9 @@
+snt-backup (2.1-31) stable; urgency=low
+
+  * forgot to add snapshot-wrapper.pl; added to snt-backup-utils
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Thu, 13 Dec 2007 15:25:24 +0100
+
 snt-backup (2.1-30) stable; urgency=low
 
   * add support for backupping frozen snapshots, by using lvm snapshot
