@@ -131,10 +131,9 @@ function files_backup {
 		echo "Creating Backup '$line'"
 
 		CONV="`conv_filename "${line}"`"
+		. "${CONFDIR}/files/Default.conf"
 		if [ -f "${CONFDIR}/files/${CONV}.conf" ] ; then
 			. "${CONFDIR}/files/${CONV}.conf"
-		else 
-			. "${CONFDIR}/files/Default.conf"
 		fi
 
 		AVAIL="`checkbackup "${line}"`"
@@ -158,10 +157,9 @@ function files_weekly {
 		echo "Cleaning Backup '$line'"
 
 		CONV="`conv_filename "${line}"`"
+		. "${CONFDIR}/files/Default.conf"
 		if [ -f "${CONFDIR}/files/${CONV}.conf" ] ; then
 			. "${CONFDIR}/files/${CONV}.conf"
-		else 
-			. "${CONFDIR}/files/Default.conf"
 		fi
 
 		AVAIL="`checkbackup "${line}"`"
@@ -179,10 +177,9 @@ function files_monthly {
 		echo "Cleaning Backup '$line'"
 
 		CONV="`conv_filename "${line}"`"
+		. "${CONFDIR}/files/Default.conf"
 		if [ -f "${CONFDIR}/files/${CONV}.conf" ] ; then
 			. "${CONFDIR}/files/${CONV}.conf"
-		else 
-			. "${CONFDIR}/files/Default.conf"
 		fi
 
 		AVAIL="`checkbackup "${line}"`"
