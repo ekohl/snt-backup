@@ -59,31 +59,32 @@ function mysql_backup {
 
     fi
 
-    LOG_BIN_BASENAME=`/usr/sbin/mysqld --verbose --help | egrep ^'log-bin ' | tr -s ' ' | cut -d' ' -f 2`
-    DATA_DIR=`/usr/sbin/mysqld --verbose --help | egrep ^'datadir ' | tr -s ' ' | cut -d' ' -f 2`
+    LOG_BIN_BASENAME=`/usr/sbin/mysqld --verbose --help | sed 's/^log-bin  *//p;d' | sed 's/\.[^\.]\+$//'`
+    DATA_DIR=`/usr/sbin/mysqld --verbose --help         | sed 's/^datadir  *//p;d'`
 
     # Mysqld outputs '(No default value)' if log-bin is not set. Since
     # we cut on spaces we match with '(No' to check whether log-bin is
     # set to something
     # 
     # FIXME: This should be done more cleanly
-    # FIXME: We assume that log-bin is set to a basename without an
-    # absolute path. This code doesnt handle log-bin without a
-    # basename, and log-bin as an absolute path.
-    # FIXME: mysqld forgets the extension if it is specified. So
-    # should we.
-    if [ "${LOG_BIN_BASENAME}x" != '(Nox' -a "${LOG_BIN_BASENAME}x" != 'x' ]; then
-	
+    if [ "${LOG_BIN_BASENAME}x" != '(No default value)x' -a "${LOG_BIN_BASENAME}x" != 'x' ]; then
+
 	# Binary logging is enabled; Backup all binary logs.
-	
+
 	if [ "${HOSTNAME_TAG}x" == "x" ]; then
 	    TARFILE="${TODIR}/mysql_${DATEFIX}_binlogs.tar"
 	else
 	    TARFILE="${TODIR}/mysql_${DATEFIX}_${HOSTNAME_TAG}_binlogs.tar"
 	fi
-	
-	echo "Dumping mysql binary logs"	
-        "${BASEDIR}/bin/rmt-client.pl" "${TARFILE}${C_TAG}${E_TAG}" tar -C / --ignore-failed-read --create --file - --blocking-factor=1 -P "${DATA_DIR}/${LOG_BIN_BASENAME}"* $COMPRESS $ENCRYPT || { touch "${SNAPSHOTDIR}/error"; echo 'mysql backup failed.'; }
+
+	# NOTE: bashism
+	if [ "${LOG_BIN_BASENAME:0:1}" != "/" ]; then
+		# path is relative to DATA_DIR
+		LOG_BIN_BASENAME="${DATA_DIR}/${LOG_BIN_BASENAME}"
+	fi
+
+	echo "Dumping mysql binary logs"
+        "${BASEDIR}/bin/rmt-client.pl" "${TARFILE}${C_TAG}${E_TAG}" tar -C / --ignore-failed-read --create --file - --blocking-factor=1 -P "${LOG_BIN_BASENAME}"* $COMPRESS $ENCRYPT || { touch "${SNAPSHOTDIR}/error"; echo 'mysql backup failed.'; }
 	
     fi
 
