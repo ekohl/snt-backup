@@ -92,8 +92,8 @@ function run_dump {
 	# nu vraag je je vast af.. waarom moet die './' nu weer zo nodig
 	# voor die BACKUPDIR?.. dit lijkt helaas de enige sane manier te
 	# zijn om je excludes goed werkend te krijgen. [BvS]
-	"${BASEDIR}/bin/rmt-client.pl" "${TARFILE}${C_TAG}${E_TAG}" \
-		tar ${EXCLUDE} -C / --listed-incremental "${SNAPFILE}" \
+	${LVM_SNAP_WRAP} "${BASEDIR}/bin/rmt-client.pl" "${TARFILE}${C_TAG}${E_TAG}" \
+		tar ${EXCLUDE} -C "${TAR_ROOT_PATH}" --listed-incremental "${SNAPFILE}" \
 			--ignore-failed-read --create --file - \
 			--blocking-factor=1 ./"${BACKUPDIR}" \
 		$COMPRESS $ENCRYPT
@@ -120,6 +120,31 @@ function rm_snap {
 	rm -f "${SNAPFILE}"
 }
 
+function files_clean_env {
+	unset CYCLE
+	# when make full backups: 'daily', 'weekly', 'monthly'
+
+	unset TYPE
+	# 'full': always full backups
+	# 'incr': incremental backups, diff from previous incremental backup
+	# 'diff': incremental backups, diff from previouw full backup
+
+	TAR_ROOT_PATH='/'
+	# used for -C parameter when using tar
+
+	unset LVM_SNAP_WRAP
+	# wrapper script
+
+	unset LVM_SNAP_SNAP_NAME
+	unset LVM_SNAP_SNAP_GRP
+	unset LVM_SNAP_SNAP_MNT
+	unset LVM_SNAP_SNAP_SIZE
+
+	unset LVM_SNAP_BK_PATH
+	unset LVM_SNAP_BK_DEV
+	unset LVM_SNAP_BK_FSTYPE
+}
+
 #
 # files_backup
 #
@@ -129,6 +154,8 @@ function files_backup {
 		echo
 	} | grep -v '^ *\(#.*\|\)$' | while read -r line ; do
 		echo "Creating Backup '$line'"
+
+		files_clean_env
 
 		CONV="`conv_filename "${line}"`"
 		. "${CONFDIR}/files/Default.conf"
@@ -156,6 +183,8 @@ function files_weekly {
 	} | grep -v '^ *\(#.*\|\)$' | while read -r line ; do
 		echo "Cleaning Backup '$line'"
 
+		files_clean_env
+
 		CONV="`conv_filename "${line}"`"
 		. "${CONFDIR}/files/Default.conf"
 		if [ -f "${CONFDIR}/files/${CONV}.conf" ] ; then
@@ -175,6 +204,8 @@ function files_monthly {
 		echo
 	} | grep -v '^ *\(#.*\|\)$' | while read -r line ; do
 		echo "Cleaning Backup '$line'"
+
+		files_clean_env
 
 		CONV="`conv_filename "${line}"`"
 		. "${CONFDIR}/files/Default.conf"
