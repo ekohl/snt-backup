@@ -92,7 +92,7 @@ if ( -e $snap_dev ) {
 	exit 1;
 }
 
-system('lvcreate',
+system('/sbin/lvcreate',
 		'--size', $snap_size,
 		'--snapshot',
 		'--name', $snap_name,
@@ -103,13 +103,13 @@ if (my $error = $?) {
 	exit 1;
 }
 
-system('fsck.'.$bk_fstype, '-f', '-p', $snap_dev);
+system('/sbin/fsck.'.$bk_fstype, '-f', '-p', $snap_dev);
 if (my $error = $?) {
 	# 0 = ok
 	# 1 = recovered
 	if ($error != 256) {
 		warn "e2fsck returned an error: $error\n";
-		system('lvremove', '-f', $snap_dev);
+		system('/sbin/lvremove', '-f', $snap_dev);
 		exit 1;
 	}
 }
@@ -118,7 +118,7 @@ system('mkdir', '-p', $snap_mnt_path);
 if (my $error = $?) {
 	# 0 = ok
 	warn "failed to create mountpoint\n";
-	system('lvremove', '-f', $snap_dev);
+	system('/sbin/lvremove', '-f', $snap_dev);
 	exit 1;
 }
 
@@ -126,7 +126,7 @@ system('mount', '-t', $bk_fstype, '-o', 'ro', $snap_dev, $snap_mnt_path);
 if (my $error = $?) {
 	# 0 = ok
 	warn "failed to mount snapshot on mountpoint\n";
-	system('lvremove', '-f', $snap_dev);
+	system('/sbin/lvremove', '-f', $snap_dev);
 	exit 1;
 }
 
@@ -135,7 +135,7 @@ if (my $error = $?) {
 	# 0 = ok
 	warn "failed to change directory to mountpoint\n";
 	system('umount', $snap_mnt_path);
-	system('lvremove', '-f', $snap_dev);
+	system('/sbin/lvremove', '-f', $snap_dev);
 	exit 1;
 }
 
@@ -147,7 +147,7 @@ if (my $error = $?) {
 	# 0 = ok
 	warn "failed to change directory to /\n";
 	system('umount', $snap_mnt_path);
-	system('lvremove', '-f', $snap_dev);
+	system('/sbin/lvremove', '-f', $snap_dev);
 	exit 1;
 }
 
@@ -155,19 +155,19 @@ system('umount', $snap_mnt_path);
 if (my $error = $?) {
 	# 0 = ok
 	warn "failed to unmount snapshot\n";
-	system('lvremove', '-f', $snap_dev);
+	system('/sbin/lvremove', '-f', $snap_dev);
 	exit 1;
 }
 
-system('lvdisplay', $snap_dev);
+system('/sbin/lvdisplay', $snap_dev);
 if (my $error = $?) {
 	# 0 = ok
 	warn "failed to display snapshot info\n";
-	system('lvremove', '-f', $snap_dev);
+	system('/sbin/lvremove', '-f', $snap_dev);
 	exit 1;
 }
 
-system('lvremove', '-f', $snap_dev);
+system('/sbin/lvremove', '-f', $snap_dev);
 if (my $error = $?) {
 	# 0 = ok
 	warn "failed to remove snapshot\n";
