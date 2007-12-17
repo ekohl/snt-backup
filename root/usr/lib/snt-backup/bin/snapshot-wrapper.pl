@@ -19,14 +19,15 @@ my $snap_size = $ENV{LVM_SNAP_SNAP_SIZE} || '250m';
 my $bk_path   = $ENV{LVM_SNAP_BK_PATH};   # '/opt'
 my $bk_dev    = $ENV{LVM_SNAP_BK_DEV};    # '/dev/data/opt'
 my $bk_fstype = $ENV{LVM_SNAP_BK_FSTYPE}; # 'ext3'
+my $bk_fsopt  = $ENV{LVM_SNAP_BK_FSOPT};  # 'ro,user_xattr,acl'
 
 die "environment variable LVM_SNAP_BK_PATH not set!\n"
 	unless defined $bk_path;
 
-unless (defined $bk_dev || defined $bk_fstype) {
-	my $mnt_dev    = undef;
-	my $mnt_fstype = undef;
-
+my $mnt_dev    = undef;
+my $mnt_fstype = undef;
+my $mnt_fsopt  = undef;
+unless (defined $bk_dev || defined $bk_fstype || defined $bk_fsopt) {
 	open MNT, '<', '/proc/mounts'
 		or die "Could not open '/proc/mounts': $!\n";
 	while (my $line = <MNT>) {
@@ -36,18 +37,57 @@ unless (defined $bk_dev || defined $bk_fstype) {
 		if ($mnt eq $bk_path) {
 			$mnt_dev    = $dev;
 			$mnt_fstype = $fstype;
+			$mnt_fsopt  = $opts;
 		}
 	}
 	close MNT;
 
-	die "Mount-point '$bk_path' is not mounted!\n"
-		unless defined $mnt_dev;
-
 	$bk_dev    = $mnt_dev    unless defined $bk_dev;
 	$bk_fstype = $mnt_fstype unless defined $bk_fstype;
+
+	die "Mount-point '$bk_path' is not mounted!\n"
+		unless defined $bk_dev;
 }
 
 $bk_fstype = 'ext3' unless defined $bk_fstype;
+
+unless (defined $bk_fsopt) {
+	my %bk_fsopt = ();
+	$bk_fsopt{ro}++;
+	$bk_fsopt{nouuid}++ if $bk_fstype eq 'xfs';
+
+	if (defined $mnt_fsopt) {
+		my %mnt_fsopt = ();
+		foreach my $opt (split /,/, $mnt_fsopt) {
+			if ($opt =~ /\A([^=]+=)(.*)\z/s) {
+				$mnt_fsopt{$1} = $2;
+			} else {
+				$mnt_fsopt{$1}++;
+			}
+		}
+
+		if ($bk_fstype =~ /^(?:ext[23]|reiserfs)$/) {
+			$bk_fsopt{acl}++		if $mnt_fsopt{acl};
+			$bk_fsopt{user_xattr}++	if $mnt_fsopt{user_xattr};
+		} elsif ($bk_fstype =~ /^(?:[jx]fs)$/) {
+			# no options
+		} else {
+			die;
+		}
+
+	} else {
+		if ($bk_fstype =~ /^(?:ext[23]|reiserfs)$/) {
+			$bk_fsopt{acl}++;
+			$bk_fsopt{user_xattr}++;
+		} elsif ($bk_fstype =~ /^(?:[jx]fs)$/) {
+			# no options
+		} else {
+			die;
+		}
+	}
+
+	$bk_fsopt = join ',', keys %bk_fsopt;
+}
 
 # variable checking
 die "environment variable LVM_SNAP_BK_DEV not set!\n"
@@ -62,7 +102,7 @@ die "Invalid original lvm volume device '$bk_dev'\n"
 	unless $bk_dev =~ /\A(\/dev\/[^\/]+)\/[^\/]+\z/;
 $snap_grp = $1 unless defined $snap_grp;
 die "Unknown file-system type '$bk_fstype'\n"
-	unless grep { $bk_fstype eq $_ } qw/ ext2 ext3 reiserfs jfs /;
+	unless grep { $bk_fstype eq $_ } qw/ ext2 ext3 reiserfs jfs xfs /;
 
 # check snapshot lvm
 die "Invalid lvm volume group '$snap_grp'\n"
@@ -122,7 +162,7 @@ if (my $error = $?) {
 	exit 1;
 }
 
-system('mount', '-t', $bk_fstype, '-o', 'ro', $snap_dev, $snap_mnt_path);
+system('mount', '-t', $bk_fstype, '-o', $bk_fsopt, $snap_dev, $snap_mnt_path);
 if (my $error = $?) {
 	# 0 = ok
 	warn "failed to mount snapshot on mountpoint\n";
