@@ -505,11 +505,12 @@ foreach my $root (@roots) {
 	#   duplicity --no-encryption --sftp-command $sftp_cmd --scp-command $scp_cmd --exclude $e $path $rdir
 	my @cmdline = qw/ duplicity /;
 
+	push @cmdline, qw/ full / if $full;
+		# syntax changed in duplicity 0.4.4, was '--full'
+
 	push @cmdline, qw/ --sftp-command /, $sftp_command;
 
 	push @cmdline, qw/ --scp-command /, $scp_command;
-
-	push @cmdline, qw/ --full / if $full;
 
 	push @cmdline, qw/ --exclude-device-files /
 		if defined $config->{'exclude-device-files'};
