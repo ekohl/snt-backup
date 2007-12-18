@@ -132,6 +132,15 @@ if ( -e $snap_dev ) {
 	exit 1;
 }
 
+if ($bk_fstype eq 'xfs') {
+	system('/usr/sbin/xfs_freeze', '-f', $bk_path);
+
+	if (my $error = $?) {
+		warn "xfs_freeze -f returned an error: $error\n";
+		exit 1;
+	}
+}
+
 system('/sbin/lvcreate',
 		'--size', $snap_size,
 		'--snapshot',
@@ -140,7 +149,19 @@ system('/sbin/lvcreate',
 
 if (my $error = $?) {
 	warn "lvcreate returned an error: $error\n";
+	system('/usr/sbin/xfs_freeze', '-u', $bk_path)
+		if $bk_fstype eq 'xfs';
 	exit 1;
+}
+
+if ($bk_fstype eq 'xfs') {
+	system('/usr/sbin/xfs_freeze', '-u', $bk_path);
+
+	if (my $error = $?) {
+		warn "xfs_freeze -u returned an error: $error\n";
+		system('/sbin/lvremove', '-f', $snap_dev);
+		exit 1;
+	}
 }
 
 system('/sbin/fsck.'.$bk_fstype, '-f', '-p', $snap_dev);
