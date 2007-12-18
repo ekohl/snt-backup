@@ -46,3 +46,6 @@ if [ "_$RET" = "_true" ]; then
   chmod 600 /etc/snt-backup/slapd/slapd.secret
 
 fi
+
+#DEBHELPER#
+

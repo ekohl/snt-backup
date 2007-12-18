@@ -25,3 +25,6 @@ if [ "_$RET" = "_true" ]; then
   mv -f /etc/snt-backup/server/server.conf.new /etc/snt-backup/server/server.conf
 
 fi
+
+#DEBHELPER#
+

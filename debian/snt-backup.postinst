@@ -105,3 +105,6 @@ if [ "_$RET" = "_true" ]; then
   mv -f /etc/snt-backup/config.new /etc/snt-backup/config
 
 fi
+
+#DEBHELPER#
+
