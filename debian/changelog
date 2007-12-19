@@ -1,3 +1,10 @@
+snt-backup (2.1-33) stable; urgency=low
+
+  * Fix warning in snapshot-wrapper script
+  * add filesystem-options comment in files/Default.conf
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Wed, 19 Dec 2007 10:00:22 +0100
+
 snt-backup (2.1-32) stable; urgency=low
 
   * support new command-line syntax of duplicity

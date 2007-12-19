@@ -62,7 +62,7 @@ unless (defined $bk_fsopt) {
 			if ($opt =~ /\A([^=]+=)(.*)\z/s) {
 				$mnt_fsopt{$1} = $2;
 			} else {
-				$mnt_fsopt{$1}++;
+				$mnt_fsopt{$opt}++;
 			}
 		}
 
