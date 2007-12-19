@@ -62,10 +62,6 @@ function mysql_backup {
     LOG_BIN_BASENAME=`/usr/sbin/mysqld --verbose --help | sed 's/^log-bin  *//p;d' | sed 's/\.[^\.]\+$//'`
     DATA_DIR=`/usr/sbin/mysqld --verbose --help         | sed 's/^datadir  *//p;d'`
 
-    # Mysqld outputs '(No default value)' if log-bin is not set. Since
-    # we cut on spaces we match with '(No' to check whether log-bin is
-    # set to something
-    # 
     # FIXME: This should be done more cleanly
     if [ "${LOG_BIN_BASENAME}x" != '(No default value)x' -a "${LOG_BIN_BASENAME}x" != 'x' ]; then
 
@@ -81,6 +77,8 @@ function mysql_backup {
 	if [ "${LOG_BIN_BASENAME:0:1}" != "/" ]; then
 		# path is relative to DATA_DIR
 		LOG_BIN_BASENAME="${DATA_DIR}/${LOG_BIN_BASENAME}"
+	else
+		LOG_BIN_BASENAME="./${LOG_BIN_BASENAME}"
 	fi
 
 	echo "Dumping mysql binary logs"
