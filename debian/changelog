@@ -1,3 +1,17 @@
+snt-backup (2.1-32) stable; urgency=low
+
+  * support new command-line syntax of duplicity
+    (and dropping old syntax support)
+  * add debhelper tags to preinst/postinst scripts
+  * remove mysql binary log '/' warning
+  * autodetect postgres versions 8.3 and 8.2
+  * add snapshot filesystem options
+    (needed to backup extended acls and user xattrs)
+  * add xfs support to snapshot wrapper
+  * specify full paths of lvm tools and fsck
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Wed, 19 Dec 2007 09:39:59 +0100
+
 snt-backup (2.1-31) stable; urgency=low
 
   * forgot to add snapshot-wrapper.pl; added to snt-backup-utils
