@@ -7,7 +7,22 @@
 #
 
 function pgsql_backup {
-	su postgres -c '/usr/bin/psql -t -d template1 -c "SELECT datname FROM pg_database ORDER BY datname"' | sed 's/^ *//;/^$/d' | (
+	# defaults
+	export PGUSER=postgres
+	export PGPASSFILE=''
+
+	# load config
+	if [ -f "${CONFDIR}/pgsql/pgsql.conf" ] ; then
+		. "${CONFDIR}/pgsql/pgsql.conf"
+	fi
+
+	# do backup
+	PG_SH="su $PGUSER"
+	if [ "x$PGPASSFILE" != 'x' ]; then
+		PG_SH="sh"
+	fi
+
+	$PG_SH -c '/usr/bin/psql -t -d template1 -c "SELECT datname FROM pg_database ORDER BY datname"' | sed 's/^ *//;/^$/d' | (
 		while read -r PGSQL_DB
 		do
 			if ! grep -Fxq "${PGSQL_DB}" "${CONFDIR}/pgsql/pgsql.exclude"
@@ -22,7 +37,7 @@ function pgsql_backup {
 				fi
 
 				"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
-					su postgres -c '/usr/bin/pg_dump "${PGSQL_DB}"' $COMPRESS $ENCRYPT \
+					$PG_SH -c '/usr/bin/pg_dump "${PGSQL_DB}"' $COMPRESS $ENCRYPT \
 					|| { touch "${SNAPSHOTDIR}/error"; echo 'pgsql dump failed.'; }
 			fi
 		done
@@ -52,7 +67,7 @@ function pgsql_backup {
 	fi
 
 	"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
-		su postgres -c "$PG_BIN/pg_dumpall -g" $COMPRESS $ENCRYPT \
+		$PG_SH -c "$PG_BIN/pg_dumpall -g" $COMPRESS $ENCRYPT \
 		|| { touch "${SNAPSHOTDIR}/error"; echo 'pgsql dump failed.'; }
 }
 

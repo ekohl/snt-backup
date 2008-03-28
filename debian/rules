@@ -203,9 +203,16 @@ install: build
 
 	# config files & libraries
 	for file in \
+		./etc/snt-backup/pgsql/pgsql.conf \
 		./etc/snt-backup/pgsql/pgsql.exclude; \
 	do \
 		install -o root -g root -m 0644 -p root/$$file $(DESTDIR_PGSQL)/$$file; \
+	done
+
+	for file in \
+		./etc/snt-backup/pgsql/pgsql.pass; \
+	do \
+		install -o root -g root -m 0600 -p root/$$file $(DESTDIR_PGSQL)/$$file; \
 	done
 
 
