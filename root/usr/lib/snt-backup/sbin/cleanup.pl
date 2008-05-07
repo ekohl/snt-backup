@@ -10,8 +10,11 @@
 #               - Onbekende bestanden (GEEN backup files)
 #                 negeren, zodat deze niet per ongeluk verwijderd
 #                 kunnen worden.
+#   07/05/2008  - Dataretentie is nu instelbaar in termen van hoe 
+#                 lang data beschikbaar moet zijn.
 
 use strict;
+use Time::Local;
 
 my @list = ();
 my %data = ();
@@ -22,18 +25,31 @@ my $flag_no_act = 0;
 my $flag_verbose = 0;
 my $flag_report = 0;
 
+# Sane defaults for data retention
+my $retention_period_daily = 31;
+my $retention_period_monthly = 365;
+my $retention_period_yearly = 0;
+
 while (@ARGV) {
-	my $param = shift;
-	if ($param eq '-d' || $param eq '--no-act') {
-		$flag_no_act = 1;
-	} elsif ($param eq '-v' || $param eq '--verbose') {
-		$flag_verbose = 1;
-	} elsif ($param eq '-r' || $param eq '--report') {
-		$flag_report = 1;
-	} else {
-		die "Usage: $0 [-d] [-v]\n";
-	}
+    my $param = shift;
+    if ($param eq '-d' || $param eq '--no-act') {
+	$flag_no_act = 1;
+    } elsif ($param eq '-v' || $param eq '--verbose') {
+	$flag_verbose = 1;
+    } elsif ($param eq '-r' || $param eq '--report') {
+	$flag_report = 1;
+    } elsif ($param =~ /^--retention_period_daily=(\d+)/) {
+	$retention_period_daily = $1;
+    } elsif ($param =~ /^--retention_period_monthly=(\d+)/) {
+	$retention_period_monthly = $1;
+    } elsif ($param =~ /^--retention_period_yearly=(\d+)/) {
+	$retention_period_yearly = $1;
+    } else {
+	die "Usage: $0 [-d] [-v] [-r] [--retention_period_daily=n] [--retention_period_monthly=n] [--retention_period_yearly=n]\n";
+    }
 }
+
+print "Performing cleanup with the following data-retention: Daily: $retention_period_daily, Monthly: $retention_period_monthly, Yearly: $retention_period_yearly\n" if ($flag_verbose);
 
 # genereer "today"
 {
@@ -116,8 +132,8 @@ foreach my $module (keys %data) {
 		# zoek eerst de belangrijke files uit
 		my @full_backups = ();
 
-		my $last_hyear = undef;
-		my @hyear_backup = ();
+		my $last_year = undef;
+		my @year_backup = ();
 
 		my $last_month = undef;
 		my @month_backup = ();
@@ -134,14 +150,13 @@ foreach my $module (keys %data) {
 				$last_month = $str;
 			}
 
-			{ # first full backup of the "half year"..
+			{ # first full backup of the year..
 				my ($str) = ($date =~ /^(\d\d\d\d-\d\d-)/);
 				$str =~ s/^(\d\d\d\d)-0[1-6]-$/$1_01/;
-				$str =~ s/^(\d\d\d\d)-(0[7-9]|1[0-2])-$/$1_07/;
-				next if ((defined $last_hyear) && ($str eq $last_hyear));
-				push @hyear_backup, $date;
-				print "First_of_hyear: $module $path $date\n" if($flag_verbose);
-				$last_hyear = $str;
+				next if ((defined $last_year) && ($str eq $last_year));
+				push @year_backup, $date;
+				print "First_of_year: $module $path $date\n" if($flag_verbose);
+				$last_year = $str;
 			}
 		}
 
@@ -151,39 +166,104 @@ foreach my $module (keys %data) {
 			next;
 		}
 
-		# bewaar alleen de laatste 3 full backups ...
-		@full_backups = (@full_backups > 2) ? splice @full_backups, -2 : @full_backups;
+		# Zoek uit welke backups we allemaal willen bewaren
+		my @keep_daily;
+                my @keep_monthly;
+                my @keep_yearly;
+		my @keep_incr;
+		my $now_date = time;
 
-		my $only_delete_before = ((@full_backups > 2) ? splice @full_backups, -2 : @full_backups)[0];
-		print "Only_delete_before: $only_delete_before\n" if($flag_verbose);
+		# Zoek uit welke yearlies we willen bewaren
+		foreach my $date (@year_backup) {
+                    if ($date =~ /^(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})$/) {
+                        my $backup_date = timelocal($6, $5, $4, $3, $2-1, $1-1900, 0, 0, 0);
+                        if (($now_date - $backup_date) < ($retention_period_yearly*86400) || $retention_period_yearly == 0) {
+                            print "$date is newer than $retention_period_yearly days\n" if ($flag_verbose);
+                            push @keep_yearly, $date;
+                        }
+                    }
+                }
 
-		# ... de laatste 3 maandelijkse full backups
-		@month_backup = (@month_backup > 3) ? splice @month_backup, -3 : @month_backup;
+		# Zoek uit welke monthlies we willen bewaren
+		foreach my $date (@month_backup) {
+                    if ($date =~ /^(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})$/) {
+                        my $backup_date = timelocal($6, $5, $4, $3, $2-1, $1-1900, 0, 0, 0);
+                        if (($now_date - $backup_date) < ($retention_period_monthly*86400) || $retention_period_monthly == 0) {
+                            print "$date is newer than $retention_period_monthly days\n" if ($flag_verbose);
+                            push @keep_monthly, $date;
+                        }
+                    }
+                }
 
-		# ... en de 3 laatste half-jaarlijkse backups
-		@hyear_backup = (@hyear_backup > 3) ? splice @hyear_backup, -3 : @hyear_backup;
+		# Zoek uit welke dailies we willen bewaren
 
+		#
+		# Deze is iets lastiger. 
+                # Als er niet dagelijks full gebackupt wordt is het mogelijk en waarschijnlijk dat de oudste dag waar we 
+		# data van willen hebben een incremental of differential backup is. Daarom hebben we ook nieuwst full backup 
+		# die buiten de retentieperiode valt nodig, en alle incrementals sinds die periode.
+		#
+		
+		my $newest_daily_outside_retention_period = undef;
+		foreach my $date (@full_backups) {
+                    if ($date =~ /^(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})$/) {
+                        my $backup_date = timelocal($6, $5, $4, $3, $2-1, $1-1900, 0, 0, 0);
+                        if (($now_date - $backup_date) < ($retention_period_daily*86400) || $retention_period_daily == 0) {
+                            print "$date is newer than $retention_period_daily days\n" if ($flag_verbose);
+                            push @keep_daily, $date;
+                        }
+			else {
+			    $newest_daily_outside_retention_period = $date;
+			}
+                    }
+                }
+		print "Newest daily outside retention period: $newest_daily_outside_retention_period\n" if ($flag_verbose);
+		push @keep_daily, $newest_daily_outside_retention_period;
+		
+		# De incrementals die we willen bewaren (alle sinds $newest_daily_outside_retention_period)
+		foreach my $date (@dates) {
+		    if ($date =~ /^(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})$/) {
+			if (!defined($newest_daily_outside_retention_period)) {
+			    print "No newest daily outside retention period\n" if ($flag_verbose);
+			    push @keep_incr, $date;
+			}
+			else {
+			    my $backup_date = timelocal($6, $5, $4, $3, $2-1, $1-1900, 0, 0, 0);
+			    $newest_daily_outside_retention_period =~ /^(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})$/;
+			    my $newest_daily_outside_retention_period_ts = timelocal($6, $5, $4, $3, $2-1, $1-1900, 0, 0, 0);
+			    if ($backup_date >= $newest_daily_outside_retention_period_ts) {
+				if ($data{$module}{$path}{$date}{'type'} eq 'diff' || $data{$module}{$path}{$date}{'type'} eq 'incr') {
+				    print "Incremental/differential $date is newer than newest daily outside retention period: $newest_daily_outside_retention_period\n" if ($flag_verbose);
+				    push @keep_incr, $date;
+				}
+			    }
+			}
+		    }
+		}
+		
 		# nu nog even een grote lijst van maken .....
-		my @keep_backups = (@full_backups, @month_backup, @hyear_backup);
-
+		my @keep_backups = (@keep_daily, @keep_monthly, @keep_yearly, @keep_incr);
+		
+		
 		# .. welke wilden we nu ook al weer bewaren?
 		foreach my $date (@dates) {
-			next if (($date lt $only_delete_before) && (! is_in_array($date, @keep_backups)));
+		    next if (! is_in_array($date, @keep_backups));
 
-			print "keep " . $data{$module}{$path}{$date}{'file'} . "\n" if($flag_verbose);
-			delete $data{$module}{$path}{$date};
+		    print "keep " . $data{$module}{$path}{$date}{'file'} . "\n" if($flag_verbose);
+		    delete $data{$module}{$path}{$date};
 		}
-
+		
 		# verwijder niet-interessante onderdelen
 		foreach my $date (sort keys %{$data{$module}{$path}}) {
-#			print "rm " . $data{$module}{$path}{$date}{'file'} . "\n";
-			if (! $flag_no_act) {
-				unlink $data{$module}{$path}{$date}{'file'};
-				unlink $data{$module}{$path}{$date}{'file'}.'.report';
-				unlink $data{$module}{$path}{$date}{'file'}.'.list';
-				unlink $data{$module}{$path}{$date}{'file'}.'.errors';
-				delete $data{$module}{$path}{$date};
-			}
+		    print "rm " . $data{$module}{$path}{$date}{'file'} . "\n" if ($flag_verbose);
+		    if (! $flag_no_act) {
+#				unlink $data{$module}{$path}{$date}{'file'};
+#				unlink $data{$module}{$path}{$date}{'file'}.'.report';
+#				unlink $data{$module}{$path}{$date}{'file'}.'.list';
+#				unlink $data{$module}{$path}{$date}{'file'}.'.errors';
+#				delete $data{$module}{$path}{$date};
+		    }
 		}
-	}
-}
+	    }
+    }
+

@@ -1,3 +1,19 @@
+snt-backup (2.1-34) stable; urgency=low
+
+  * Added configurable data-retention policies to cleanup.pl
+	
+    Note: This change alters the default behaviour of cleanup.pl when it 
+    comes to data retention. The previous version kept the last 2 full backups, 
+    the last 2 first-of-months backups, and the last 2 first-of-half-year 
+    backups. This version keeps all full backups newer than 31 days, all 
+    first-of-month backups newer than 365 years, and all first-of-year backups.
+    
+    Depending on the frequency and type of backups, the period of available 
+    backups and/or diskspace usage may change heavily. Be sure to configure the
+    data retention times to suit your needs.
+		
+ -- Rien Broekstra <rien@rename-it.nl>  Wed, 07 May 2008 15:42:34 +0100
+
 snt-backup (2.1-33) stable; urgency=low
 
   * Fix warning in snapshot-wrapper script
