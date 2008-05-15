@@ -11,7 +11,7 @@ fi
 
 # remove old hostkeys
 while read -r LINE; do
-	grep -vx "$LINE" /etc/ssh/ssh_known_hosts > /etc/ssh/ssh_known_hosts.tmp
+	grep -vx "$LINE" /etc/ssh/ssh_known_hosts > /etc/ssh/ssh_known_hosts.tmp || true
 	mv /etc/ssh/ssh_known_hosts.tmp /etc/ssh/ssh_known_hosts
 done < /etc/snt-backup/known_hosts.old
 
