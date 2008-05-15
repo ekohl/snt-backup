@@ -9,6 +9,13 @@ if [ ! -e /etc/ssh/ssh_known_hosts ]; then
 	touch /etc/ssh/ssh_known_hosts
 fi
 
+# remove old hostkeys
+while read -r LINE; do
+	grep -vx "$LINE" /etc/ssh/ssh_known_hosts > /etc/ssh/ssh_known_hosts.tmp
+	mv /etc/ssh/ssh_known_hosts.tmp /etc/ssh/ssh_known_hosts
+done < /etc/snt-backup/known_hosts.old
+
+# add new hostkeys
 while read -r LINE; do
 	if ! grep -qx "$LINE" /etc/ssh/ssh_known_hosts; then
 		echo "$LINE" >> /etc/ssh/ssh_known_hosts
