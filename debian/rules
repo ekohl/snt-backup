@@ -57,7 +57,8 @@ install: build
 
 	# config files & libraries
 	for file in \
-		./etc/snt-backup/known_hosts; \
+		./etc/snt-backup/known_hosts \
+		./etc/snt-backup/known_hosts.old; \
 	do \
 		install -o root -g root -m 0644 -p root/$$file $(DESTDIR_HKEY)/$$file; \
 	done
