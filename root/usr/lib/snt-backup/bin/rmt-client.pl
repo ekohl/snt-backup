@@ -150,9 +150,32 @@ die "Usage: $0 <remote file> [<command> [<arg>] .. ['|' <command> [<arg>] .. ]]\
 
 my $rfile = shift @ARGV;
 my @commands = ();
+my $errors = '';
 my @pids = ();
+sub wait_pids {
+	for (my $i=0; $i < @pids; $i++) {
+		my $pid = $pids[$i];
+		my $cmd = $commands[$i][0];
+		my $kid;
+		do {
+			$kid = waitpid($pid, 0);
+		} until defined $kid && ($kid == -1 || $kid == $pid);
+
+		if ($kid == $pid) {
+			if (my $exitcode = $?) {
+				warn "pid $pid ($cmd) exit code: '$exitcode'..\n";
+				$errors .= "pid $pid ($cmd) exit code: '$exitcode'..\n";
+			}
+		} else {
+			warn "missed exit code from pid $pid ($cmd)\n";
+		}
+	}
+	@pids = ();
+}
 
 my $read_fd = *STDIN;
+
+END { close($read_fd) if defined $read_fd; wait_pids }
 
 if (@ARGV) {
 	my $cmd = [];
@@ -209,25 +232,10 @@ RMTopen($rfile);
 while (sysread $read_fd, (my $buf), 16384) {
 	RMTwrite($buf);
 }
-my $errors = '';
-for (my $i=0; $i < @pids; $i++) {
-	my $pid = $pids[$i];
-	my $cmd = $commands[$i][0];
-	my $kid;
-	do {
-		$kid = waitpid($pid, 0);
-	} until defined $kid && ($kid == -1 || $kid == $pid);
-
-	if ($kid == $pid) {
-		if (my $exitcode = $?) {
-			warn "pid $pid ($cmd) exit code: '$exitcode'..\n";
-			$errors .= "pid $pid ($cmd) exit code: '$exitcode'..\n";
-		}
-	} else {
-		warn "missed exit code from pid $pid ($cmd)\n";
-	}
-}
+close($read_fd);
+$read_fd = undef;
 RMTclose();
+wait_pids();
 
 if ($errors ne '') {
 	RMTopen($rfile.'.error');
