@@ -203,10 +203,10 @@ if (my $error = $?) {
 system(@ARGV);
 my $wrap_error = $?;
 
-chdir('/');
-if (my $error = $?) {
-	# 0 = ok
-	warn "failed to change directory to /\n";
+unless (chdir('/')) {
+	my $error = $!;
+
+	warn "failed to change directory to '/': $error\n";
 	system('umount', $snap_mnt_path);
 	system('/sbin/lvremove', '-f', $snap_dev);
 	exit 1;
