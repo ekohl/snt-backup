@@ -5,10 +5,11 @@ set -e
 action=$1
 version=$2
 
+mkdir -p /etc/snt-backup
+
 # todo: eigenlijk zou 'config' niet mogen schrijven, dus het is
 # netter om dit eens te verplaatsen naar de preinst
 if [ -d /etc/backups/conf ] && [ ! -d /etc/snt-backup ]; then
-  mkdir /etc/snt-backup
 
   (
     # load old config
