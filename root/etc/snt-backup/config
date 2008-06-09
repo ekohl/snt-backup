@@ -20,6 +20,8 @@ export C_TAG='.gz'
 #export COMPRESS='| /bin/bzip2 -9'
 #export C_TAG='.bz2'
 
+export DAY_WEEKLY_CLEANUP='monday'
+
 ## Encryption
 #(openssl wrapper)
 #export ENCRYPT='| /usr/lib/snt-backup/bin/data_enc.sh'

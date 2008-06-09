@@ -14,95 +14,98 @@ db_version 2.0
 db_get snt-backup/use_debconf
 
 if [ "_$RET" = "_true" ]; then
-  # encryption
-  db_get snt-backup/use_encryption
-  if [ "_$RET" = "_true" ] && [ ! -f /etc/snt-backup/rsakey.pub ]; then
-    cd ~root/
-    echo "Building encryption key.." >&2
-    /usr/lib/snt-backup/bin/build_key.sh >&2
-  fi
+	# encryption
+	db_get snt-backup/use_encryption
+	if [ "_$RET" = "_true" ] && [ ! -f /etc/snt-backup/rsakey.pub ]; then
+		cd ~root/
+		echo "Building encryption key.." >&2
+		/usr/lib/snt-backup/bin/build_key.sh >&2
+	fi
 
-  {
-    echo "# /etc/snt-backup/config"
-    echo "#"
-    echo "# Configuration file for snt-backup package"
-    echo
-    echo "# *** WARNING ***"
-    echo "# configured with debconf, use dpkg-reconfigure snt-backup"
-    echo "# to change these values.."
-    echo
-    echo "export IDENTITY='/etc/snt-backup/id_dsa'"
-    echo "export SNAPSHOTDIR='/var/cache/snt-backup'"
-    echo "export BACKUPFILE='dirs'"
-    echo "export DATEFIX=\"\`date +%Y-%m-%d_%H-%M-%S\`\""
-    db_get snt-backup/location
-    echo "export TODIR='$RET'"
-    db_get snt-backup/hostname_tag
-    echo "export HOSTNAME_TAG='$RET'"
-    echo
-    echo "## Explicit plugin activation (None==autodetect)"
-    db_get snt-backup/explicit_plugin_activation
-    PLUGINS=`echo $RET | sed 's/, / /g'`
-    echo "export LOAD_PLUGINS='$PLUGINS'"
-    echo
-    echo
-    echo "## Compression"
-    db_get snt-backup/use_compression
-    echo "#(gzip)"
-    if [ "_$RET" = "_gzip" ]; then
-      echo "export COMPRESS='| /bin/gzip -9n'"
-      echo "export C_TAG='.gz'"
-    else
-      echo "#export COMPRESS='| /bin/gzip -9n'"
-      echo "#export C_TAG='.gz'"
-    fi
-    echo
-    echo "#(bzip)"
-    if [ -x '/usr/bin/bzip2' ]; then
-      if [ "_$RET" = "_bzip2" ]; then
-        echo "export COMPRESS='| /usr/bin/bzip2 -9'"
-        echo "export C_TAG='.bz2'"
-      else
-        echo "#export COMPRESS='| /usr/bin/bzip2 -9'"
-        echo "#export C_TAG='.bz2'"
-      fi
-    else
-      if [ "_$RET" = "_bzip2" ]; then
-        echo "export COMPRESS='| /bin/bzip2 -9'"
-        echo "export C_TAG='.bz2'"
-      else
-        echo "#export COMPRESS='| /bin/bzip2 -9'"
-        echo "#export C_TAG='.bz2'"
-      fi
-    fi
-    echo
-    echo "## Encryption"
-    db_get snt-backup/use_encryption
-    echo "#(openssl wrapper)"
-    if [ "_$RET" = "_true" ]; then
-      echo "export ENCRYPT='| /usr/lib/snt-backup/bin/data_enc.sh'"
-      echo "export E_TAG='.enc'"
-    else
-      echo "#export ENCRYPT='| /usr/lib/snt-backup/bin/data_enc.sh'"
-      echo "#export E_TAG='.enc'"
-    fi
-    echo
-    echo "## Hooks"
-    echo "#(mysql pre and post scripts)"
-    db_get snt-backup/use_mysql_locking
-    if [ "_$RET" = "_true" ]; then
-      echo "export PRE_mysql='/usr/local/lib/mysql_lock'"
-      echo "export POST_mysql='/usr/local/lib/mysql_unlock'"
-    else
-      echo "#export PRE_mysql='/usr/local/lib/mysql_lock'"
-      echo "#export POST_mysql='/usr/local/lib/mysql_unlock'"
-    fi
-  } > /etc/snt-backup/config.new
+	{
+		echo "# /etc/snt-backup/config"
+		echo "#"
+		echo "# Configuration file for snt-backup package"
+		echo
+		echo "# *** WARNING ***"
+		echo "# configured with debconf, use dpkg-reconfigure snt-backup"
+		echo "# to change these values.."
+		echo
+		echo "export IDENTITY='/etc/snt-backup/id_dsa'"
+		echo "export SNAPSHOTDIR='/var/cache/snt-backup'"
+		echo "export BACKUPFILE='dirs'"
+		echo "export DATEFIX=\"\`date +%Y-%m-%d_%H-%M-%S\`\""
+		db_get snt-backup/location
+		echo "export TODIR='$RET'"
+		db_get snt-backup/hostname_tag
+		echo "export HOSTNAME_TAG='$RET'"
+		echo
+		echo "## Explicit plugin activation (None==autodetect)"
+		db_get snt-backup/explicit_plugin_activation
+		PLUGINS=`echo $RET | sed 's/, / /g'`
+		echo "export LOAD_PLUGINS='$PLUGINS'"
+		echo
+		echo
+		echo "## Compression"
+		db_get snt-backup/use_compression
+		echo "#(gzip)"
+		if [ "_$RET" = "_gzip" ]; then
+			echo "export COMPRESS='| /bin/gzip -9n'"
+			echo "export C_TAG='.gz'"
+		else
+			echo "#export COMPRESS='| /bin/gzip -9n'"
+			echo "#export C_TAG='.gz'"
+		fi
+		echo
+		echo "#(bzip)"
+		if [ -x '/usr/bin/bzip2' ]; then
+			if [ "_$RET" = "_bzip2" ]; then
+				echo "export COMPRESS='| /usr/bin/bzip2 -9'"
+				echo "export C_TAG='.bz2'"
+			else
+				echo "#export COMPRESS='| /usr/bin/bzip2 -9'"
+				echo "#export C_TAG='.bz2'"
+			fi
+		else
+			if [ "_$RET" = "_bzip2" ]; then
+				echo "export COMPRESS='| /bin/bzip2 -9'"
+				echo "export C_TAG='.bz2'"
+			else
+				echo "#export COMPRESS='| /bin/bzip2 -9'"
+				echo "#export C_TAG='.bz2'"
+			fi
+		fi
+		echo
+		echo "## Encryption"
+		db_get snt-backup/use_encryption
+		echo "#(openssl wrapper)"
+		if [ "_$RET" = "_true" ]; then
+			echo "export ENCRYPT='| /usr/lib/snt-backup/bin/data_enc.sh'"
+			echo "export E_TAG='.enc'"
+		else
+			echo "#export ENCRYPT='| /usr/lib/snt-backup/bin/data_enc.sh'"
+			echo "#export E_TAG='.enc'"
+		fi
+		echo
+		echo "## Hooks"
+		echo "#(mysql pre and post scripts)"
+		db_get snt-backup/use_mysql_locking
+		if [ "_$RET" = "_true" ]; then
+			echo "export PRE_mysql='/usr/local/lib/mysql_lock'"
+			echo "export POST_mysql='/usr/local/lib/mysql_unlock'"
+		else
+			echo "#export PRE_mysql='/usr/local/lib/mysql_lock'"
+			echo "#export POST_mysql='/usr/local/lib/mysql_unlock'"
+		fi
+		echo
+		db_get snt-backup/day_weekly_cleanups
+		echo "export DAY_WEEKLY_CLEANUP='$RET'"
+	} > /etc/snt-backup/config.new
 
-  if [ -f /etc/snt-backup/config ]; then
-    mv -f /etc/snt-backup/config /etc/snt-backup/config.old
-  fi
-  mv -f /etc/snt-backup/config.new /etc/snt-backup/config
+	if [ -f /etc/snt-backup/config ]; then
+		mv -f /etc/snt-backup/config /etc/snt-backup/config.old
+	fi
+	mv -f /etc/snt-backup/config.new /etc/snt-backup/config
 
 fi
 

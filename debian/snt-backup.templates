@@ -86,5 +86,15 @@ Description: Plugins expliciet activeren?
  .
  Indien je geen plugins expliciet activeert, dan zal snt-backup
  automatisch detecteren welke plugins beschikbaar zijn, en alle
- beschikbare plugins uitvoeren. 
- 
+ beschikbare plugins uitvoeren.
+
+Template: snt-backup/day_weekly_cleanups
+Type: multiselect
+Choices: saturday, sunday, monday, tuesday, wednesday, thursday, friday
+Default: monday
+Description: Op welke dag moet de weekly cleanup gedraaid worden?
+ Default wordt de weekly cleanup op maandag-ochtend gedraaid (met als
+ gevolg dat bijvoorbeeld een full weekly backup op maandag gedraaid
+ wordt) In sommige gevallen kunnen de backups beter op een andere dag
+ dan maandag gedraaid worden.
+

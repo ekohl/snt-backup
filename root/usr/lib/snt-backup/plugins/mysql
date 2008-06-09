@@ -8,84 +8,91 @@
 # mysql_backup - maak een backup van alle mysql databases
 #
 function mysql_backup {
-    ALL_DATABASES=`mysqldump --defaults-extra-file=${CONFDIR}/mysql/mysql.conf --help | egrep ^all-databases | tr -s ' ' | cut -d' ' -f 2`
+	ALL_DATABASES=`mysqldump --defaults-extra-file=${CONFDIR}/mysql/mysql.conf --help | egrep ^all-databases | tr -s ' ' | cut -d' ' -f 2`
 
-    # Als de dump configuratie --all-databases bevat, of een
-    # expliciete databases configuratie, moeten we slechts 1 dump
-    # uitvoeren. In het andere geval moeten alle databases apart worden
-    # gedumpt.
-    if [ "${ALL_DATABASES}x" = "TRUEx" ]; then
-	
-	echo "Dumping all mysql databases"
+	# Als de dump configuratie --all-databases bevat, of een
+	# expliciete databases configuratie, moeten we slechts 1 dump
+	# uitvoeren. In het andere geval moeten alle databases apart worden
+	# gedumpt.
+	if [ "${ALL_DATABASES}x" = "TRUEx" ]; then
+		echo "Dumping all mysql databases"
 
-	if [ "${HOSTNAME_TAG}x" == "x" ]; then
-	    TOFILE="mysql_${DATEFIX}_complete.sql"
-	else
-	    TOFILE="mysql_${DATEFIX}_${HOSTNAME_TAG}_complete.sql"
-	fi
-	
-	"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
-	    mysqldump --defaults-extra-file="${CONFDIR}/mysql/mysql.conf" \
-	    $COMPRESS $ENCRYPT \
-	    || { touch "${SNAPSHOTDIR}/error"; echo 'mysql backup failed.'; }
-	    
-    else 
-	
-	# vraag de lijst met databases op
-	mysql --defaults-extra-file="${CONFDIR}/mysql/mysql.conf" --batch --exec='SHOW DATABASES;' | (
-		# lees de header van de tabel in..
-		read -r DUMMY
+		if [ "${HOSTNAME_TAG}x" == "x" ]; then
+			TOFILE="mysql_${DATEFIX}_complete.sql"
+		else
+			TOFILE="mysql_${DATEFIX}_${HOSTNAME_TAG}_complete.sql"
+		fi
 
-		# lees een voor een de database namen in..
-		while read -r MYSQL_DB
-		do
-			if ! grep -Fxq "${MYSQL_DB}" "${CONFDIR}/mysql/mysql.exclude"
-			then
-				echo "Dumping mysql database: '${MYSQL_DB}'"
-				
-				if [ "${HOSTNAME_TAG}x" == "x" ]; then
-				    TOFILE="mysql_${DATEFIX}_${MYSQL_DB}.sql"
-				else
-				    TOFILE="mysql_${DATEFIX}_${HOSTNAME_TAG}_${MYSQL_DB}.sql"
+		"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
+			mysqldump --defaults-extra-file="${CONFDIR}/mysql/mysql.conf" \
+			$COMPRESS $ENCRYPT \
+				|| {	touch "${SNAPSHOTDIR}/error"; \
+						echo 'mysql backup failed.'; }
+
+	else 
+		# vraag de lijst met databases op
+
+		mysql --defaults-extra-file="${CONFDIR}/mysql/mysql.conf" \
+				--batch --exec='SHOW DATABASES;' | (
+			# lees de header van de tabel in..
+			read -r DUMMY
+
+			# lees een voor een de database namen in..
+			while read -r MYSQL_DB
+			do
+				if ! grep -Fxq "${MYSQL_DB}" "${CONFDIR}/mysql/mysql.exclude"
+				then
+					echo "Dumping mysql database: '${MYSQL_DB}'"
+
+					if [ "${HOSTNAME_TAG}x" == "x" ]; then
+						TOFILE="mysql_${DATEFIX}_${MYSQL_DB}.sql"
+					else
+						TOFILE="mysql_${DATEFIX}_${HOSTNAME_TAG}_${MYSQL_DB}.sql"
+					fi
+
+					"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
+						mysqldump --defaults-extra-file="${CONFDIR}/mysql/mysql.conf" \
+							--opt "${MYSQL_DB}" \
+						$COMPRESS $ENCRYPT \
+							|| {	touch "${SNAPSHOTDIR}/error"; \
+									echo 'mysql backup failed.'; }
 				fi
-
-				"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
-					mysqldump --defaults-extra-file="${CONFDIR}/mysql/mysql.conf" \
-						--opt "${MYSQL_DB}" $COMPRESS $ENCRYPT \
-					|| { touch "${SNAPSHOTDIR}/error"; echo 'mysql backup failed.'; }
-			fi
-		done
-	)
-
-    fi
-
-    LOG_BIN_BASENAME=`/usr/sbin/mysqld --verbose --help | sed 's/^log-bin  *//p;d' | sed 's/\.[^\.]\+$//'`
-    DATA_DIR=`/usr/sbin/mysqld --verbose --help         | sed 's/^datadir  *//p;d'`
-
-    # FIXME: This should be done more cleanly
-    if [ "${LOG_BIN_BASENAME}x" != '(No default value)x' -a "${LOG_BIN_BASENAME}x" != 'x' ]; then
-
-	# Binary logging is enabled; Backup all binary logs.
-
-	if [ "${HOSTNAME_TAG}x" == "x" ]; then
-	    TARFILE="${TODIR}/mysql_${DATEFIX}_binlogs.tar"
-	else
-	    TARFILE="${TODIR}/mysql_${DATEFIX}_${HOSTNAME_TAG}_binlogs.tar"
+			done
+		)
 	fi
 
-	# NOTE: bashism
-	if [ "${LOG_BIN_BASENAME:0:1}" != "/" ]; then
-		# path is relative to DATA_DIR
-		LOG_BIN_BASENAME="${DATA_DIR}/${LOG_BIN_BASENAME}"
-	else
-		LOG_BIN_BASENAME="./${LOG_BIN_BASENAME}"
+	LOG_BIN_BASENAME=`/usr/sbin/mysqld --verbose --help	| sed 's/^log-bin  *//p;d' | sed 's/\.[^\.]\+$//'`
+	DATA_DIR=`/usr/sbin/mysqld --verbose --help			| sed 's/^datadir  *//p;d'`
+
+	# FIXME: This should be done more cleanly
+	if [ "${LOG_BIN_BASENAME}x" != '(No default value)x' -a "${LOG_BIN_BASENAME}x" != 'x' ]; then
+		# Binary logging is enabled; Backup all binary logs.
+
+		if [ "${HOSTNAME_TAG}x" == "x" ]; then
+			TARFILE="${TODIR}/mysql_${DATEFIX}_binlogs.tar"
+		else
+			TARFILE="${TODIR}/mysql_${DATEFIX}_${HOSTNAME_TAG}_binlogs.tar"
+		fi
+
+		# NOTE: bashism
+		if [ "${LOG_BIN_BASENAME:0:1}" != "/" ]; then
+			# path is relative to DATA_DIR
+			DATA_DIR="`echo "$DATA_DIR" | sed 's/\/$//'`"
+			LOG_BIN_BASENAME="${DATA_DIR}/${LOG_BIN_BASENAME}"
+		fi
+
+		echo "Dumping mysql binary logs"
+		"${BASEDIR}/bin/rmt-client.pl" "${TARFILE}${C_TAG}${E_TAG}" \
+			find "${LOG_BIN_BASENAME}"* -type f -print '|' \
+			sed 's:^:.:' '|' \
+			tar --create --file - \
+				--directory / \
+				--files-from - --no-recursion --no-wildcards \
+				--ignore-failed-read --blocking-factor=1 \
+			$COMPRESS $ENCRYPT \
+				|| {	touch "${SNAPSHOTDIR}/error"; \
+						echo 'mysql backup failed.'; }
 	fi
-
-	echo "Dumping mysql binary logs"
-        "${BASEDIR}/bin/rmt-client.pl" "${TARFILE}${C_TAG}${E_TAG}" tar -C / --ignore-failed-read --create --file - --blocking-factor=1 -P "${LOG_BIN_BASENAME}"* $COMPRESS $ENCRYPT || { touch "${SNAPSHOTDIR}/error"; echo 'mysql backup failed.'; }
-	
-    fi
-
 }
 
 #
