@@ -1,3 +1,12 @@
+snt-backup (2.1-37) stable; urgency=low
+
+  * Added support for changing the day of the full backup
+  * Fix 'mkdir /etc/snt-backup' problem at install
+  * Added ssh master-channel support
+  * Cleanup snt-backup cron.d entry
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Wed, 08 Oct 2008 11:54:32 +0200
+
 snt-backup (2.1-36) stable; urgency=low
 
   * better error-checking in snapshot wrapper and rmt client scripts

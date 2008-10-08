@@ -81,26 +81,26 @@ fi
 rm -f "${SNAPSHOTDIR}/error"
 
 (
-		if [ "${LOAD_PLUGINS}x" = "x" ]; then
-				# Als niet gedefinieerd is welke plugins we willen laden,
-				# dan laden we ze allemaal automagisch
-				# som alle uitvoerbare plugins in de plugins dir op.. (met +x)
-				PLUGINS="`cd "${BASEDIR}/plugins" && find . -type f -perm +100 -a ! -name '*.dpkg-*' | sed 's|^\./||'`"
-		else
-			# Anders halen we het uit de config
-			PLUGINS=""
-			for plugin in ${LOAD_PLUGINS}; do
-					if [ ! -x ${BASEDIR}/plugins/${plugin} ]; then
-							echo "Error: Plugin ${plugin} not found" 1>&2
-				touch "${SNAPSHOTDIR}/error"
-					else
-						PLUGINS="${PLUGINS} ${plugin}"
-					fi
-			done
-		fi
+	if [ "${LOAD_PLUGINS}x" = "x" ]; then
+			# Als niet gedefinieerd is welke plugins we willen laden,
+			# dan laden we ze allemaal automagisch
+			# som alle uitvoerbare plugins in de plugins dir op.. (met +x)
+			PLUGINS="`cd "${BASEDIR}/plugins" && find . -type f -perm +100 -a ! -name '*.dpkg-*' | sed 's|^\./||'`"
+	else
+		# Anders halen we het uit de config
+		PLUGINS=""
+		for plugin in ${LOAD_PLUGINS}; do
+				if [ ! -x ${BASEDIR}/plugins/${plugin} ]; then
+						echo "Error: Plugin ${plugin} not found" 1>&2
+			touch "${SNAPSHOTDIR}/error"
+				else
+					PLUGINS="${PLUGINS} ${plugin}"
+				fi
+		done
+	fi
 
-		# laad alle scripts in
-		for plugin in ${PLUGINS}; do
+	# laad alle scripts in
+	for plugin in ${PLUGINS}; do
 		echo "Loading plugin '${plugin}'."
 		. "${BASEDIR}/plugins/${plugin}"
 	done

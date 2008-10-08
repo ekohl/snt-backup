@@ -169,7 +169,7 @@ if (my $error = $?) {
 	# 0 = ok
 	# 1 = recovered
 	if ($error != 256) {
-		warn "e2fsck returned an error: $error\n";
+		warn "fsck.$bk_fstype returned an error: $error\n";
 		system('/sbin/lvremove', '-f', $snap_dev);
 		exit 1;
 	}
