@@ -73,13 +73,16 @@ install: build
 		./usr/bin/dpkg-dump \
 		./usr/bin/lock.pl \
 		./usr/lib/snt-backup/bin/backup.sh \
-		./usr/lib/snt-backup/bin/rmt-client.pl \
+		./usr/lib/snt-backup/bin/backup_wrapper.sh \
 		./usr/lib/snt-backup/bin/build_key.sh \
-		./usr/lib/snt-backup/bin/data_enc.sh \
 		./usr/lib/snt-backup/bin/data_dec.sh \
-		./usr/lib/snt-backup/bin/sftp \
+		./usr/lib/snt-backup/bin/data_enc.sh \
+		./usr/lib/snt-backup/bin/mail_wrapper.sh \
+		./usr/lib/snt-backup/bin/rmt-client.pl \
 		./usr/lib/snt-backup/bin/scp \
-		./usr/lib/snt-backup/bin/snapshot-wrapper.pl; \
+		./usr/lib/snt-backup/bin/sftp \
+		./usr/lib/snt-backup/bin/snapshot-wrapper.pl \
+		./usr/lib/snt-backup/bin/ssh_wrapper.pl; \
 	do \
 		install -o root -g root -m 0755 -p root/$$file $(DESTDIR_UTILS)/$$file; \
 	done

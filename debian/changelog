@@ -1,3 +1,9 @@
+snt-backup (2.1-38) stable; urgency=low
+
+  * Bugfix release: add new files to package
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Wed, 08 Oct 2008 12:10:31 +0200
+
 snt-backup (2.1-37) stable; urgency=low
 
   * Added support for changing the day of the full backup
