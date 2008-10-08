@@ -216,13 +216,21 @@ if (@ARGV) {
 # build rmt command
 my $rmt_id_dsa  = $ENV{'HOME'}.'/.ssh/id_dsa';
 $rmt_id_dsa     = $ENV{'IDENTITY'} if defined $ENV{'IDENTITY'};
+my $rmt_control = $ENV{'SSH_CONTROL_PATH'};
 
 my $rmt_account = undef;
 $rmt_account    = $1 if $rfile =~ s/^([^:]+)://;
 
 # open rmt tunnel
 if (defined $rmt_account) {
-	my $rmt_cmd = "/usr/bin/ssh -T -a -x -i '$rmt_id_dsa' '$rmt_account' /etc/rmt";
+	my $opts = '-T -a -x';
+	if (defined $rmt_id_dsa) {
+		$opts .= " -i '$rmt_id_dsa'";
+	}
+	if (defined $rmt_control) {
+		$opts .= " -o 'ControlPath $rmt_control'";
+	}
+	my $rmt_cmd = "/usr/bin/ssh $opts '$rmt_account' /etc/rmt";
 
 	open2($rmt_rd, $rmt_wr, $rmt_cmd)
 		or die "Could not spawn ssh: $!";
