@@ -8,12 +8,14 @@ export CONFDIR='/etc/snt-backup'
 #			- backup	het maken van een backup
 #			- weekly	voor wekelijkse cleanups e.d.
 #			- monthly	voor maandelijkse cleanups e.d.
+#			- cleanup   clean all incremental data and force a full backup
+#                       on the next 'backup' invocation
 #
 export FUNC='backup'
 
 if [ "${#}" != 1 -o "_${1}" = "_-h" -o "_${1}" = "_--help" ]
 then
-	echo "Usage: ${0} [ backup | weekly | monthly ]" >&2
+	echo "Usage: ${0} [ backup | weekly | monthly | cleanup ]" >&2
 	exit 1
 fi
 
@@ -26,6 +28,9 @@ case "${1}" in
 		;;
 	monthly)
 		export FUNC='monthly'
+		;;
+	cleanup)
+		export FUNC='cleanup'
 		;;
 	*)
 		echo "Unknown command '${1}'!" >&2
@@ -113,7 +118,15 @@ rm -f "${SNAPSHOTDIR}/error"
 		fi
 
 		echo "Running plugin '${plugin}'."
-		"`echo "${plugin}" | sed 's|/|_|g'`_${FUNC}"
+		if [ "_${FUNC}" = '_cleanup' ]; then
+			export FUNC=weekly
+			"`echo "${plugin}" | sed 's|/|_|g'`_weekly"
+			export FUNC=monthly
+			"`echo "${plugin}" | sed 's|/|_|g'`_monthly"
+			export FUNC=cleanup
+		else
+			"`echo "${plugin}" | sed 's|/|_|g'`_${FUNC}"
+		fi
 
 		if [ "_${FUNC}" = '_backup' ] && [ "`eval "echo -n \\\$POST_${plugin}"`" ]; then
 			echo "Running post-${plugin} script."

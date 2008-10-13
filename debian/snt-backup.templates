@@ -89,7 +89,7 @@ Description: Plugins expliciet activeren?
  beschikbare plugins uitvoeren.
 
 Template: snt-backup/day_weekly_cleanups
-Type: multiselect
+Type: select
 Choices: saturday, sunday, monday, tuesday, wednesday, thursday, friday
 Default: monday
 Description: Op welke dag moet de weekly cleanup gedraaid worden?
