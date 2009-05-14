@@ -102,7 +102,7 @@ die "Invalid original lvm volume device '$bk_dev'\n"
 	unless $bk_dev =~ /\A(\/dev\/[^\/]+)\/[^\/]+\z/;
 $snap_grp = $1 unless defined $snap_grp;
 die "Unknown file-system type '$bk_fstype'\n"
-	unless grep { $bk_fstype eq $_ } qw/ ext2 ext3 reiserfs jfs xfs /;
+	unless grep { $bk_fstype eq $_ } qw/ ext2 ext3 ext4 reiserfs jfs xfs /;
 
 # check snapshot lvm
 die "Invalid lvm volume group '$snap_grp'\n"
