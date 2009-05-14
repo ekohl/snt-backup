@@ -5,8 +5,9 @@
 # - journalling _SHOULD_ _NEVER_ be on an external device;
 #   if we recover from the journal, we cripple the
 #   original filesystem
-# - detect full snapshot (parse lvdisplay or try to write to
-#   device)
+# - detect full (overflown) snapshot (parse lvdisplay or try to
+#   write to device)
+
 
 use strict;
 
@@ -42,11 +43,29 @@ unless (defined $bk_dev || defined $bk_fstype || defined $bk_fsopt) {
 	}
 	close MNT;
 
+	if (defined $mnt_dev && $mnt_dev =~ s/\A\/dev\/mapper\///) {
+		$mnt_dev = undef unless $mnt_dev =~ s/(?<!-)-(?!-)/\//;
+		if (defined $mnt_dev) {
+			$mnt_dev =~ s/--/-/g;
+			$mnt_dev = '/dev/'.$mnt_dev;
+		}
+		warn "Failed to convert /dev/mapper/<vg>-<lv> into /dev/<vg>/<lv>.\n"
+			unless defined $mnt_dev;
+	}
+
 	$bk_dev    = $mnt_dev    unless defined $bk_dev;
 	$bk_fstype = $mnt_fstype unless defined $bk_fstype;
 
 	die "Mount-point '$bk_path' is not mounted!\n"
 		unless defined $bk_dev;
+}
+
+if (!defined $bk_fstype && defined $bk_dev && -x '/sbin/vol_id') {
+	my $bk_dev_esc = $bk_dev;
+	$bk_dev_esc =~ s/'/'\\''/g; # shell escaping
+	$bk_fstype = `/sbin/vol_id --type '$bk_dev_esc'`;
+	chomp $bk_fstype;
+	$bk_fstype = undef if $bk_fstype eq '';
 }
 
 $bk_fstype = 'ext3' unless defined $bk_fstype;
