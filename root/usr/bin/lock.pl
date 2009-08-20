@@ -7,30 +7,49 @@ use Fcntl;
 
 my $use_md5 = eval { require Digest::MD5 };
 
-my $lockfile = undef;
+my @lockfiles = ();
+my $acquire_time = 60;
+my $lock_all = 1;
 
-if ((@ARGV) && ($ARGV[0] =~ /^-/)) {
+while ((@ARGV) && ($ARGV[0] =~ /^-/)) {
 	my $param = shift @ARGV;
 	if (($param =~ /^-l$/) || ($param =~ /^--lockfile$/)) {
-		if (@ARGV) {
-			$lockfile = shift @ARGV;
-		} else {
+		unless (@ARGV) {
 			print STDERR "Invalid parameter.\n";
 			exit 1;
 		}
+		push @lockfiles, shift @ARGV;
+
 	} elsif (($param =~ /^-l=(.*)$/) || ($param =~ /^--lockfile=(.*)$/)) {
-		$lockfile = $1;
+		push @lockfiles, $1;
+
+	} elsif (($param =~ /^-a$/) || ($param =~ /^--acquire-time$/)) {
+		unless (@ARGV) {
+			print STDERR "Invalid parameter.\n";
+			exit 1;
+		}
+		$acquire_time = shift @ARGV;
+
+	} elsif (($param =~ /^-a=(.*)$/) || ($param =~ /^--acquire-time=(.*)$/)) {
+		$acquire_time = $1;
+
+	} elsif ($param eq '--one-lock') {
+		$lock_all = 0;
+
 	} else {
 		print STDERR "Unknown parameter: '$param'.\n";
 	}
 }
 
+die "Invalid lock-acquire time: '$acquire_time'.\n"
+	unless $acquire_time =~ /^[1-9]\d*$/;
+
 unless (@ARGV) {
-	print STDERR "Usage: $0 [--lockfile <lockfile>] <command> <args..>\n";
+	print STDERR "Usage: $0 [--lockfile <lockfile>] [--acquire-time <seconds>] <command> <args..>\n";
 	exit 0;
 }
 
-unless (defined $lockfile) {
+unless (@lockfiles) {
 	my $hash = join "\0", @ARGV;
 	if ($use_md5) {
 		$hash = Digest::MD5::md5_hex($hash);
@@ -39,44 +58,59 @@ unless (defined $lockfile) {
 		while ($hash =~ s/^(.{1,16})//s) { $hash2 ^= $1 }
 		$hash = unpack 'H*', $hash2;
 	}
-	$lockfile = '/var/lock/.lockfile-'.$hash;
+	push @lockfiles, '/var/lock/.lockfile-'.$hash;
 }
 
-if (sysopen LOCK, $lockfile, O_RDONLY) {
-	my $pid = <LOCK>;
-	close LOCK;
+foreach my $lockfile (@lockfiles) {
+	if (sysopen LOCK, $lockfile, O_RDONLY) {
+		my $pid = <LOCK>;
+		close LOCK;
 
-	$pid = '' unless defined $pid;
-	chomp $pid;
-	if ($pid =~ /^[1-9][0-9]*$/) {
-		unless ( -d "/proc/$pid" ) {
-			print STDERR "Process locked: PID $pid not found.\n";
+		$pid = '' unless defined $pid;
+		chomp $pid;
+		if ($pid =~ /^[1-9]\d*$/) {
+			unless ( -d "/proc/$pid" ) {
+				print STDERR "Process locked: PID $pid not found (lockfile '$lockfile').\n";
+			}
+		} else {
+			print STDERR "Process locked: No PID in lockfile found (lockfile '$lockfile').\n";
 		}
-	} else {
-		print STDERR "Process locked: No PID in lockfile found.\n";
 	}
 }
 
 # lock
 my $now = time;
-while (! sysopen LOCK, $lockfile, O_CREAT | O_EXCL | O_WRONLY, 0600) {
-	if ($now + 60 <= time) {
-		# lock failed..
-		print STDERR "Process locked: Lock not released after 60 secs.\n";
-		exit 1;
-	}
+my @lock_queue = @lockfiles;
+my @lock_done = ();
+while (@lock_queue) {
+	my $lockfile = shift @lock_queue;
 
-	sleep 1;
+	if (sysopen LOCK, $lockfile, O_CREAT | O_EXCL | O_WRONLY, 0600) {
+		push @lock_done, $lockfile;
+		print LOCK "$$\n";
+		close LOCK;
+		last unless $lock_all;
+
+	} else {
+		push @lock_queue, $lockfile;
+		if ($now + $acquire_time <= time) {
+			# lock failed..
+			print STDERR "Process locked: Lock not released after $acquire_time secs (lockfile '$lockfile').\n";
+			foreach my $lockfile (@lock_done) {
+				unlink $lockfile;
+			}
+			exit 1;
+		}
+
+		sleep 1;
+	}
 }
 
-print LOCK "$$\n";
-close LOCK;
 
 # call command..
 system(@ARGV);
-my $exit_value = $? >> 8;
 
 # unlock
-unlink $lockfile;
-
-exit $exit_value;
+foreach my $lockfile (@lock_done) {
+	unlink $lockfile;
+}
