@@ -22,6 +22,9 @@ function pgsql_backup {
 		PG_SH="sh"
 	fi
 
+	# check whether the database is starting up
+	$PG_SH -c 'echo -n | /usr/bin/psql 2>&1 | /bin/grep -q "FATAL:  the database system is starting up"' && return
+
 	$PG_SH -c '/usr/bin/psql -t -d template1 -c "SELECT datname FROM pg_database ORDER BY datname"' | sed 's/^ *//;/^$/d' | (
 		while read -r PGSQL_DB
 		do
