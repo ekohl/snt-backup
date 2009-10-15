@@ -68,7 +68,8 @@ close F;
 # voer deze lijst in..
 foreach my $file (@list) {
 	chomp $file;
-	$file =~ s|^\./||s;
+	my $realfile = $file;
+	$file =~ s|^.+/||s;
 	next if ($file =~ /\.(report|list|error|errors)$/s);
 
 	my ($module, $date, $path, $type);
@@ -88,12 +89,12 @@ foreach my $file (@list) {
 	}
 
 	# Destilleer een eventueel backup type
-	if ($path =~ /(.*)_(full|incr|diff)$/) {
+	if ($path =~ /(.*)_(full|incr|diff|dummy)$/) {
 		($path, $type) = ($1, $2);
 	}
 
 	$data{$module}{$path}{$date} = {
-		file => $file,
+		file => $realfile,
 		type => $type,
 		module => $module,
 		date => $date,
