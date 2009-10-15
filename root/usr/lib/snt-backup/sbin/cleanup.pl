@@ -10,7 +10,7 @@
 #               - Onbekende bestanden (GEEN backup files)
 #                 negeren, zodat deze niet per ongeluk verwijderd
 #                 kunnen worden.
-#   07/05/2008  - Dataretentie is nu instelbaar in termen van hoe 
+#   07/05/2008  - Dataretentie is nu instelbaar in termen van hoe
 #                 lang data beschikbaar moet zijn.
 
 use strict;
@@ -198,7 +198,7 @@ foreach my $module (keys %data) {
 		# Zoek uit welke dailies we willen bewaren
 
 		#
-		# Deze is iets lastiger. 
+		# Deze is iets lastiger.
 		# Als er niet dagelijks full gebackupt wordt is het mogelijk en
 		# waarschijnlijk dat de oudste dag waar we data van willen hebben
 		# een incremental of differential backup is. Daarom hebben we ook
