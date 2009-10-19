@@ -42,7 +42,7 @@ sub readData {
 
 ### Device openen / sluiten
 my @files = ();
-my $currOpen = undef;
+my $currOpen = undef;  # [ <virt file>, <real file> ]
 
 sub deviceClose {
 	return unless defined $currOpen;
@@ -72,7 +72,7 @@ sub deviceOpen {
 	
 	return 0 unless sysopen FILE, $fname, O_CREAT|O_EXCL|O_WRONLY, 0644;
 
-	$currOpen = $device;
+	$currOpen = [ $device, $fname ];
 	push @files, $fname;
 	return 1;
 }
@@ -117,8 +117,7 @@ while (defined ($cmd = readChar)) {
 	} elsif ($cmd eq 'C') {		# Close device
 		last unless	defined(my $device	= readLine);
 
-		my $file = $currOpen;
-		$file =~ s/^\/+//;
+		my $file = $currOpen->[1];
 		deviceClose;
 
 		if ($device =~ /^md5:(.*)$/) {
