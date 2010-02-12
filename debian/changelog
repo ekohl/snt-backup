@@ -1,3 +1,16 @@
+snt-backup (2.1-40) stable; urgency=low
+
+  * add dependency on cron
+  * skip postgres backup when the database is starting up
+     (redundancy setups)
+  * try to convert /dev/mapper/<vg>-<lv> into /dev/<vg>/<lv> names
+  * use vol_id to determine file-system type
+  * allow ext4 as filesystem type
+  * add support for backup-files in subdirs
+  * update lock.pl file
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Fri, 12 Feb 2010 12:07:14 +0100
+
 snt-backup (2.1-39) stable; urgency=low
 
   * weekly full backups were broken when the full backup wasn't on monday
