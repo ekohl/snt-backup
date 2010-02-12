@@ -30,6 +30,9 @@ if ($next_rev <= $head_rev) {
 			"--revision", "$next_rev:$head_rev", $repos) == 0
 				or die "svnadmin dump failed: $?\n";
 
+	# on svn corruption, dump fails with exit-level 1..
+	# FIXME: idea is to dump every revision individually
+
 	if (open REV, "> $f_rev") {
 		print REV "$head_rev\n";
 		close REV;
