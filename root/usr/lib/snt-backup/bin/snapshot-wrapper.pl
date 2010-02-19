@@ -85,23 +85,23 @@ unless (defined $bk_fsopt) {
 			}
 		}
 
-		if ($bk_fstype =~ /^(?:ext[23]|reiserfs)$/) {
+		if ($bk_fstype =~ /^(?:ext[234]|reiserfs)$/) {
 			$bk_fsopt{acl}++		if $mnt_fsopt{acl};
 			$bk_fsopt{user_xattr}++	if $mnt_fsopt{user_xattr};
 		} elsif ($bk_fstype =~ /^(?:[jx]fs)$/) {
 			# no options
 		} else {
-			die;
+			die "unknown options for filesystem type '$bk_fstype'\n";
 		}
 
 	} else {
-		if ($bk_fstype =~ /^(?:ext[23]|reiserfs)$/) {
+		if ($bk_fstype =~ /^(?:ext[234]|reiserfs)$/) {
 			$bk_fsopt{acl}++;
 			$bk_fsopt{user_xattr}++;
 		} elsif ($bk_fstype =~ /^(?:[jx]fs)$/) {
 			# no options
 		} else {
-			die;
+			die "unknown options for filesystem type '$bk_fstype'\n";
 		}
 	}
 
