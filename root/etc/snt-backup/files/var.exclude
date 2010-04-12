@@ -30,3 +30,4 @@
 ./var/lock
 ./var/spool/cyrus/mail/*/cyrus.index
 ./var/spool/cyrus/mail/*/cyrus.cache
+./var/spool/squid
