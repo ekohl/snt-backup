@@ -9,7 +9,9 @@
 ./var/lib/apt
 ./var/lib/clamav
 ./var/lib/cron
+./var/lib/defoma/*-cache
 ./var/lib/dhcp
+./var/lib/dhcp3
 ./var/lib/dpkg/available
 ./var/lib/dpkg/available-old
 ./var/lib/dpkg/status
@@ -28,6 +30,5 @@
 ./var/lib/rrdtool
 ./var/lib/texmf
 ./var/lock
-./var/spool/cyrus/mail/*/cyrus.index
 ./var/spool/cyrus/mail/*/cyrus.cache
 ./var/spool/squid
