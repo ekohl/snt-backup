@@ -5,6 +5,7 @@ use Fcntl;
 use Data::Dumper;
 
 my $dpkgdir = '/var/lib/dpkg';
+my $aptdir  = '/var/lib/apt';
 
 # gecopypaste uit de dpkg package..
 my @statstr = (
@@ -32,14 +33,19 @@ my @statstr = (
 );
 
 my $dpkgfile = "$dpkgdir/status";
+my $edpkgfile = "$aptdir/extended_states";
 my $flag_src = 0;
 my $flag_tab = 0;
 my @packages;
+
+$edpkgfile = undef unless -e $edpkgfile;
 
 while (@ARGV && $ARGV[0] =~ /^-/) {
 	my $arg = shift;
 	if ($arg eq '-f') {
 		$dpkgfile = shift;
+	} elsif ($arg eq '-e') {
+		$edpkgfile = shift;
 	} elsif ($arg eq '-s') {
 		$flag_src = 1;
 	} elsif ($arg eq '-t') {
@@ -51,6 +57,34 @@ while (@ARGV && $ARGV[0] =~ /^-/) {
 
 @packages = @ARGV;
 my $sep = $flag_tab ? "\t" : ' ';
+
+my %extended_states = ();
+
+if (defined $edpkgfile) {
+	sysopen (F, $edpkgfile, O_RDONLY)
+		or die "Could not open apt extended_states file!\n";
+
+	my $pkg = '';
+	while ($_ = <F>) {
+		chomp $_;
+		if (!/\s/) {
+			$pkg = '';
+		} elsif (/^Package: (.*)$/) {
+			$pkg = $1;
+		} elsif (/^([\w-]+): (.*)$/) {
+			if ($pkg ne '') {
+				$extended_states{$pkg}{$1} = $2;
+			} else {
+				die "syntax error in extended_states.\n";
+			}
+		} else {
+			die "syntax error in extended_states.\n";
+		}
+	}
+
+	close F;
+}
+
 
 sysopen (F, $dpkgfile, O_RDONLY)
 	or die "Could not open dpkg status file!\n";
@@ -96,7 +130,11 @@ sub parse_pkg {
 		return unless grep { $src eq $_ } @packages;
 	}
 
-	print $status[0] . $status[2] . $status[1] . $sep . $package .
+	my $auto_installed = $extended_states{$package}{'Auto-Installed'};
+#	$auto_installed = !defined $auto_installed ? '?' : $auto_installed ? 'a' : 'i';
+	$auto_installed = !defined $auto_installed ? 'i' : $auto_installed ? 'a' : 'i';
+
+	print $status[0] . $status[2] . $status[1] . $auto_installed . $sep . $package .
 		((exists $pkg->{'Version'}) ? $sep . $pkg->{'Version'} : '') . "\n";
 }
 
@@ -126,6 +164,6 @@ while ($_ = <F>) {
 	$line++;
 }
 
-close (F);
+close F;
 
 parse_pkg(\%pkg);
