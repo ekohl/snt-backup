@@ -137,7 +137,9 @@ foreach my $lockfile (@lock_done) {
 	unlink $lockfile;
 }
 
-if ($exitlvl & 255) {
+if ($exitlvl == 0) {
+	exit 0;
+} elsif ($exitlvl & 255) {
 	exit $exitlvl >> 8;
 } else {
 	exit 128 + ($exitlvl & 127);
