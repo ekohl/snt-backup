@@ -194,11 +194,13 @@ install: build
 	### snt-backup-pgsql
 	install -o root -g root -m 0755 -d $(DESTDIR_PGSQL)/etc/snt-backup/pgsql
 	install -o root -g root -m 0755 -d $(DESTDIR_PGSQL)/etc/snt-backup/duplicity/excludes.d
+	install -o root -g root -m 0755 -d $(DESTDIR_PGSQL)/usr/lib/snt-backup/bin
 	install -o root -g root -m 0755 -d $(DESTDIR_PGSQL)/usr/lib/snt-backup/plugins
 	install -o root -g root -m 0755 -d $(DESTDIR_PGSQL)/var/cache/snt-backup/pgsql
 
 	# executable scripts
 	for file in \
+		./usr/lib/snt-backup/bin/pg_dump_sort.pl \
 		./usr/lib/snt-backup/plugins/pgsql \
 		./etc/snt-backup/duplicity/excludes.d/snt-backup-pgsql; \
 	do \
