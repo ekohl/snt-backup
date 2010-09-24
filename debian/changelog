@@ -1,3 +1,17 @@
+snt-backup (2.1-41) stable; urgency=low
+
+  * improve ext4 support in lvm snapshot wrapper
+  * add squid cache, dhcp3 state and defoma cache to backup excludes
+  * remove cyrus.index files from backup excludes
+  * let dpkg-dump dump the extended state of a package (auto-installed or not)
+  * improvements on lock.pl:
+    - better locking in race-condition situations
+       (suppresses warnings about empty pidfiles)
+    - pass on exit status to caller
+  * add pg_dump_sort script, which sorts the records of a table in a pg_dump output
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Fri, 24 Sep 2010 14:49:36 +0200
+
 snt-backup (2.1-40) stable; urgency=low
 
   * add dependency on cron
