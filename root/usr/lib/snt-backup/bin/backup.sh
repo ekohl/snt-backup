@@ -51,6 +51,11 @@ export E_TAG=''
 . "${CONFDIR}/config"
 . "${BASEDIR}/lib/base"
 
+# backup disabled?
+if [ "_${TODIR}" = _ ]; then
+	exit 0
+fi
+
 # cd to snapshotdir
 cd "${SNAPSHOTDIR}" || exit 1
 

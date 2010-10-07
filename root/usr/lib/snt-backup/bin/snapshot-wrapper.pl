@@ -7,7 +7,7 @@
 #   original filesystem
 # - detect full (overflown) snapshot (parse lvdisplay or try to
 #   write to device)
-
+# - sometimes lvm remove reports 'device or resource busy' errors (lvm bug?)
 
 use strict;
 
@@ -237,6 +237,12 @@ if (my $error = $?) {
 	warn "failed to unmount snapshot\n";
 	system('/sbin/lvremove', '-f', $snap_dev);
 	exit 1;
+}
+
+system('/bin/sync');
+if (my $error = $?) {
+	# 0 = ok
+	warn "sync failed, ignored..\n";
 }
 
 system('/sbin/lvdisplay', $snap_dev);
