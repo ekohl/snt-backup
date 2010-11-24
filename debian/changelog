@@ -1,3 +1,12 @@
+snt-backup (2.1-42) stable; urgency=low
+
+  * backupping is disabled when TODIR is empty
+  * add sync in snapshot-wrapper before lvremove (hoping to solve some device-busy problems)
+  * mysql plugin: use /dev/null as pid-file.
+    due to a bug in mysqld/mariadb, the pid-file was removed after requesting --help
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Wed, 24 Nov 2010 11:28:25 +0100
+
 snt-backup (2.1-41) stable; urgency=low
 
   * improve ext4 support in lvm snapshot wrapper
