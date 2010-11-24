@@ -61,8 +61,8 @@ function mysql_backup {
 		)
 	fi
 
-	LOG_BIN_BASENAME=`/usr/sbin/mysqld --verbose --help	| sed 's/^log-bin  *//p;d' | sed 's/\.[^\.]\+$//'`
-	DATA_DIR=`/usr/sbin/mysqld --verbose --help			| sed 's/^datadir  *//p;d'`
+	LOG_BIN_BASENAME=`/usr/sbin/mysqld --verbose --help --pid-file=/dev/null | sed 's/^log-bin  *//p;d' | sed 's/\.[^\.]\+$//'`
+	DATA_DIR=`/usr/sbin/mysqld --verbose --help --pid-file=/dev/null         | sed 's/^datadir  *//p;d'`
 
 	# FIXME: This should be done more cleanly
 	if [ "${LOG_BIN_BASENAME}x" != '(No default value)x' -a "${LOG_BIN_BASENAME}x" != 'x' ]; then
