@@ -55,6 +55,14 @@ function pgsql_backup {
 	PG_BIN=''
 	if [ -d '/usr/lib/postgresql/bin' ]; then
 		PG_BIN='/usr/lib/postgresql/bin'
+	elif [ -d '/usr/lib/postgresql/9.1/bin' ]; then
+		PG_BIN='/usr/lib/postgresql/9.1/bin'
+	elif [ -d '/usr/lib/postgresql/9.0/bin' ]; then
+		PG_BIN='/usr/lib/postgresql/9.0/bin'
+	elif [ -d '/usr/lib/postgresql/8.5/bin' ]; then
+		PG_BIN='/usr/lib/postgresql/8.5/bin'
+	elif [ -d '/usr/lib/postgresql/8.4/bin' ]; then
+		PG_BIN='/usr/lib/postgresql/8.4/bin'
 	elif [ -d '/usr/lib/postgresql/8.3/bin' ]; then
 		PG_BIN='/usr/lib/postgresql/8.3/bin'
 	elif [ -d '/usr/lib/postgresql/8.2/bin' ]; then
