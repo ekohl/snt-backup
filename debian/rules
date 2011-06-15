@@ -16,6 +16,7 @@ export DESTDIR_PGSQL=$(shell pwd)/debian/snt-backup-pgsql
 export DESTDIR_DEBIAN=$(shell pwd)/debian/snt-backup-debian
 export DESTDIR_SVN=$(shell pwd)/debian/snt-backup-svn
 export DESTDIR_SLAPD=$(shell pwd)/debian/snt-backup-slapd
+export DESTDIR_ARIADNE=$(shell pwd)/debian/snt-backup-ariadne
 
 build: build-stamp
 build-stamp:
@@ -291,6 +292,34 @@ install: build
 		./etc/snt-backup/slapd/slapd.secret; \
 	do \
 		install -o root -g root -m 0600 -p root/$$file $(DESTDIR_SLAPD)/$$file; \
+	done
+
+	### snt-backup-ariadne
+	install -o root -g root -m 0755 -d $(DESTDIR_ARIADNE)/etc/snt-backup/ariadne
+	install -o root -g root -m 0755 -d $(DESTDIR_ARIADNE)/usr/lib/snt-backup/bin
+	install -o root -g root -m 0755 -d $(DESTDIR_ARIADNE)/usr/lib/snt-backup/plugins
+	install -o root -g root -m 0755 -d $(DESTDIR_ARIADNE)/var/cache/snt-backup/ariadne
+
+	# executable scripts
+	for file in \
+		./usr/lib/snt-backup/plugins/ariadne \
+		./usr/lib/snt-backup/bin/ariadne-dump.sh \
+		./usr/lib/snt-backup/bin/ariadne-dump-sites.php \
+		./usr/lib/snt-backup/bin/ariadne-dummy-dump.sh \
+		./usr/lib/snt-backup/bin/ariadne-check-ctime.php; \
+	do \
+		install -o root -g root -m 0755 -p root/$$file $(DESTDIR_ARIADNE)/$$file; \
+	done
+
+	# config files & libraries
+	for file in \
+		./etc/snt-backup/ariadne/ \
+		./etc/snt-backup/ariadne/Default.conf \
+		./etc/snt-backup/ariadne/Default.scan \
+		./etc/snt-backup/ariadne/Default.list \
+		./etc/snt-backup/ariadne/installs ;\
+	do \
+		install -o root -g root -m 0644 -p root/$$file $(DESTDIR_ARIADNE)/$$file; \
 	done
 
 binary-indep: build install

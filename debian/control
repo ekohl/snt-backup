@@ -76,3 +76,8 @@ Depends: snt-backup, ldap-utils
 Description: SNT backup scripts slapd support
  SNT backup script for dumping slapd directories
 
+Package: snt-backup-ariadne
+Architecture: all
+Depends: snt-backup, php5-cli
+Description: SNT backup scripts ariadne support
+ SNT backup script for dumping ariadne sites

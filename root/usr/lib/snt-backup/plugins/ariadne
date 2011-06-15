@@ -1,0 +1,198 @@
+#! /bin/bash
+# (al is 't alleen maar om m'n syntax highlighting goed te krijgen.. [BvS])
+
+# lib_ariadne			- ariadne backuppen
+###############################################################################
+
+#
+# convert filename $dir
+#
+function conv_filename {
+	FROP="${1}"
+	echo "${FROP}" |
+		sed -e 's|^/||' -e 's|/$||' -e 's/[ 	]/_/g' -e 's|/|-|g'
+}
+
+
+#
+# ariadne_run_dump $type $dir
+#
+# full - volledig
+# incr - incremental
+# diff - incremental, maar dan zonder de snapshotfile te updaten
+#        ( verzoek van Jasper van der Neut )
+#
+
+function ariadne_run_dump {
+	TYPE="${1}"
+	ARIADNEDIR="${2}"
+	BACKUPDIR="${3}"
+
+	CONVNAME="`conv_filename "${ARIADNEDIR}"`--`conv_filename "${BACKUPDIR}"`"
+	REVFILE="${SNAPSHOTDIR}/ariadne/${CONVNAME}.rev"
+
+	if [ -f "${REVFILE}" ] ; then
+		REVPREV="`cat ${REVFILE}`"
+		"${BASEDIR}/bin/ariadne-check-ctime.php" "${ARIADNEDIR}" "${BACKUPDIR}" "${REVPREV}"
+		if [ ${?} -eq  0 ] ; then
+			TYPE='dummy'
+		else
+			TYPE='full'
+		fi
+	else
+		TYPE='full'
+	fi
+
+	# pre dingen..
+	case "${TYPE}" in
+		# nog geen support voor types
+	esac
+	
+	ARIADNEFILE="${TODIR}/ariadne_${DATEFIX}_${CONVNAME}_${TYPE}.ax"
+
+	# het bouwen van de tar zelf
+
+	# nu vraag je je vast af.. waarom moet die './' nu weer zo nodig
+	# voor die BACKUPDIR?.. dit lijkt helaas de enige sane manier te
+	# zijn om je excludes goed werkend te krijgen. [BvS]
+	# we don't do compression, it's already compressed
+	if [ ${TYPE} == 'dummy' ] ; then
+		"${BASEDIR}/bin/rmt-client.pl" "${ARIADNEFILE}${E_TAG}" \
+			"${BASEDIR}/bin/ariadne-dummy-dump.sh" "${ARIADNEDIR}" "${BACKUPDIR}" "${REVFILE}" \
+			$ENCRYPT
+	else 
+		"${BASEDIR}/bin/rmt-client.pl" "${ARIADNEFILE}${E_TAG}" \
+			"${BASEDIR}/bin/ariadne-dump.sh" "${ARIADNEDIR}" "${BACKUPDIR}" "${REVFILE}" \
+			$ENCRYPT
+	fi
+
+	# post dingen..
+	case "${TYPE}" in
+		# nog geen support voor types
+	esac
+}
+
+
+#
+# ariadne_backup
+#
+function ariadne_backup {
+	{
+		cat "${CONFDIR}/ariadne/installs"
+		echo
+	} | grep -v '^ *\(#.*\|\)$' | while read -r line ; do
+		echo "Creating Backups for '$line'"
+
+		CONV="`conv_filename "${line}"`"
+		. "${CONFDIR}/ariadne/Default.conf"
+		if [ -f "${CONFDIR}/ariadne/${CONV}.conf" ] ; then
+			. "${CONFDIR}/ariadne/${CONV}.conf"
+		fi
+
+		{
+			if [ -f "${CONFDIR}/ariadne/${CONV}.list" ] ; then
+				cat "${CONFDIR}/ariadne/${CONV}.list"
+			else
+				cat "${CONFDIR}/ariadne/Default.list"
+			fi
+			{
+				if [ -f "${CONFDIR}/ariadne/${CONV}.scan" ] ; then
+					cat "${CONFDIR}/ariadne/${CONV}.scan"
+				else 
+					cat "${CONFDIR}/ariadne/Default.scan"
+				fi
+				echo
+			} |  grep -v '^ *\(#.*\|\)$' | while read -r scandir ; do
+			"${BASEDIR}/bin/ariadne-dump-sites.php" "${line}" "${scandir}"
+			done
+
+			echo 
+		} | grep -v '^ *\(#.*\|\)$' | sort | uniq |while read -r line2 ; do
+			echo "Creating Backup '$line2'"
+			ariadne_run_dump full "${line}" "${line2}" 
+		done
+	done
+}
+
+#
+# clean_ariadne weekly / clean_ariadne monthly
+#
+function ariadne_weekly {
+	{
+		cat "${CONFDIR}/ariadne/installs"
+		echo
+	} | grep -v '^ *\(#.*\|\)$' | while read -r line ; do
+		echo "Cleaning backups for '$line'" 
+
+		CONV="`conv_filename "${line}"`"
+		. "${CONFDIR}/ariadne/Default.conf"
+		if [ -f "${CONFDIR}/ariadne/${CONV}.conf" ] ; then
+			. "${CONFDIR}/ariadne/${CONV}.conf"
+		fi
+
+		{
+			if [ -f "${CONFDIR}/ariadne/${CONV}.list" ] ; then
+				cat "${CONFDIR}/ariadne/${CONV}.list"
+			else
+				cat "${CONFDIR}/ariadne/Default.list"
+			fi
+			{
+				if [ -f "${CONFDIR}/ariadne/${CONV}.scan" ] ; then
+					cat "${CONFDIR}/ariadne/${CONV}.scan"
+				else 
+					cat "${CONFDIR}/ariadne/Default.scan"
+				fi
+				echo
+			} |  grep -v '^ *\(#.*\|\)$' | while read -r scandir ; do
+			"${BASEDIR}/bin/ariadne-dump-sites.php" "${line}" "${scandir}"
+			done
+		} |  grep -v '^ *\(#.*\|\)$' | while read -r line2 ; do
+			echo "Cleaning Backup '$line2'" 
+			CONVNAME="${CONV}--`conv_filename "${line2}"`"
+			REVFILE="${SNAPSHOTDIR}/ariadne/${CONVNAME}.rev"
+			if [ -f "${REVFILE}" -a "_${CYCLE}" = "_weekly" ] ; then
+				rm "${REVFILE}" 
+			fi
+		done
+	done
+}
+
+function ariadne_monthly {
+	{
+		cat "${CONFDIR}/ariadne/installs"
+		echo
+	} | grep -v '^ *\(#.*\|\)$' | while read -r line ; do
+		echo "Cleaning backups for '$line'" 
+
+		CONV="`conv_filename "${line}"`"
+		. "${CONFDIR}/ariadne/Default.conf"
+		if [ -f "${CONFDIR}/ariadne/${CONV}.conf" ] ; then
+			. "${CONFDIR}/ariadne/${CONV}.conf"
+		fi
+
+		{
+			if [ -f "${CONFDIR}/ariadne/${CONV}.list" ] ; then
+				cat "${CONFDIR}/ariadne/${CONV}.list"
+			else
+				cat "${CONFDIR}/ariadne/Default.list"
+			fi
+			{
+				if [ -f "${CONFDIR}/ariadne/${CONV}.scan" ] ; then
+					cat "${CONFDIR}/ariadne/${CONV}.scan"
+				else 
+					cat "${CONFDIR}/ariadne/Default.scan"
+				fi
+				echo
+			} |  grep -v '^ *\(#.*\|\)$' | while read -r scandir ; do
+			"${BASEDIR}/bin/ariadne-dump-sites.php" "${line}" "${scandir}"
+			done
+		} |  grep -v '^ *\(#.*\|\)$' | while read -r line2 ; do
+			echo "Cleaning Backup '$line2'" 
+			CONVNAME="${CONV}--`conv_filename "${line2}"`"
+			REVFILE="${SNAPSHOTDIR}/ariadne/${CONVNAME}.rev"
+			if [ -f "${REVFILE}" -a "_${CYCLE}" = "_monthly" ] ; then
+				rm "${REVFILE}" 
+			fi
+		done
+	done
+}
