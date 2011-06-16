@@ -3,7 +3,7 @@ snt-backup (2.1-43) stable; urgency=low
   * adding support for ariadne
   * fix typo in debian/control Conflicts line
 
- -- Robbert Muller <muller@robbert.office.muze.nl>  Tue, 14 Jun 2011 15:25:39 +0200
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Tue, 14 Jun 2011 15:25:39 +0200
 
 snt-backup (2.1-42) stable; urgency=low
 
