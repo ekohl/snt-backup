@@ -235,7 +235,7 @@ foreach my $module (keys %data) {
 					$newest_daily_outside_retention_period =~ /^(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})$/;
 					my $newest_daily_outside_retention_period_ts = timelocal($6, $5, $4, $3, $2-1, $1-1900, 0, 0, 0);
 					if ($backup_date >= $newest_daily_outside_retention_period_ts) {
-						if ($data{$module}{$path}{$date}{'type'} eq 'diff' || $data{$module}{$path}{$date}{'type'} eq 'incr') {
+						if ($data{$module}{$path}{$date}{'type'} eq 'diff' || $data{$module}{$path}{$date}{'type'} eq 'incr'  || $data{$module}{$path}{$date}{'type'} eq 'dummy') {
 							print "Incremental/differential $date is newer than newest daily outside retention period: $newest_daily_outside_retention_period\n" if ($flag_verbose);
 							push @keep_incr, $date;
 						}
