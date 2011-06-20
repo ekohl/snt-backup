@@ -1,3 +1,10 @@
+snt-backup (2.1-44) stable; urgency=low
+
+  * improved support for dummy backups in cleanup.pl
+  * added dependency on snt-backup-utils for snt-backup-server
+
+ -- Robbert Muller <muller@muze.nl>  Fri, 17 Jun 2011 09:37:44 +0200
+
 snt-backup (2.1-43) stable; urgency=low
 
   * adding support for ariadne

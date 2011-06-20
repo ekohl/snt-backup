@@ -29,7 +29,7 @@ Description: SNT backup utilities
 
 Package: snt-backup-server
 Architecture: all
-Depends: bash, tar, sed
+Depends: bash, tar, sed, snt-backup-utils
 Suggests: bzip2
 Description: SNT backup server package
  SNT backup server package
