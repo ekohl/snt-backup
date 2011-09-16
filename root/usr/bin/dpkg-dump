@@ -34,8 +34,10 @@ my @statstr = (
 
 my $dpkgfile = "$dpkgdir/status";
 my $edpkgfile = "$aptdir/extended_states";
+my $lockfile = "$dpkgdir/lock";
 my $flag_src = 0;
 my $flag_tab = 0;
+my $flag_lock = 0;
 my @packages;
 
 $edpkgfile = undef unless -e $edpkgfile;
@@ -46,10 +48,14 @@ while (@ARGV && $ARGV[0] =~ /^-/) {
 		$dpkgfile = shift;
 	} elsif ($arg eq '-e') {
 		$edpkgfile = shift;
+	} elsif ($arg eq '-l') {
+		$lockfile = shift;
 	} elsif ($arg eq '-s') {
 		$flag_src = 1;
 	} elsif ($arg eq '-t') {
 		$flag_tab = 1;
+	} elsif ($arg eq '-L') {
+		$flag_lock = 1;
 	} else {
 		die "Unknown parameter: '$arg'\n";
 	}
@@ -58,11 +64,20 @@ while (@ARGV && $ARGV[0] =~ /^-/) {
 @packages = @ARGV;
 my $sep = $flag_tab ? "\t" : ' ';
 
+if ($flag_lock) {
+	sysopen (LOCK, $lockfile, O_RDONLY)
+		or die "Could not open dpkg lockfile: $!\n";
+
+	my $lock = pack('sslllli', F_RDLCK, 0, 0, 0, 0, 0, 0);
+	fcntl (LOCK, F_SETLK, $lock)
+		or die "Could not acquire lock: $!\n";
+}
+
 my %extended_states = ();
 
 if (defined $edpkgfile) {
 	sysopen (F, $edpkgfile, O_RDONLY)
-		or die "Could not open apt extended_states file!\n";
+		or die "Could not open apt extended_states file: $!\n";
 
 	my $pkg = '';
 	while ($_ = <F>) {
@@ -87,7 +102,7 @@ if (defined $edpkgfile) {
 
 
 sysopen (F, $dpkgfile, O_RDONLY)
-	or die "Could not open dpkg status file!\n";
+	or die "Could not open dpkg status file: $!\n";
 
 sub parse_pkg {
 	my $pkg = shift;
@@ -167,3 +182,5 @@ while ($_ = <F>) {
 close F;
 
 parse_pkg(\%pkg);
+
+exit 0;
