@@ -1,3 +1,11 @@
+snt-backup (2.1-45) stable; urgency=low
+
+  * add optional locking to dpkg-dump. (use -L to request read-lock)
+  * try 'sleep 1; sync; sleep 1' before lvremove in snapshot_wrap
+  * update lock.pl: more robustness, bugfixes and improved error handling
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Tue, 04 Oct 2011 10:18:31 +0200
+
 snt-backup (2.1-44) stable; urgency=low
 
   * improved support for dummy backups in cleanup.pl
