@@ -8,6 +8,8 @@
 # - detect full (overflown) snapshot (parse lvdisplay or try to
 #   write to device)
 # - sometimes lvm remove reports 'device or resource busy' errors (lvm bug?)
+#     2010-10-07 added sync before remove
+#     2011-10-04 added sleep(1) before and after sync
 
 use strict;
 
@@ -239,12 +241,6 @@ if (my $error = $?) {
 	exit 1;
 }
 
-system('/bin/sync');
-if (my $error = $?) {
-	# 0 = ok
-	warn "sync failed, ignored..\n";
-}
-
 system('/sbin/lvdisplay', $snap_dev);
 if (my $error = $?) {
 	# 0 = ok
@@ -252,6 +248,16 @@ if (my $error = $?) {
 	system('/sbin/lvremove', '-f', $snap_dev);
 	exit 1;
 }
+
+sleep(1);
+
+system('/bin/sync');
+if (my $error = $?) {
+	# 0 = ok
+	warn "sync failed, ignored..\n";
+}
+
+sleep(1);
 
 system('/sbin/lvremove', '-f', $snap_dev);
 if (my $error = $?) {
