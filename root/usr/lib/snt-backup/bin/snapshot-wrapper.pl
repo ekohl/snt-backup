@@ -10,6 +10,7 @@
 # - sometimes lvm remove reports 'device or resource busy' errors (lvm bug?)
 #     2010-10-07 added sync before remove
 #     2011-10-04 added sleep(1) before and after sync
+#     2011-10-26 redirect lvremove stderr to stdout
 
 use strict;
 
@@ -146,6 +147,8 @@ die "Original lvm volume device not in given volume group '$bk_dev'\n"
 my $snap_dev      = $snap_grp.'/'.$snap_name;
 my $snap_mnt_path = $snap_mnt.$bk_path;
 
+my $snap_dev_esc = $snap_dev;
+$snap_dev_esc =~ s/'/'\\''/g;
 
 # ok, start :)
 if ( -e $snap_dev ) {
@@ -180,7 +183,7 @@ if ($bk_fstype eq 'xfs') {
 
 	if (my $error = $?) {
 		warn "xfs_freeze -u returned an error: $error\n";
-		system('/sbin/lvremove', '-f', $snap_dev);
+		system("/sbin/lvremove -f '$snap_dev_esc' 2>&1");
 		exit 1;
 	}
 }
@@ -191,7 +194,7 @@ if (my $error = $?) {
 	# 1 = recovered
 	if ($error != 256) {
 		warn "fsck.$bk_fstype returned an error: $error\n";
-		system('/sbin/lvremove', '-f', $snap_dev);
+		system("/sbin/lvremove -f '$snap_dev_esc' 2>&1");
 		exit 1;
 	}
 }
@@ -200,7 +203,7 @@ system('mkdir', '-p', $snap_mnt_path);
 if (my $error = $?) {
 	# 0 = ok
 	warn "failed to create mountpoint\n";
-	system('/sbin/lvremove', '-f', $snap_dev);
+	system("/sbin/lvremove -f '$snap_dev_esc' 2>&1");
 	exit 1;
 }
 
@@ -208,7 +211,7 @@ system('mount', '-t', $bk_fstype, '-o', $bk_fsopt, $snap_dev, $snap_mnt_path);
 if (my $error = $?) {
 	# 0 = ok
 	warn "failed to mount snapshot on mountpoint\n";
-	system('/sbin/lvremove', '-f', $snap_dev);
+	system("/sbin/lvremove -f '$snap_dev_esc' 2>&1");
 	exit 1;
 }
 
@@ -217,7 +220,7 @@ if (my $error = $?) {
 	# 0 = ok
 	warn "failed to change directory to mountpoint\n";
 	system('umount', $snap_mnt_path);
-	system('/sbin/lvremove', '-f', $snap_dev);
+	system("/sbin/lvremove -f '$snap_dev_esc' 2>&1");
 	exit 1;
 }
 
@@ -229,7 +232,7 @@ unless (chdir('/')) {
 
 	warn "failed to change directory to '/': $error\n";
 	system('umount', $snap_mnt_path);
-	system('/sbin/lvremove', '-f', $snap_dev);
+	system("/sbin/lvremove -f '$snap_dev_esc' 2>&1");
 	exit 1;
 }
 
@@ -237,7 +240,7 @@ system('umount', $snap_mnt_path);
 if (my $error = $?) {
 	# 0 = ok
 	warn "failed to unmount snapshot\n";
-	system('/sbin/lvremove', '-f', $snap_dev);
+	system("/sbin/lvremove -f '$snap_dev_esc' 2>&1");
 	exit 1;
 }
 
@@ -245,7 +248,7 @@ system('/sbin/lvdisplay', $snap_dev);
 if (my $error = $?) {
 	# 0 = ok
 	warn "failed to display snapshot info\n";
-	system('/sbin/lvremove', '-f', $snap_dev);
+	system("/sbin/lvremove -f '$snap_dev_esc' 2>&1");
 	exit 1;
 }
 
@@ -259,7 +262,7 @@ if (my $error = $?) {
 
 sleep(1);
 
-system('/sbin/lvremove', '-f', $snap_dev);
+system("/sbin/lvremove -f '$snap_dev_esc' 2>&1");
 if (my $error = $?) {
 	# 0 = ok
 	warn "failed to remove snapshot\n";
