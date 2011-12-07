@@ -1,3 +1,10 @@
+snt-backup (2.1-46) stable; urgency=low
+
+  * ignore lvremove errors to stderr. redirect then to stdout and
+    only check the exit-code for success.
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Wed, 07 Dec 2011 10:15:05 +0100
+
 snt-backup (2.1-45) stable; urgency=low
 
   * add optional locking to dpkg-dump. (use -L to request read-lock)
