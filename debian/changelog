@@ -1,6 +1,13 @@
+snt-backup (2.1-47) stable; urgency=low
+
+  * also ignore lvcreate and lvdisplay errors to stderr. redirect them to
+    stdout and only check the exit-code for success.
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Thu, 05 Jan 2012 10:19:30 +0100
+
 snt-backup (2.1-46) stable; urgency=low
 
-  * ignore lvremove errors to stderr. redirect then to stdout and
+  * ignore lvremove errors to stderr. redirect them to stdout and
     only check the exit-code for success.
 
  -- Bas van Sisseren <bas@quarantainenet.nl>  Wed, 07 Dec 2011 10:15:05 +0100
