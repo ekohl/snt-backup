@@ -148,20 +148,43 @@ sub RMTwrite($) {
 # main part..
 die "Usage: $0 <remote file> [<command> [<arg>] .. ['|' <command> [<arg>] .. ]]\n" unless @ARGV;
 
+sub escape_shell {
+	my $str = shift;
+	return $str if $str =~ /\A[:,.\/=+0-9A-Za-z-]+\z/;
+	$str =~ s/'/'\\''/g;
+	$str = "'$str'";
+	$str =~ s/\A''//;
+	$str =~ s/''\z//;
+	$str = "''" if $str eq '';
+	return $str;
+}
+
 my $rfile = shift @ARGV;
 my @commands = ();
 my $errors = '';
 my @pids = ();
+my @stderr = ();
 sub wait_pids {
 	for (my $i=0; $i < @pids; $i++) {
 		my $pid = $pids[$i];
-		my $cmd = $commands[$i][0];
+		my $cmd = join ' ', map { escape_shell $_ } @{ $commands[$i] };
 		my $kid;
 		do {
 			$kid = waitpid($pid, 0);
 		} until defined $kid && ($kid == -1 || $kid == $pid);
 
 		if ($kid == $pid) {
+			if ( -s $stderr[$i] ) {
+				open my $f, '<', $stderr[$i];
+				my $msg = do { local $/; <$f> };
+				close $f;
+				chomp $msg;
+				$msg .= "\n";
+				warn "pid $pid ($cmd) stderr output:\n".$msg;
+				$errors .= "pid $pid ($cmd) stderr output:\n".$msg;
+			}
+			unlink $stderr[$i];
+
 			if (my $exitcode = $?) {
 				warn "pid $pid ($cmd) exit code: '$exitcode'..\n";
 				$errors .= "pid $pid ($cmd) exit code: '$exitcode'..\n";
@@ -175,7 +198,13 @@ sub wait_pids {
 
 my $read_fd = *STDIN;
 
-END { close($read_fd) if defined $read_fd; wait_pids }
+my $main_pid = $$;
+END {
+	if ($$ == $main_pid) {
+		close($read_fd) if defined $read_fd;
+		wait_pids;
+	}
+}
 
 if (@ARGV) {
 	my $cmd = [];
@@ -194,7 +223,11 @@ if (@ARGV) {
 
 	foreach my $cmd (@commands) {
 		pipe(my $p_in, my $p_out)
-			or die "Cout not create pipe: $!\n";
+			or die "Could not create pipe: $!\n";
+
+		use File::Temp qw/ tempfile /;
+		my ($fh, $filename) = tempfile();
+		push @stderr, $filename;
 
 		if (defined (my $pid = fork())) {
 			if (!$pid) {
@@ -202,6 +235,7 @@ if (@ARGV) {
 				foreach (keys %SIG) { $SIG{$_} = 'DEFAULT' }
 				POSIX::dup2(fileno($read_fd), 0);
 				POSIX::dup2(fileno($p_out), 1);
+				POSIX::dup2(fileno($fh), 2);
 				exec @$cmd;
 				die "Could not exec process: $!\n";
 			}
