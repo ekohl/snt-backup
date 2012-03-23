@@ -10,6 +10,7 @@ use Errno qw/ EEXIST /;
 my @lockfiles = ();
 my $acquire_time = 60;
 my $lock_all = 1;
+my $quiet = 0;
 
 while ((@ARGV) && ($ARGV[0] =~ /^-/)) {
 	my $param = shift @ARGV;
@@ -27,6 +28,9 @@ while ((@ARGV) && ($ARGV[0] =~ /^-/)) {
 	} elsif (($param =~ /^-a=(.*)\z/) || ($param =~ /^--acquire-time=(.*)\z/)) {
 		$acquire_time = $1;
 
+	} elsif (($param eq '-q') || ($param eq '--quiet')) {
+		$quiet = 1;
+
 	} elsif ($param eq '--one-lock') {
 		$lock_all = 0;
 
@@ -38,7 +42,7 @@ while ((@ARGV) && ($ARGV[0] =~ /^-/)) {
 die "Invalid lock-acquire time: '$acquire_time'.\n"
 	unless $acquire_time =~ /^[1-9]\d*$/;
 
-die "Usage: $0 [--lockfile <lockfile>] [--acquire-time <seconds>] <command> <args..>\n"
+die "Usage: $0 [--lockfile <lockfile>] [--acquire-time <seconds>] [--quiet] <command> <args..>\n"
 	unless @ARGV;
 
 push @lockfiles, '/var/lock/.lockfile-'.md5_hex(join "\0", @ARGV)
@@ -65,12 +69,12 @@ foreach my $lockfile (@lockfiles) {
 
 					chomp $pid2;
 					if ($pid eq $pid2) {
-						warn "Process locked: PID $pid not found (lockfile '$lockfile').\n";
+						warn "Process locked: PID $pid not found (lockfile '$lockfile').\n" unless $quiet;
 					} # else 'old lock finished; lockfile claimed by next process'
 				} # else 'old lock finished; lockfile removed'
 			}
 		} else {
-			warn "Process locked: No PID in lockfile found (lockfile '$lockfile').\n";
+			warn "Process locked: No PID in lockfile found (lockfile '$lockfile').\n" unless $quiet;
 		}
 	}
 }
@@ -98,7 +102,7 @@ while (@lock_queue) {
 		push @lock_queue, $lockfile;
 		if ($now + $acquire_time <= time) {
 			# lock failed..
-			warn "Process locked: Lock not released after $acquire_time secs (lockfile '$lockfile').\n";
+			warn "Process locked: Lock not released after $acquire_time secs (lockfile '$lockfile').\n" unless $quiet;
 			foreach my $lockfile (@lock_done) {
 				unlink $lockfile;
 			}
