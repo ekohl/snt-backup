@@ -1,3 +1,12 @@
+snt-backup (2.1-48) stable; urgency=low
+
+  * ignore the message '[Note] Plugin 'FEDERATED' is disabled' in the mysql plugin
+  * use tempfile to store stderr output of all commands
+  * report full command on stderr output and exit-status
+  * add --quiet option to lock.pl
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Fri, 23 Mar 2012 11:57:21 +0100
+
 snt-backup (2.1-47) stable; urgency=low
 
   * also ignore lvcreate and lvdisplay errors to stderr. redirect them to
