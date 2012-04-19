@@ -1,3 +1,9 @@
+snt-backup (2.1-49) stable; urgency=low
+
+  * bugfix: logic-error in passing on error of child process
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Thu, 19 Apr 2012 15:30:57 +0200
+
 snt-backup (2.1-48) stable; urgency=low
 
   * ignore the message '[Note] Plugin 'FEDERATED' is disabled' in the mysql plugin
