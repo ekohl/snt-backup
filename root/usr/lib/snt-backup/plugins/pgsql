@@ -39,8 +39,12 @@ function pgsql_backup {
 				    TOFILE="pgsql_${DATEFIX}_${HOSTNAME_TAG}_${PGSQL_DB}.sql"
 				fi
 
+				set PG_DUMP_OPTS=''
+				if [ -f "${CONFDIR}/pgsql/db.${PGSQL_DB}.conf" ]; then
+					. "${CONFDIR}/pgsql/db.${PGSQL_DB}.conf"
+				fi
 				"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
-					$PG_SH -c '/usr/bin/pg_dump "${PGSQL_DB}"' $COMPRESS $ENCRYPT \
+					$PG_SH -c '/usr/bin/pg_dump ${PG_DUMP_OPTS} "${PGSQL_DB}"' $COMPRESS $ENCRYPT \
 					|| { touch "${SNAPSHOTDIR}/error"; echo 'pgsql dump failed.'; }
 			fi
 		done
