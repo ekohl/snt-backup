@@ -57,8 +57,8 @@ unless (defined $bk_dev || defined $bk_fstype || defined $bk_fsopt) {
 			unless defined $mnt_dev;
 	}
 
-	$bk_dev    = $mnt_dev    unless defined $bk_dev;
-	$bk_fstype = $mnt_fstype unless defined $bk_fstype;
+	$bk_dev    //= $mnt_dev;
+	$bk_fstype //= $mnt_fstype;
 
 	die "Mount-point '$bk_path' is not mounted!\n"
 		unless defined $bk_dev;
@@ -72,7 +72,15 @@ if (!defined $bk_fstype && defined $bk_dev && -x '/sbin/vol_id') {
 	$bk_fstype = undef if $bk_fstype eq '';
 }
 
-$bk_fstype = 'ext3' unless defined $bk_fstype;
+if (!defined $bk_fstype && defined $bk_dev && -x '/sbin/blkid') {
+	my $bk_dev_esc = $bk_dev;
+	$bk_dev_esc =~ s/'/'\\''/g; # shell escaping
+	$bk_fstype = `/sbin/blkid -o value -s TYPE '$bk_dev_esc'`;
+	chomp $bk_fstype;
+	$bk_fstype = undef if $bk_fstype eq '';
+}
+
+$bk_fstype //= 'ext3';
 
 unless (defined $bk_fsopt) {
 	my %bk_fsopt = ();
@@ -123,7 +131,7 @@ die "Invalid original mount-point '$bk_path'\n"
 	unless -d $bk_path;
 die "Invalid original lvm volume device '$bk_dev'\n"
 	unless $bk_dev =~ /\A(\/dev\/[^\/]+)\/[^\/]+\z/;
-$snap_grp = $1 unless defined $snap_grp;
+$snap_grp //= $1;
 die "Unknown file-system type '$bk_fstype'\n"
 	unless grep { $bk_fstype eq $_ } qw/ ext2 ext3 ext4 reiserfs jfs xfs /;
 
