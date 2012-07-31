@@ -1,3 +1,17 @@
+snt-backup (2.1-50) stable; urgency=low
+
+  * pgsql plugin: add config-option to add options to pg_dump (e.g. exclude specific tables)
+  * files plugin: typo-fix in comment in Default.conf
+  * snapshot_wrap.pl: add fstype-detection with the blkid utility
+  * lock.pl: many improvements:
+    - allow acquire-time of 0 seconds
+    - use hardlinks to fix partial-file-read problem.
+    - pass on signals SIGHUP, SIGINT, SIGQUIT and SIGTERM to the child process.
+    - use signal SIGPWR to kill child process.
+    - verify writes when writing to the pid-file. (fix disk-full problem)
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Tue, 31 Jul 2012 10:32:43 +0200
+
 snt-backup (2.1-49) stable; urgency=low
 
   * bugfix: logic-error in passing on error of child process
