@@ -108,8 +108,8 @@ function ariadne_backup {
 					cat "${CONFDIR}/ariadne/Default.scan"
 				fi
 				echo
-			} |  grep -v '^ *\(#.*\|\)$' | while read -r scandir ; do
-			"${BASEDIR}/bin/ariadne-dump-sites.php" "${line}" "${scandir}"
+			} |  grep -v '^ *\(#.*\|\)$' | while read -r scandir query ; do
+			"${BASEDIR}/bin/ariadne-dump-sites.php" "${line}" "${scandir}" ${query}
 			done
 
 			echo 
