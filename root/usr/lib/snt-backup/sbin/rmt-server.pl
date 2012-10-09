@@ -61,7 +61,7 @@ sub deviceOpen {
 
 	# devicename moet uit specifieke characters bestaan en
 	# mag evt. met een / beginnen.
-	return 0 unless	$device =~ /^\/*[A-Za-z0-9_.-]+$/;
+	return 0 unless	$device =~ /^\/*[%A-Za-z0-9_.-]+$/;
 
 	# de extensies .report en .list zijn gereserveerd voor
 	# het controle-script.
