@@ -13,6 +13,12 @@ function conv_filename {
 		sed -e 's|^/||' -e 's|/$||' -e 's/[ 	]/_/g' -e 's|/|-|g'
 }
 
+function conv_ariadne {
+	FROP="${1}"
+	echo "${FROP}" |
+		sed -e s'|-|%2d|g' -e 's|^/||' -e 's|/$||' -e 's/[ 	]/_/g' -e 's|/|-|g'
+}
+
 
 #
 # ariadne_run_dump $type $dir
@@ -28,7 +34,7 @@ function ariadne_run_dump {
 	ARIADNEDIR="${2}"
 	BACKUPDIR="${3}"
 
-	CONVNAME="`conv_filename "${ARIADNEDIR}"`--`conv_filename "${BACKUPDIR}"`"
+	CONVNAME="`conv_filename "${ARIADNEDIR}"`--`conv_ariadne "${BACKUPDIR}"`"
 	REVFILE="${SNAPSHOTDIR}/ariadne/${CONVNAME}.rev"
 
 	if [ -f "${REVFILE}" ] ; then
@@ -148,7 +154,7 @@ function ariadne_weekly {
 			done
 		} |  grep -v '^ *\(#.*\|\)$' | while read -r line2 ; do
 			echo "Cleaning Backup '$line2'" 
-			CONVNAME="${CONV}--`conv_filename "${line2}"`"
+			CONVNAME="${CONV}--`conv_ariadne "${line2}"`"
 			REVFILE="${SNAPSHOTDIR}/ariadne/${CONVNAME}.rev"
 			if [ -f "${REVFILE}" -a "_${CYCLE}" = "_weekly" ] ; then
 				rm "${REVFILE}" 
@@ -188,7 +194,7 @@ function ariadne_monthly {
 			done
 		} |  grep -v '^ *\(#.*\|\)$' | while read -r line2 ; do
 			echo "Cleaning Backup '$line2'" 
-			CONVNAME="${CONV}--`conv_filename "${line2}"`"
+			CONVNAME="${CONV}--`conv_ariadne "${line2}"`"
 			REVFILE="${SNAPSHOTDIR}/ariadne/${CONVNAME}.rev"
 			if [ -f "${REVFILE}" -a "_${CYCLE}" = "_monthly" ] ; then
 				rm "${REVFILE}" 
