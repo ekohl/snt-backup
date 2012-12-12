@@ -109,7 +109,7 @@ function ariadne_backup {
 				fi
 				echo
 			} |  grep -v '^ *\(#.*\|\)$' | while read -r scandir query ; do
-			"${BASEDIR}/bin/ariadne-dump-sites.php" "${line}" "${scandir}" ${query}
+			"${BASEDIR}/bin/ariadne-dump-sites.php" "${line}" "${scandir}" "${query}"
 			done
 
 			echo 
@@ -149,8 +149,8 @@ function ariadne_weekly {
 					cat "${CONFDIR}/ariadne/Default.scan"
 				fi
 				echo
-			} |  grep -v '^ *\(#.*\|\)$' | while read -r scandir ; do
-			"${BASEDIR}/bin/ariadne-dump-sites.php" "${line}" "${scandir}"
+			} |  grep -v '^ *\(#.*\|\)$' | while read -r scandir query ; do
+			"${BASEDIR}/bin/ariadne-dump-sites.php" "${line}" "${scandir}" "${query}"
 			done
 		} |  grep -v '^ *\(#.*\|\)$' | while read -r line2 ; do
 			echo "Cleaning Backup '$line2'" 
@@ -189,8 +189,8 @@ function ariadne_monthly {
 					cat "${CONFDIR}/ariadne/Default.scan"
 				fi
 				echo
-			} |  grep -v '^ *\(#.*\|\)$' | while read -r scandir ; do
-			"${BASEDIR}/bin/ariadne-dump-sites.php" "${line}" "${scandir}"
+			} |  grep -v '^ *\(#.*\|\)$' | while read -r scandir query ; do
+			"${BASEDIR}/bin/ariadne-dump-sites.php" "${line}" "${scandir}" "${query}"
 			done
 		} |  grep -v '^ *\(#.*\|\)$' | while read -r line2 ; do
 			echo "Cleaning Backup '$line2'" 
