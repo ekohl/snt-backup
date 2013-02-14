@@ -39,7 +39,10 @@ function pgsql_backup {
 				    TOFILE="pgsql_${DATEFIX}_${HOSTNAME_TAG}_${PGSQL_DB}.sql"
 				fi
 
-				set PG_DUMP_OPTS=''
+				export PG_DUMP_OPTS=''
+				if [ -f "${CONFDIR}/pgsql/pgsql.conf" ] ; then
+					. "${CONFDIR}/pgsql/pgsql.conf"
+				fi
 				if [ -f "${CONFDIR}/pgsql/db.${PGSQL_DB}.conf" ]; then
 					. "${CONFDIR}/pgsql/db.${PGSQL_DB}.conf"
 				fi
@@ -59,6 +62,10 @@ function pgsql_backup {
 	PG_BIN=''
 	if [ -d '/usr/lib/postgresql/bin' ]; then
 		PG_BIN='/usr/lib/postgresql/bin'
+	elif [ -d '/usr/lib/postgresql/9.3/bin' ]; then
+		PG_BIN='/usr/lib/postgresql/9.3/bin'
+	elif [ -d '/usr/lib/postgresql/9.2/bin' ]; then
+		PG_BIN='/usr/lib/postgresql/9.2/bin'
 	elif [ -d '/usr/lib/postgresql/9.1/bin' ]; then
 		PG_BIN='/usr/lib/postgresql/9.1/bin'
 	elif [ -d '/usr/lib/postgresql/9.0/bin' ]; then
@@ -82,7 +89,7 @@ function pgsql_backup {
 	fi
 
 	"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
-		$PG_SH -c "$PG_BIN/pg_dumpall -g" $COMPRESS $ENCRYPT \
+		$PG_SH -c "$PG_BIN/pg_dumpall -g ${PG_DUMPALL_OPTS}" $COMPRESS $ENCRYPT \
 		|| { touch "${SNAPSHOTDIR}/error"; echo 'pgsql dump failed.'; }
 }
 
