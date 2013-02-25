@@ -2,10 +2,10 @@
 
 package=snt-backup
 
-export DH_COMPAT=1
+export DH_COMPAT=5
 #export DH_VERBOSE=1
 
-export DESTDIR=$(shell pwd)/debian/tmp
+export DESTDIR=$(shell pwd)/debian/snt-backup
 export DESTDIR_HKEY=$(shell pwd)/debian/snt-backup-hostkey
 export DESTDIR_UTILS=$(shell pwd)/debian/snt-backup-utils
 export DESTDIR_SERVER=$(shell pwd)/debian/snt-backup-server

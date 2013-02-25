@@ -1,4 +1,0 @@
-/etc/snt-backup/pgsql/pgsql.conf
-/etc/snt-backup/pgsql/pgsql.pass
-/etc/snt-backup/pgsql/pgsql.exclude
-/etc/snt-backup/duplicity/excludes.d/snt-backup-pgsql

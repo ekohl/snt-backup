@@ -1,3 +1,0 @@
-/etc/snt-backup/mysql/mysql.conf
-/etc/snt-backup/mysql/mysql.exclude
-/etc/snt-backup/duplicity/excludes.d/snt-backup-mysql

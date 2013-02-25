@@ -1,3 +1,18 @@
+snt-backup (2.1-52) stable; urgency=low
+
+  [mysql plugin]
+  * add performance_schema to mysql database exclude list
+
+  [postgres plugin]
+  * allow global PG_DUMP_OPTS option; add PG_DUMPALL_OPTS option
+  * add support for postgres 9.2 and 9.3
+  * fixup in PG_DUMP_OPTS option
+
+  [misc]
+  * update scripts to use dh_compat level 5
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Mon, 25 Feb 2013 15:20:36 +0100
+
 snt-backup (2.1-51) stable; urgency=low
 
   * Added % as valid character for the backup file name in rmt-server.pl
