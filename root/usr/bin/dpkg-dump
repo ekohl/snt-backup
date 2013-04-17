@@ -73,35 +73,47 @@ if ($flag_lock) {
 		or die "Could not acquire lock: $!\n";
 }
 
+my $default_arch = `dpkg --print-architecture`;
+chomp $default_arch;
 my %extended_states = ();
 
 if (defined $edpkgfile) {
-	sysopen (F, $edpkgfile, O_RDONLY)
+	sysopen (my $f, $edpkgfile, O_RDONLY)
 		or die "Could not open apt extended_states file: $!\n";
 
-	my $pkg = '';
-	while ($_ = <F>) {
+	my $rec = {};
+	while ($_ = <$f>) {
 		chomp $_;
 		if (!/\s/) {
-			$pkg = '';
-		} elsif (/^Package: (.*)$/) {
-			$pkg = $1;
-		} elsif (/^([\w-]+): (.*)$/) {
-			if ($pkg ne '') {
-				$extended_states{$pkg}{$1} = $2;
-			} else {
-				die "syntax error in extended_states.\n";
+			if (keys %$rec) {
+				my $package = $rec->{Package};
+				die "Missing package name in extended_states record.\n" unless defined $package;
+				my $arch = $rec->{Architecture} // $default_arch;
+				$extended_states{$package.':'.$arch} = $rec;
+				$extended_states{$package} = $rec;
+				$rec = {};
 			}
+		} elsif (/^([\w-]+): (.*)$/) {
+			$rec->{$1} = $2;
 		} else {
 			die "syntax error in extended_states.\n";
 		}
 	}
 
-	close F;
+	if (keys %$rec) {
+		my $package = $rec->{Package};
+		die "Missing package name in extended_states record.\n" unless defined $package;
+		my $arch = $rec->{Architecture} // $default_arch;
+		$extended_states{$package.':'.$arch} = $rec;
+		$extended_states{$package} = $rec;
+		$rec = {};
+	}
+
+	close $f;
 }
 
 
-sysopen (F, $dpkgfile, O_RDONLY)
+sysopen (my $f, $dpkgfile, O_RDONLY)
 	or die "Could not open dpkg status file: $!\n";
 
 sub parse_pkg {
@@ -112,13 +124,18 @@ sub parse_pkg {
 		unless exists $pkg->{'Package'};
 
 	my $package = $pkg->{'Package'};
+	my $arch = $pkg->{'Architecture'} // $default_arch;
 
-	die "No status defined for package $package.\n"
+	my $package_arch = $package;
+	if (defined $pkg->{'Multi-Arch'}) {
+		$package_arch .= ':'.$arch;
+	}
+	die "No status defined for package $package_arch.\n"
 		unless exists $pkg->{'Status'};
 
 	my @status = split / /, $pkg->{'Status'};
 
-	die "Status of package $package is in wrong format.\n"
+	die "Status of package $package_arch is in wrong format.\n"
 		unless (@status == 3);
 
 	for (my $i=0; $i<3; $i++) {
@@ -126,7 +143,7 @@ sub parse_pkg {
 			$status[$i] = $statstr[$i]->{$status[$i]};
 		} else {
 			warn "Unknown status item ($i) '$status[$i]' for ".
-					"package $package.\n";
+					"package $package_arch.\n";
 		}
 	}
 
@@ -145,11 +162,10 @@ sub parse_pkg {
 		return unless grep { $src eq $_ } @packages;
 	}
 
-	my $auto_installed = $extended_states{$package}{'Auto-Installed'};
-#	$auto_installed = !defined $auto_installed ? '?' : $auto_installed ? 'a' : 'i';
+	my $auto_installed = $extended_states{$package_arch}{'Auto-Installed'};
 	$auto_installed = !defined $auto_installed ? 'i' : $auto_installed ? 'a' : 'i';
 
-	print $status[0] . $status[2] . $status[1] . $auto_installed . $sep . $package .
+	print $status[0] . $status[2] . $status[1] . $auto_installed . $sep . $package_arch .
 		((exists $pkg->{'Version'}) ? $sep . $pkg->{'Version'} : '') . "\n";
 }
 
@@ -157,7 +173,7 @@ my %pkg = ();
 my $hdr = '';
 my $line = 1;
 
-while ($_ = <F>) {
+while ($_ = <$f>) {
 	chomp $_;
 	if (/^$/) {
 		parse_pkg(\%pkg);
@@ -179,7 +195,7 @@ while ($_ = <F>) {
 	$line++;
 }
 
-close F;
+close $f;
 
 parse_pkg(\%pkg);
 
