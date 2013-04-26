@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
@@ -16,7 +16,17 @@ db_get snt-backup-server/use_debconf
 if [ "_$RET" = "_true" ]; then
   {
       db_get snt-backup-server/backup_location
-      echo "BACKUP_LOCATION='$RET'"
+		# read defaults
+		. /etc/snt-backup/server/server.conf
+
+		# override answers from dpkg
+		BACKUP_LOCATION="${RET}"
+
+      echo "BACKUP_LOCATION='${BACKUP_LOCATION}'"
+		echo "VERBOSE=\"${VERBOS0E:-no}\""
+		echo "NO_ACT=\"${NO_ACT:-no}\""
+		echo "REPORT=\"${REPORT:-no}\""
+		echo "SPLITPATH=${SPLITPATH:-0}"
   } > /etc/snt-backup/server/server.conf.new
 
   if [ -f /etc/snt-backup/server/server.conf ]; then

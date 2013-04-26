@@ -5,6 +5,9 @@
 
 export BASEDIR='/usr/lib/snt-backup'
 export CONFDIR='/etc/snt-backup'
+. ${CONFDIR}/server/server.conf
+
+export SPLITPATH
 
 if [ "_$#" = '_2' ]
 then

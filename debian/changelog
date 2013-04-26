@@ -2,6 +2,7 @@ snt-backup (2.1-53) stable; urgency=low
 
   [server]
   * cleanup script didn't clean without editing
+  * subdirectory support for backup storage
 
  -- Robbert Muller <muller@muze.nl>  Fri, 26 Apr 2013 14:12:49 +0200
 

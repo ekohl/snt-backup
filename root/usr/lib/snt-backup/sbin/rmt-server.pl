@@ -7,6 +7,8 @@ use Digest::MD5;
 
 STDOUT->autoflush(1);
 
+my $splitpath = $ENV{"SPLITPATH"} || 0;
+
 # ignore signals..
 foreach (keys %SIG) { $SIG{$_} = 'IGNORE' }
 
@@ -70,6 +72,13 @@ sub deviceOpen {
 	my $fname = $device;
 	$fname =~ s/^\/+//;
 	
+	if ( $splitpath ) {
+		my ($type, $date, $time, $path) = split /_/, $fname;
+		my $subdir = $type.'_'.$path;
+		unless ( -d $subdir ) { mkdir $subdir; }
+		$fname = $subdir.'/'.$fname;
+	}
+
 	return 0 unless sysopen FILE, $fname, O_CREAT|O_EXCL|O_WRONLY, 0644;
 
 	$currOpen = [ $device, $fname ];
