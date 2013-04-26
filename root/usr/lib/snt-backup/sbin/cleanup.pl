@@ -260,11 +260,11 @@ foreach my $module (keys %data) {
 		foreach my $date (sort keys %{$data{$module}{$path}}) {
 			print "rm " . $data{$module}{$path}{$date}{'file'} . "\n" if ($flag_verbose);
 			if (! $flag_no_act) {
-#				unlink $data{$module}{$path}{$date}{'file'};
-#				unlink $data{$module}{$path}{$date}{'file'}.'.report';
-#				unlink $data{$module}{$path}{$date}{'file'}.'.list';
-#				unlink $data{$module}{$path}{$date}{'file'}.'.errors';
-#				delete $data{$module}{$path}{$date};
+				unlink $data{$module}{$path}{$date}{'file'};
+				unlink $data{$module}{$path}{$date}{'file'}.'.report';
+				unlink $data{$module}{$path}{$date}{'file'}.'.list';
+				unlink $data{$module}{$path}{$date}{'file'}.'.errors';
+				delete $data{$module}{$path}{$date};
 			}
 		}
 	}
