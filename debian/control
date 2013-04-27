@@ -1,5 +1,5 @@
 Source: snt-backup
-Section: base
+Section: utils
 Maintainer: Bas van Sisseren <bas@snt.utwente.nl>
 Priority: standard
 Uploaders: Bas van Sisseren <bas@snt.utwente.nl>
@@ -8,7 +8,7 @@ Build-Depends: debhelper
 
 Package: snt-backup
 Architecture: all
-Depends: snt-backup-utils, bash, tar, sed, debianutils, cron, ${misc:Depends}
+Depends: snt-backup-utils, cron, ${misc:Depends}
 Recommends: openssl, libdigest-md5-perl, snt-backup-hostkey
 Suggests: snt-backup-files, snt-backup-duplicity, snt-backup-debian, snt-backup-mysql, snt-backup-pgsql, snt-backup-slapd
 Description: SNT backup scripts
@@ -16,13 +16,11 @@ Description: SNT backup scripts
 
 Package: snt-backup-hostkey
 Architecture: all
-Depends: bash
 Description: SNT backup-host public key
  SNT backup-host public key
 
 Package: snt-backup-utils
 Architecture: all
-Depends: bash, tar, sed
 Suggests: bzip2, snt-backup
 Conflicts: snt-backup (<< 2.1-26)
 Description: SNT backup utilities
@@ -30,7 +28,7 @@ Description: SNT backup utilities
 
 Package: snt-backup-server
 Architecture: all
-Depends: bash, tar, sed, snt-backup-utils
+Depends: snt-backup-utils
 Suggests: bzip2
 Description: SNT backup server package
  SNT backup server package
