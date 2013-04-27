@@ -4,6 +4,7 @@ Maintainer: Bas van Sisseren <bas@snt.utwente.nl>
 Priority: standard
 Uploaders: Bas van Sisseren <bas@snt.utwente.nl>
 Standards-Version: 3.5.7
+Build-Depends: debhelper
 
 Package: snt-backup
 Architecture: all

@@ -3,8 +3,11 @@ snt-backup (2.1-53) stable; urgency=low
   [server]
   * cleanup script didn't clean without editing
   * subdirectory support for backup storage
+  
+  [misc]
+  * added build-depends so package building in a pbuilder enviroments works
 
- -- Robbert Muller <muller@muze.nl>  Fri, 26 Apr 2013 14:12:49 +0200
+ -- Robbert Müller <muller@muze.nl>  Sat, 27 Apr 2013 20:12:59 +0200
 
 snt-backup (2.1-52) stable; urgency=low
 
