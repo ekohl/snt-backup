@@ -6,6 +6,7 @@ snt-backup (2.1-53) stable; urgency=low
   
   [misc]
   * added build-depends so package building in a pbuilder enviroments works
+  * updated gpl2 licence with newer version of the text
 
  -- Robbert Müller <muller@muze.nl>  Sat, 27 Apr 2013 20:12:59 +0200
 
