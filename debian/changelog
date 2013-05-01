@@ -3,6 +3,7 @@ snt-backup (2.1-53) stable; urgency=low
   [server]
   * cleanup script didn't clean without editing
   * subdirectory support for backup storage
+  * fixed bug in cleanup.pl: it was deleting all incrementals until there was a daily outside the keep daily
   
   [misc]
   * added build-depends so package building in a pbuilder enviroments works

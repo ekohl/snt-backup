@@ -179,7 +179,7 @@ foreach my $module (keys %data) {
 			if ($date =~ /^(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})$/) {
 				my $backup_date = timelocal($6, $5, $4, $3, $2-1, $1-1900, 0, 0, 0);
 				if (($now_date - $backup_date) < ($retention_period_yearly*86400) || $retention_period_yearly == 0) {
-					print "$date is newer than $retention_period_yearly days\n" if ($flag_verbose);
+					print "yearly: $date is newer than $retention_period_yearly days\n" if ($flag_verbose);
 					push @keep_yearly, $date;
 				}
 			}
@@ -190,7 +190,7 @@ foreach my $module (keys %data) {
 			if ($date =~ /^(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})$/) {
 				my $backup_date = timelocal($6, $5, $4, $3, $2-1, $1-1900, 0, 0, 0);
 				if (($now_date - $backup_date) < ($retention_period_monthly*86400) || $retention_period_monthly == 0) {
-					print "$date is newer than $retention_period_monthly days\n" if ($flag_verbose);
+					print "monthly: $date is newer than $retention_period_monthly days\n" if ($flag_verbose);
 					push @keep_monthly, $date;
 				}
 			}
@@ -212,7 +212,7 @@ foreach my $module (keys %data) {
 			if ($date =~ /^(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})$/) {
 				my $backup_date = timelocal($6, $5, $4, $3, $2-1, $1-1900, 0, 0, 0);
 				if (($now_date - $backup_date) < ($retention_period_daily*86400) || $retention_period_daily == 0) {
-					print "$date is newer than $retention_period_daily days\n" if ($flag_verbose);
+					print "daily: $date is newer than $retention_period_daily days\n" if ($flag_verbose);
 					push @keep_daily, $date;
 				}
 				else {
@@ -221,7 +221,9 @@ foreach my $module (keys %data) {
 			}
 		}
 		print "Newest daily outside retention period: $newest_daily_outside_retention_period\n" if ($flag_verbose);
-		push @keep_daily, $newest_daily_outside_retention_period;
+		if(defined $newest_daily_outside_retention_period) {
+			push @keep_daily, $newest_daily_outside_retention_period;
+		}
 
 		# De incrementals die we willen bewaren (alle sinds $newest_daily_outside_retention_period)
 		foreach my $date (@dates) {
