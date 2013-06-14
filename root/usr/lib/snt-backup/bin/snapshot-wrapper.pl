@@ -14,6 +14,7 @@
 #     2011-12-16 also redirect lvcreate and lvdisplay stderr to stdout
 
 use strict;
+use POSIX qw//;
 
 # configurable variables
 my $snap_name = $ENV{LVM_SNAP_SNAP_NAME} || 'snap';
@@ -25,6 +26,8 @@ my $bk_path   = $ENV{LVM_SNAP_BK_PATH};   # '/opt'
 my $bk_dev    = $ENV{LVM_SNAP_BK_DEV};    # '/dev/data/opt'
 my $bk_fstype = $ENV{LVM_SNAP_BK_FSTYPE}; # 'ext3'
 my $bk_fsopt  = $ENV{LVM_SNAP_BK_FSOPT};  # 'ro,user_xattr,acl'
+
+POSIX::close(3); # the parent sometimes leaks fd 3..
 
 die "environment variable LVM_SNAP_BK_PATH not set!\n"
 	unless defined $bk_path;
@@ -162,6 +165,20 @@ sub shell_esc {
 	return "'$value'";
 }
 
+sub lvremove {
+	my $snap_dev = shift;
+	my $retries = 5;
+	while (1) {
+		system("/sbin/lvremove -f ".shell_esc($snap_dev)." 2>&1");
+		my $error = $?;
+		return $error unless $error; # 0 = ok
+		return $error if $retries-- <= 0;
+		print "failed to remove snapshot, retrying.\n";
+		sleep(1);
+	}
+}
+
+
 # ok, start :)
 if ( -e $snap_dev ) {
 	warn "Snapshot device '$snap_dev' exists! aborted!\n";
@@ -195,7 +212,7 @@ if ($bk_fstype eq 'xfs') {
 
 	if (my $error = $?) {
 		warn "xfs_freeze -u returned an error: $error\n";
-		system("/sbin/lvremove -f ".shell_esc($snap_dev)." 2>&1");
+		lvremove($snap_dev);
 		exit 1;
 	}
 }
@@ -206,7 +223,7 @@ if (my $error = $?) {
 	# 1 = recovered
 	if ($error != 256) {
 		warn "fsck.$bk_fstype returned an error: $error\n";
-		system("/sbin/lvremove -f ".shell_esc($snap_dev)." 2>&1");
+		lvremove($snap_dev);
 		exit 1;
 	}
 }
@@ -215,7 +232,7 @@ system('mkdir', '-p', $snap_mnt_path);
 if (my $error = $?) {
 	# 0 = ok
 	warn "failed to create mountpoint\n";
-	system("/sbin/lvremove -f ".shell_esc($snap_dev)." 2>&1");
+	lvremove($snap_dev);
 	exit 1;
 }
 
@@ -223,7 +240,7 @@ system('mount', '-t', $bk_fstype, '-o', $bk_fsopt, $snap_dev, $snap_mnt_path);
 if (my $error = $?) {
 	# 0 = ok
 	warn "failed to mount snapshot on mountpoint\n";
-	system("/sbin/lvremove -f ".shell_esc($snap_dev)." 2>&1");
+	lvremove($snap_dev);
 	exit 1;
 }
 
@@ -232,7 +249,7 @@ if (my $error = $?) {
 	# 0 = ok
 	warn "failed to change directory to mountpoint\n";
 	system('umount', $snap_mnt_path);
-	system("/sbin/lvremove -f ".shell_esc($snap_dev)." 2>&1");
+	lvremove($snap_dev);
 	exit 1;
 }
 
@@ -244,7 +261,7 @@ unless (chdir('/')) {
 
 	warn "failed to change directory to '/': $error\n";
 	system('umount', $snap_mnt_path);
-	system("/sbin/lvremove -f ".shell_esc($snap_dev)." 2>&1");
+	lvremove($snap_dev);
 	exit 1;
 }
 
@@ -252,7 +269,7 @@ system('umount', $snap_mnt_path);
 if (my $error = $?) {
 	# 0 = ok
 	warn "failed to unmount snapshot\n";
-	system("/sbin/lvremove -f ".shell_esc($snap_dev)." 2>&1");
+	lvremove($snap_dev);
 	exit 1;
 }
 
@@ -260,7 +277,7 @@ system("/sbin/lvdisplay ".shell_esc($snap_dev)." 2>&1");
 if (my $error = $?) {
 	# 0 = ok
 	warn "failed to display snapshot info\n";
-	system("/sbin/lvremove -f ".shell_esc($snap_dev)." 2>&1");
+	lvremove($snap_dev);
 	exit 1;
 }
 
@@ -274,8 +291,8 @@ if (my $error = $?) {
 
 sleep(1);
 
-system("/sbin/lvremove -f ".shell_esc($snap_dev)." 2>&1");
-if (my $error = $?) {
+my $error = lvremove($snap_dev);
+if ($error) {
 	# 0 = ok
 	warn "failed to remove snapshot\n";
 	exit 1;
