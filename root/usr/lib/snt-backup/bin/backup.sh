@@ -47,6 +47,8 @@ export C_TAG=''
 export ENCRYPT=''
 export E_TAG=''
 
+export BUFFER='' # no buffering
+
 # laad de config en standaard modules in
 . "${CONFDIR}/config"
 . "${BASEDIR}/lib/base"

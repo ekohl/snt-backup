@@ -47,7 +47,7 @@ function pgsql_backup {
 					. "${CONFDIR}/pgsql/db.${PGSQL_DB}.conf"
 				fi
 				"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
-					$PG_SH -c '/usr/bin/pg_dump ${PG_DUMP_OPTS} "${PGSQL_DB}"' $COMPRESS $ENCRYPT \
+					$PG_SH -c '/usr/bin/pg_dump ${PG_DUMP_OPTS} "${PGSQL_DB}"' $COMPRESS $ENCRYPT $BUFFER \
 					|| { touch "${SNAPSHOTDIR}/error"; echo 'pgsql dump failed.'; }
 			fi
 		done
@@ -89,7 +89,7 @@ function pgsql_backup {
 	fi
 
 	"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
-		$PG_SH -c "$PG_BIN/pg_dumpall -g ${PG_DUMPALL_OPTS}" $COMPRESS $ENCRYPT \
+		$PG_SH -c "$PG_BIN/pg_dumpall -g ${PG_DUMPALL_OPTS}" $COMPRESS $ENCRYPT $BUFFER \
 		|| { touch "${SNAPSHOTDIR}/error"; echo 'pgsql dump failed.'; }
 }
 
