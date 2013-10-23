@@ -1,3 +1,13 @@
+snt-backup (2.1-54) stable; urgency=low
+
+  * add ignore for mysql.event table; do not backup events.
+  * the parent leaks file-descriptor 3; we don't use it, so close it.
+  * retry lvremove several times. the first attempt often does not succeed.
+  * add verbose-flag to dpkg-dump tool.
+  * add support for buffering postgresql backups.
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Wed, 23 Oct 2013 13:20:56 +0200
+
 snt-backup (2.1-53) stable; urgency=low
 
   [server]
