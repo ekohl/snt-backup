@@ -38,6 +38,7 @@ my $lockfile = "$dpkgdir/lock";
 my $flag_src = 0;
 my $flag_tab = 0;
 my $flag_lock = 0;
+my $flag_verbose = 0;
 my @packages;
 
 $edpkgfile = undef unless -e $edpkgfile;
@@ -56,6 +57,8 @@ while (@ARGV && $ARGV[0] =~ /^-/) {
 		$flag_tab = 1;
 	} elsif ($arg eq '-L') {
 		$flag_lock = 1;
+	} elsif ($arg eq '-v') {
+		$flag_verbose = 1;
 	} else {
 		die "Unknown parameter: '$arg'\n";
 	}
@@ -165,8 +168,21 @@ sub parse_pkg {
 	my $auto_installed = $extended_states{$package_arch}{'Auto-Installed'};
 	$auto_installed = !defined $auto_installed ? 'i' : $auto_installed ? 'a' : 'i';
 
-	print $status[0] . $status[2] . $status[1] . $auto_installed . $sep . $package_arch .
-		((exists $pkg->{'Version'}) ? $sep . $pkg->{'Version'} : '') . "\n";
+	my @columns;
+	if (! $flag_verbose) {
+		push @columns, $status[0] . $status[2] . $status[1] . $auto_installed;
+		push @columns, $package_arch;
+		push @columns, $pkg->{'Version'} if exists $pkg->{'Version'};
+	} else {
+		push @columns, $status[0] . $status[2] . $status[1] . $auto_installed;
+		push @columns, $package_arch;
+		push @columns, $pkg->{'Version'} // '-';
+		push @columns, $arch;
+		push @columns, $pkg->{'Priority'} // '-';
+		push @columns, $pkg->{'Section'} // '-';
+	}
+
+	print join($sep, @columns)."\n";
 }
 
 my %pkg = ();
