@@ -180,6 +180,7 @@ sub parse_pkg {
 		push @columns, $arch;
 		push @columns, $pkg->{'Priority'} // '-';
 		push @columns, $pkg->{'Section'} // '-';
+		push @columns, $pkg->{'Source'} // $pkg->{'Package'};
 	}
 
 	print join($sep, @columns)."\n";
