@@ -1,3 +1,9 @@
+snt-backup (2.1-55) stable; urgency=low
+
+  * add source to dpkg-dump -v output
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Thu, 24 Oct 2013 08:49:25 +0200
+
 snt-backup (2.1-54) stable; urgency=low
 
   * add ignore for mysql.event table; do not backup events.
