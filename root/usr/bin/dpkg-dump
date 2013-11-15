@@ -195,7 +195,7 @@ while ($_ = <$f>) {
 	if (/^$/) {
 		parse_pkg(\%pkg);
 		%pkg = ();
-	} elsif (/^([A-Za-z-]+):\s*(.*)$/) {
+	} elsif (/^([0-9A-Za-z-]+):\s*(.*)$/) {
 		$hdr = $1;
 		if (exists $pkg{$1}) {
 			die "Key '$hdr' redefined on line $line..\n";
