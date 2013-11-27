@@ -105,7 +105,7 @@ sub RMTopen($) {
 	}
 
 	if (defined $rmt_wr) {
-		syswrite $rmt_wr, "O$file\nw\n";
+		syswrite $rmt_wr, "O$file\n65 O_WRONLY|O_CREAT\n";
 		
 		my $status = readStatus($rmt_rd);
 		warn "RMT Unexpected status code '$status'\n"
