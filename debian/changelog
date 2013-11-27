@@ -1,3 +1,10 @@
+snt-backup (2.1-56) stable; urgency=low
+
+  * Fix bug in rmt-client (file mode was incorrect)
+  * Make dpkg-dump compatible with Ubuntu.
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Wed, 27 Nov 2013 14:36:58 +0100
+
 snt-backup (2.1-55) stable; urgency=low
 
   * add source to dpkg-dump -v output
