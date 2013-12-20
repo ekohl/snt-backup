@@ -33,7 +33,7 @@ function mysql_backup {
 		# vraag de lijst met databases op
 
 		mysql --defaults-extra-file="${CONFDIR}/mysql/mysql.conf" \
-				--batch --exec='SHOW DATABASES;' | (
+				--batch --execute='SHOW DATABASES;' | (
 			# lees de header van de tabel in..
 			read -r DUMMY
 
