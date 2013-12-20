@@ -1,3 +1,9 @@
+snt-backup (2.1-57) stable; urgency=medium
+
+  * use mysql '--execute=..' instead of '--exec=..'
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Fri, 20 Dec 2013 13:14:36 +0100
+
 snt-backup (2.1-56) stable; urgency=low
 
   * Fix bug in rmt-client (file mode was incorrect)
