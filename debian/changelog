@@ -1,3 +1,11 @@
+snt-backup (2.1-58) stable; urgency=medium
+
+  * improve duplicity plugin:
+    . make plugin compatible with the current duplicity from Debian Wheezy
+    . only create control-channel when we really need it.
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Fri, 03 Jan 2014 13:33:59 +0100
+
 snt-backup (2.1-57) stable; urgency=medium
 
   * use mysql '--execute=..' instead of '--exec=..'

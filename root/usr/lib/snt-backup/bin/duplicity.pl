@@ -436,9 +436,12 @@ my $day_num;
 	$day_num = int($t / 86400) + 5; # day_skew 0 triggers full backup on saturday
 }
 
+# ssh backend can be: paramiko (newer duplicity), pexpect (newer duplicity; old implementation), old (old duplicity)
+my $ssh_backend = $ENV{SSH_BACKEND} // 'paramiko';
+
 # create tmpdir for ssh control path
 my $tmpdir;
-{
+if (($ssh_backend eq 'pexpect' || $ssh_backend eq 'old') && !defined $ENV{SSH_CONTROL_PATH}) {
 	my $tmpbase = '/tmp';
 
 	my $x = 1;
@@ -457,12 +460,14 @@ if ($debug) {
 }
 
 # set up master ssh
-system('/usr/bin/ssh',
-		'-o', 'ControlMaster yes',
-		'-o', 'ControlPath '.$tmpdir.'/%h_%p_%r',
-		'-o', 'IdentityFile '.$ENV{IDENTITY},
-		'-N', '-f',
-		$backup_host);
+if (defined $tmpdir) {
+	system('/usr/bin/ssh',
+			'-o', 'ControlMaster yes',
+			'-o', 'ControlPath '.$tmpdir.'/%h_%p_%r',
+			'-o', 'IdentityFile '.$ENV{IDENTITY},
+			'-N', '-f',
+			$backup_host);
+}
 
 foreach my $root (@roots) {
 	my $root_name = array_to_path $root;
@@ -508,9 +513,24 @@ foreach my $root (@roots) {
 	push @cmdline, qw/ full / if $full;
 		# syntax changed in duplicity 0.4.4, was '--full'
 
-	push @cmdline, qw/ --sftp-command /, $sftp_command;
+	push @cmdline, qw/ --ssh-backend /, $ssh_backend unless $ssh_backend eq 'old';
 
-	push @cmdline, qw/ --scp-command /, $scp_command;
+	if ($ssh_backend eq 'pexpect' || $ssh_backend eq 'old') {
+		push @cmdline, qw/ --sftp-command /, $sftp_command;
+
+		push @cmdline, qw/ --scp-command /, $scp_command;
+
+	} else {
+		my @ssh_options = ();
+
+		# set ControlPath; current paramiko implementation doesn't pick this up yet :(
+		push @ssh_options, '-oControlPath='.$ENV{SSH_CONTROL_PATH} if defined $ENV{SSH_CONTROL_PATH};
+
+		# set IdentityFile
+		push @ssh_options, '-oIdentityFile='.$ENV{IDENTITY} if defined $ENV{IDENTITY};
+
+		push @cmdline, qw/ --ssh-options /, join(' ', @ssh_options);
+	}
 
 	push @cmdline, qw/ --exclude-device-files /
 		if defined $config->{'exclude-device-files'};
@@ -584,7 +604,7 @@ foreach my $root (@roots) {
 }
 
 # exit master ssh
-{
+if (defined $tmpdir) {
 	open my $olderr, ">&STDERR";
 	open STDERR, ">> /dev/null"; # suppress message 'Exit request sent.'
 
@@ -595,6 +615,6 @@ foreach my $root (@roots) {
 			$backup_host);
 
 	open STDERR, ">&", $olderr;
-}
 
-rmdir($tmpdir);
+	rmdir($tmpdir);
+}

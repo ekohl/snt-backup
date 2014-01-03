@@ -8,6 +8,9 @@
 # duplicity_backup - maak een backup via duplicity
 #
 function duplicity_backup {
+	if [ -f "${CONFDIR}/duplicity/duplicity.conf" ] ; then
+		. "${CONFDIR}/duplicity/duplicity.conf"
+	fi
 	/usr/lib/snt-backup/bin/duplicity.pl
 }
 
