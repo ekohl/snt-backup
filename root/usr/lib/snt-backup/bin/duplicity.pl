@@ -436,12 +436,16 @@ my $day_num;
 	$day_num = int($t / 86400) + 5; # day_skew 0 triggers full backup on saturday
 }
 
-# ssh backend can be: paramiko (newer duplicity), pexpect (newer duplicity; old implementation), old (old duplicity)
-my $ssh_backend = $ENV{SSH_BACKEND} // 'paramiko';
+# ssh backend can be:
+# - old-pexpect (older duplicity with hardcoded pexpect ssh-backend            -- Debian Lenny)
+# - old-paramiko (slightly newer duplicity with hardcoded paramiko ssh-backend -- Debian Squeeze/Wheezy)
+# - pexpect (newer duplicity where we can choose the ssh-backend               -- Debian Jessie)
+# - paramiko (newer duplicity where we can choose the ssh-backend              -- Debian Jessie)
+my $ssh_backend = $ENV{SSH_BACKEND} // 'old-paramiko';
 
 # create tmpdir for ssh control path
 my $tmpdir;
-if (($ssh_backend eq 'pexpect' || $ssh_backend eq 'old') && !defined $ENV{SSH_CONTROL_PATH}) {
+if (($ssh_backend eq 'pexpect' || $ssh_backend eq 'old-pexpect') && !defined $ENV{SSH_CONTROL_PATH}) {
 	my $tmpbase = '/tmp';
 
 	my $x = 1;
@@ -513,9 +517,9 @@ foreach my $root (@roots) {
 	push @cmdline, qw/ full / if $full;
 		# syntax changed in duplicity 0.4.4, was '--full'
 
-	push @cmdline, qw/ --ssh-backend /, $ssh_backend unless $ssh_backend eq 'old';
+	push @cmdline, qw/ --ssh-backend /, $ssh_backend unless $ssh_backend =~ /\Aold-/;
 
-	if ($ssh_backend eq 'pexpect' || $ssh_backend eq 'old') {
+	if ($ssh_backend eq 'pexpect' || $ssh_backend eq 'old-pexpect') {
 		push @cmdline, qw/ --sftp-command /, $sftp_command;
 
 		push @cmdline, qw/ --scp-command /, $scp_command;

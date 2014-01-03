@@ -1,3 +1,10 @@
+snt-backup (2.1-59) stable; urgency=medium
+
+  * further improve duplicity plugin. Debian Squeeze and Wheezy do not
+    accept the --ssh-backend option, but do use the new paramiko ssh library.
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Fri, 03 Jan 2014 14:07:06 +0100
+
 snt-backup (2.1-58) stable; urgency=medium
 
   * improve duplicity plugin:
