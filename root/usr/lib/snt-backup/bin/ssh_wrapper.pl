@@ -24,6 +24,7 @@ my $tmpdir;
 
 # set up master ssh
 system('/usr/bin/ssh',
+		'-o', 'ServerAliveInterval 30',
 		'-o', 'ControlMaster yes',
 		'-o', 'ControlPath '.$tmpdir.'/%h_%p_%r',
 		'-o', 'IdentityFile '.$ENV{IDENTITY},
