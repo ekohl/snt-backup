@@ -1,3 +1,9 @@
+snt-backup (2.1-60) stable; urgency=medium
+
+  * add ServerAliveInterval to ssh_wrapper
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Tue, 04 Feb 2014 11:31:33 +0100
+
 snt-backup (2.1-59) stable; urgency=medium
 
   * further improve duplicity plugin. Debian Squeeze and Wheezy do not
