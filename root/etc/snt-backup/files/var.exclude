@@ -28,6 +28,7 @@
 ./var/lib/postgres
 ./var/lib/postgresql
 ./var/lib/rrdtool
+./var/lib/samba/winbindd_privileged/pipe
 ./var/lib/texmf
 ./var/lock
 ./var/spool/cyrus/mail/*/cyrus.cache
