@@ -1,3 +1,9 @@
+snt-backup (2.1-61) stable; urgency=medium
+
+  * ignore /var/lib/samba/winbindd_privileged/pipe when backupping files.
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Fri, 26 Sep 2014 10:40:15 +0200
+
 snt-backup (2.1-60) stable; urgency=medium
 
   * add ServerAliveInterval to ssh_wrapper
