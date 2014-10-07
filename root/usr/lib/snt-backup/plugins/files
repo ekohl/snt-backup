@@ -58,13 +58,6 @@ function run_dump {
 	
 	CONVNAME="`conv_filename "${BACKUPDIR}"`"
 
-	# .. de excludes..
-	if [ -f "${CONFDIR}/files/${CONVNAME}.exclude" ] ; then
-		EXCLUDE=" -X ${CONFDIR}/files/${CONVNAME}.exclude"
-	else
-		EXCLUDE=""
-	fi
-
 	SNAPFILE="${SNAPSHOTDIR}/files/${CONVNAME}.snap"
 
 	# pre dingen..
@@ -93,7 +86,8 @@ function run_dump {
 	# voor die BACKUPDIR?.. dit lijkt helaas de enige sane manier te
 	# zijn om je excludes goed werkend te krijgen. [BvS]
 	${LVM_SNAP_WRAP} "${BASEDIR}/bin/rmt-client.pl" "${TARFILE}${C_TAG}${E_TAG}" \
-		tar ${EXCLUDE} -C "${TAR_ROOT_PATH}" --listed-incremental "${SNAPFILE}" \
+		"${BASEDIR}/bin/build-tar-exclude.pl" "/${BACKUPDIR}" '|' \
+		tar -X - -C "${TAR_ROOT_PATH}" --listed-incremental "${SNAPFILE}" \
 			--ignore-failed-read --create --file - \
 			--blocking-factor=1 ./"${BACKUPDIR}" \
 		$COMPRESS $ENCRYPT
