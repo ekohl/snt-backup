@@ -1,3 +1,13 @@
+snt-backup (2.1-63) stable; urgency=medium
+
+  * snt-backup-utils fixes:
+    . add dependency on perl-base
+    . remove (hidden) dependency on perl (removed usage of Data::Dumper)
+    . use perl's line counter $.
+    . fix error messages. use 'at line <line>.'.
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Wed, 18 Feb 2015 12:52:33 +0100
+
 snt-backup (2.1-62) stable; urgency=medium
 
   * rewrite tar file exclusion logic to /etc/snt-backup/files/exclude.d

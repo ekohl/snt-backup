@@ -2,7 +2,6 @@
 
 use strict;
 use Fcntl;
-use Data::Dumper;
 
 my $dpkgdir = '/var/lib/dpkg';
 my $aptdir  = '/var/lib/apt';
@@ -123,7 +122,7 @@ sub parse_pkg {
 	my $pkg = shift;
 	return unless (%$pkg);
 
-	die "No package-name defined in block:\n" . Dumper($pkg)
+	die "No package-name defined in block at line $pkg->{_line}.\n"
 		unless exists $pkg->{'Package'};
 
 	my $package = $pkg->{'Package'};
@@ -188,17 +187,17 @@ sub parse_pkg {
 
 my %pkg = ();
 my $hdr = '';
-my $line = 1;
 
 while ($_ = <$f>) {
 	chomp $_;
+	$pkg{_line} //= $.;
 	if (/^$/) {
 		parse_pkg(\%pkg);
 		%pkg = ();
 	} elsif (/^([0-9A-Za-z-]+):\s*(.*)$/) {
 		$hdr = $1;
 		if (exists $pkg{$1}) {
-			die "Key '$hdr' redefined on line $line..\n";
+			die "Key '$hdr' redefined at line $..\n";
 		} else {
 			$pkg{$1} = $2;
 		}
@@ -207,9 +206,8 @@ while ($_ = <$f>) {
 	} elsif (/^ (.*?)$/) {
 		$pkg{$hdr} .= "\n" . $1;
 	} else {
-		die "Syntax error on line $line.. ('$_')\n";
+		die "Syntax error at line $..\n";
 	}
-	$line++;
 }
 
 close $f;
