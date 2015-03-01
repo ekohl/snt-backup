@@ -76,6 +76,17 @@ if [ "_$RET" = "_true" ]; then
 			fi
 		fi
 		echo
+		echo "#(xz)"
+		if [ "_$RET" = "_xz" ]; then
+			echo "export COMPRESS='| /usr/bin/xz '"
+			echo "export C_TAG='.xz'"
+			echo "export XZ_OPT=' --memlimit=25% '"
+		else
+			echo "#export COMPRESS='| /usr/bin/xz --memlimit=\"25%\" '"
+			echo "#export C_TAG='.xz'"
+			echo "#export XZ_OPT=' --memlimit=25% '"
+		fi
+		echo
 		echo "## Encryption"
 		db_get snt-backup/use_encryption
 		echo "#(openssl wrapper)"

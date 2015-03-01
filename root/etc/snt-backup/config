@@ -20,6 +20,11 @@ export C_TAG='.gz'
 #export COMPRESS='| /bin/bzip2 -9'
 #export C_TAG='.bz2'
 
+#(xz)
+#export COMPRESS='| /usr/bin/xz '
+#export C_TAG='.xz'
+#export XZ_OPT=" --memlimit=25% "
+
 export DAY_WEEKLY_CLEANUP='monday'
 
 ## Encryption

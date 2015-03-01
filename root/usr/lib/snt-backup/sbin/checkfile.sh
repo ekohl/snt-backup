@@ -39,6 +39,17 @@ case "$file" in
 		echo
 
 		;;
+	*.tar.xz)
+		tar --blocking-factor=1 -Jtvf "$file" > "$file".list 2>> "$file".errors
+
+		CNT_DIRS="`grep -c '/$' "$file".list`"
+		CNT_FILES="`grep -vc '/$' "$file".list`"
+
+		echo "Aantal directories: $CNT_DIRS"
+		echo "Aantal bestanden  : $CNT_FILES"
+		echo
+
+		;;
 
 	*.gz)
 		gzip -t "$file" 2>> "$file".errors
@@ -46,6 +57,10 @@ case "$file" in
 
 	*.bz2)
 		bzip2 -t "$file" 2>> "$file".errors
+		;;
+
+	*.xz)
+		xz -t "$file" 2>> "$file".errors
 		;;
 esac
 
@@ -68,6 +83,10 @@ else
 
 			*.bz2)
 				ln -fs ../backups/"$file" ../md5s/"`bunzip2 < "$file" 2> /dev/null | md5sum | tr -d '\\n'`"
+				;;
+
+			*.xz)
+				ln -fs ../backups/"$file" ../md5s/"`xz < "$file" 2> /dev/null | md5sum | tr -d '\\n'`"
 				;;
 
 			*)

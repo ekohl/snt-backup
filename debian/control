@@ -22,7 +22,7 @@ Description: SNT backup-host public key
 Package: snt-backup-utils
 Architecture: all
 Depends: perl-base
-Suggests: bzip2, snt-backup
+Suggests: bzip2, xz-utils, snt-backup
 Conflicts: snt-backup (<< 2.1-26)
 Description: SNT backup utilities
  SNT backup utilities
@@ -30,7 +30,7 @@ Description: SNT backup utilities
 Package: snt-backup-server
 Architecture: all
 Depends: snt-backup-utils
-Suggests: bzip2
+Suggests: bzip2, xz-utils
 Description: SNT backup server package
  SNT backup server package
 

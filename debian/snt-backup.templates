@@ -38,12 +38,12 @@ Description: aanroepen van mysql-backup pre- en post-scripts?
 
 Template: snt-backup/use_compression
 Type: select
-Choices: gzip, bzip2, none
+Choices: gzip, bzip2, xz, none
 Default: gzip
 Description: welke compressie-methode gebruiken?
  snt-backup kan meerdere compressie-methoden gebruiken. Standaard
  gebruikt het gzip, maar voor trage (kabel?) verbindingen is het
- misschien interessanter om bzip compressie te gebruiken. Ook is
+ misschien interessanter om bzip of xz compressie te gebruiken. Ook is
  er de mogelijkheid om te kiezen voor geen compressie, maar dit
  is sterk af te raden.
 
