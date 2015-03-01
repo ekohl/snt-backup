@@ -1,4 +1,4 @@
-#!/usr/bin/php -q
+#!/usr/bin/env php
 <?php
 	$ariadne = $argv[1].'/lib/';
 	$dumpdir = $argv[2];
@@ -18,18 +18,30 @@
 		echo "dumpdir required\n";
 		exit(0);
 	}
-	if (!@include_once($ariadne."/configs/ariadne.phtml")) {
-		chdir(substr($_SERVER['PHP_SELF'], 0, strrpos($_SERVER['PHP_SELF'], '/')));
-		if(!include_once($ariadne."/configs/ariadne.phtml")){
-			echo "could not open ariadne.phtml";
-			exit(1);
+
+
+	$ARLoader = 'cmd';
+	$currentDir = getcwd();
+
+	if (file_exists($ariadne."/bootstrap.php")) {
+		// ariadne 9.0
+		require_once($ariadne."/bootstrap.php");
+	} else {
+		// ariadne pre 9.0
+		if (!@include_once($ariadne."/configs/ariadne.phtml")) {
+			chdir(substr($_SERVER['PHP_SELF'], 0, strrpos($_SERVER['PHP_SELF'], '/')));
+			if(!include_once($ariadne."/configs/ariadne.phtml")){
+				echo "could not open ariadne.phtml";
+				exit(1);
+			}
 		}
+		require($ariadne."/configs/store.phtml");
+		require($ariadne."/includes/loader.cmd.php");
+		require($ariadne."/stores/".$store_config["dbms"]."store.phtml");
+		include($ariadne."/nls/".$AR->nls->default);
+
 	}
-	require_once($ariadne."/configs/store.phtml");
-	require_once($ariadne."/includes/loader.cmd.php");
-	require_once($ariadne."/stores/".$store_config["dbms"]."store.phtml");
-	include($ariadne."/nls/".$AR->nls->default);
-	require_once($ariadne."/ar.php");
+
 
 	/* instantiate the store */
 	$inst_store = $store_config["dbms"]."store";
