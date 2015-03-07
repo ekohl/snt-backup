@@ -1,3 +1,10 @@
+snt-backup (2.1-65) stable; urgency=medium
+
+  * snt-backup-server
+    - add dependency on perl for Digest/MD5.pm
+
+ -- Robbert Müller <muller@muze.nl>  Sat, 07 Mar 2015 12:17:25 +0100
+
 snt-backup (2.1-64) stable; urgency=medium
 
   * ariadne 9.0 compatibility
