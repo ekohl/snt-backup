@@ -240,7 +240,8 @@ install: build
 
 	# config files & libraries
 	for file in \
-		./etc/snt-backup/debian/pkglist.conf; \
+		./etc/snt-backup/debian/pkglist.conf \
+		./etc/snt-backup/debian/debconf.conf; \
 	do \
 		install -o root -g root -m 0644 -p root/$$file $(DESTDIR_DEBIAN)/$$file; \
 	done

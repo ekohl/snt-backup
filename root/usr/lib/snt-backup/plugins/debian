@@ -7,7 +7,7 @@
 #
 # debian_backup - maak een backup van de package list
 #
-function debian_backup {
+function debian_backup_pkglist {
 	. "${CONFDIR}/debian/pkglist.conf"
 	
 	if [ -e "${SNAPSHOTDIR}/debian/pkglist" -a \
@@ -69,6 +69,82 @@ function debian_backup {
 		"${SNAPSHOTDIR}/debian/${TOFILE}.gz"
 }
 
+function debian_backup_debconf {
+	. "${CONFDIR}/debian/debconf.conf"
+
+	if [ -f "/usr/bin/debconf-get-selections" ] ; then
+		DEBCONF="/usr/bin/debconf-get-selections"
+	else
+		DEBCONF="/usr/lib/cdebconf/debconf-get-selections"
+	fi
+	
+	if [ -e "${SNAPSHOTDIR}/debian/debconf" -a \
+		-e "${SNAPSHOTDIR}/debian/debconf.full" -a \
+		\( "${rotate}" == "weekly" -o "${rotate}" == "monthly" \) ]
+	then
+
+		${DEBCONF} | sort -u > "${SNAPSHOTDIR}/debian/debconf.new"
+
+		if [ "${type}" == "diff" ]
+		then
+		        if [ "${HOSTNAME_TAG}x" == "x" ]; then
+			        TOFILE="debian_${DATEFIX}_debconf_diff"
+			else
+			        TOFILE="debian_${DATEFIX}_${HOSTNAME_TAG}_debconf_diff"
+			fi
+			diff "${SNAPSHOTDIR}/debian/debconf.full" \
+				"${SNAPSHOTDIR}/debian/debconf.new" > \
+				"${SNAPSHOTDIR}/debian/${TOFILE}"
+		else
+			if [ "${HOSTNAME_TAG}x" == "x" ]; then
+			        TOFILE="debian_${DATEFIX}_debconf_incr"
+			else
+			        TOFILE="debian_${DATEFIX}_${HOSTNAME_TAG}_debconf_incr"
+			fi
+			diff "${SNAPSHOTDIR}/debian/debconf" \
+				"${SNAPSHOTDIR}/debian/debconf.new" > \
+				"${SNAPSHOTDIR}/debian/${TOFILE}"
+		fi
+
+		mv -f "${SNAPSHOTDIR}/debian/debconf.new" \
+			"${SNAPSHOTDIR}/debian/debconf"
+	else
+		${DEBCONF} | sort -u > "${SNAPSHOTDIR}/debian/debconf"
+
+		cp "${SNAPSHOTDIR}/debian/debconf" \
+			"${SNAPSHOTDIR}/debian/debconf.full"
+
+		if [ "${HOSTNAME_TAG}x" == "x" ]; then
+		        TOFILE="debian_${DATEFIX}_debconf_full"
+		else
+		        TOFILE="debian_${DATEFIX}_${HOSTNAME_TAG}_debconf_full"
+		fi
+
+		cp "${SNAPSHOTDIR}/debian/debconf" \
+			"${SNAPSHOTDIR}/debian/${TOFILE}"
+	fi
+
+#	if [ -s "${SNAPSHOTDIR}/debian/${TOFILE}" ]
+#	then
+		# verplaats dump van tijdelijke snapshot dir naar
+		# uiteindelijke locatie
+		"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
+			cat "${SNAPSHOTDIR}/debian/${TOFILE}" $COMPRESS $ENCRYPT
+#	fi
+
+	rm -f "${SNAPSHOTDIR}/debian/debconf.old" \
+		"${SNAPSHOTDIR}/debian/debconf.new" \
+		"${SNAPSHOTDIR}/debian/${TOFILE}" \
+		"${SNAPSHOTDIR}/debian/${TOFILE}.gz"
+}
+
+function debian_backup {
+	debian_backup_pkglist;
+	debian_backup_debconf;
+}
+
+
+
 #
 # debian_weekly / debian_monthly - ruimt tijdelijke bestanden op.
 #								wordt eens per week of maand aangeroepen.
@@ -80,6 +156,8 @@ function debian_weekly {
 	then
 		rm -f "${SNAPSHOTDIR}/debian/pkglist" \
 			"${SNAPSHOTDIR}/debian/pkglist.full"
+		rm -f "${SNAPSHOTDIR}/debian/debconf" \
+			"${SNAPSHOTDIR}/debian/debconf.full"
 	fi
 }
 
@@ -90,5 +168,7 @@ function debian_monthly {
 	then
 		rm -f "${SNAPSHOTDIR}/debian/pkglist" \
 			"${SNAPSHOTDIR}/debian/pkglist.full"
+		rm -f "${SNAPSHOTDIR}/debian/debconf" \
+			"${SNAPSHOTDIR}/debian/debconf.full"
 	fi
 }

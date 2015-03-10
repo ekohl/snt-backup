@@ -54,7 +54,7 @@ Description: SNT backup scripts svn
 
 Package: snt-backup-debian
 Architecture: all
-Depends: snt-backup
+Depends: snt-backup, debconf-utils | cdebconf
 Description: SNT backup scripts debian support
  SNT backup script for dumping debian package list
 
