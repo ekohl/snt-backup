@@ -307,6 +307,7 @@ install: build
 	for file in \
 		./usr/lib/snt-backup/plugins/ariadne \
 		./usr/lib/snt-backup/bin/ariadne-dump.sh \
+		./usr/lib/snt-backup/bin/ariadne-dump.php \
 		./usr/lib/snt-backup/bin/ariadne-dump-sites.php \
 		./usr/lib/snt-backup/bin/ariadne-dummy-dump.sh \
 		./usr/lib/snt-backup/bin/ariadne-check-ctime.php; \
