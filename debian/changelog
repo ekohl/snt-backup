@@ -1,3 +1,16 @@
+snt-backup (2.1-66) stable; urgency=medium
+
+  * snt-backup-ariadne
+    - no longer a tmp filesystem required
+    - faster backups
+    - no dependency on export script with specific arguments
+  * snt-backup-debian
+    - add dumping of debconf database
+  * snt-backup-server
+    - add option to specify a icleanup configuration per backup user
+
+ -- Robbert Müller <muller@muze.nl>  Mon, 10 Mar 2015 09:45:16 +0100
+
 snt-backup (2.1-65) stable; urgency=medium
 
   * snt-backup-server
