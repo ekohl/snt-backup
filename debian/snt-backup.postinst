@@ -78,11 +78,11 @@ if [ "_$RET" = "_true" ]; then
 		echo
 		echo "#(xz)"
 		if [ "_$RET" = "_xz" ]; then
-			echo "export COMPRESS='| /usr/bin/xz '"
+			echo "export COMPRESS='| /usr/bin/xz'"
 			echo "export C_TAG='.xz'"
 			echo "export XZ_OPT=' --memlimit=25% '"
 		else
-			echo "#export COMPRESS='| /usr/bin/xz --memlimit=\"25%\" '"
+			echo "#export COMPRESS='| /usr/bin/xz'"
 			echo "#export C_TAG='.xz'"
 			echo "#export XZ_OPT=' --memlimit=25% '"
 		fi
