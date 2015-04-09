@@ -1,3 +1,10 @@
+snt-backup (2.1-67) stable; urgency=medium
+
+  * remove strange space after 'xz'.
+  * memlimit was specified twice. one should be enough.
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Thu, 09 Apr 2015 17:05:04 +0200
+
 snt-backup (2.1-66) stable; urgency=medium
 
   * snt-backup-ariadne
