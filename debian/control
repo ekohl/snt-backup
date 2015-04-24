@@ -16,12 +16,13 @@ Description: SNT backup scripts
 
 Package: snt-backup-hostkey
 Architecture: all
+Depends: ${misc:Depends}
 Description: SNT backup-host public key
  SNT backup-host public key
 
 Package: snt-backup-utils
 Architecture: all
-Depends: perl-base
+Depends: perl-base, ${misc:Depends}
 Suggests: bzip2, xz-utils, snt-backup
 Conflicts: snt-backup (<< 2.1-26)
 Description: SNT backup utilities
@@ -29,55 +30,55 @@ Description: SNT backup utilities
 
 Package: snt-backup-server
 Architecture: all
-Depends: snt-backup-utils, perl
+Depends: snt-backup-utils, perl, ${misc:Depends}
 Suggests: bzip2, xz-utils
 Description: SNT backup server package
  SNT backup server package
 
 Package: snt-backup-files
 Architecture: all
-Depends: snt-backup
+Depends: snt-backup, ${misc:Depends}
 Description: SNT backup scripts file
  SNT backup script for dumping files
 
 Package: snt-backup-duplicity
 Architecture: all
-Depends: snt-backup, snt-backup-utils, duplicity (>= 0.4.4-1)
+Depends: snt-backup, snt-backup-utils, duplicity (>= 0.4.4-1), ${misc:Depends}
 Description: SNT backup scripts duplicity
  SNT backup script for dumping files with duplicity
 
 Package: snt-backup-svn
 Architecture: all
-Depends: snt-backup, subversion
+Depends: snt-backup, subversion, ${misc:Depends}
 Description: SNT backup scripts svn
  SNT backup script for dumping svn
 
 Package: snt-backup-debian
 Architecture: all
-Depends: snt-backup, debconf-utils | cdebconf
+Depends: snt-backup, debconf-utils | cdebconf, ${misc:Depends}
 Description: SNT backup scripts debian support
  SNT backup script for dumping debian package list
 
 Package: snt-backup-mysql
 Architecture: all
-Depends: snt-backup, mysql-client
+Depends: snt-backup, mysql-client, ${misc:Depends}
 Description: SNT backup scripts mysql support
  SNT backup script for dumping mysql tables
 
 Package: snt-backup-pgsql
 Architecture: all
-Depends: snt-backup, postgresql-client | postgresql-client-8.1
+Depends: snt-backup, postgresql-client | postgresql-client-8.1, ${misc:Depends}
 Description: SNT backup scripts pgsql support
  SNT backup script for dumping pgsql tables
 
 Package: snt-backup-slapd
 Architecture: all
-Depends: snt-backup, ldap-utils
+Depends: snt-backup, ldap-utils, ${misc:Depends}
 Description: SNT backup scripts slapd support
  SNT backup script for dumping slapd directories
 
 Package: snt-backup-ariadne
 Architecture: all
-Depends: snt-backup, php5-cli
+Depends: snt-backup, php5-cli, ${misc:Depends}
 Description: SNT backup scripts ariadne support
  SNT backup script for dumping ariadne sites
