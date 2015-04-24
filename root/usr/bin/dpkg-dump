@@ -91,6 +91,7 @@ if (defined $edpkgfile) {
 				my $package = $rec->{Package};
 				die "Missing package name in extended_states record.\n" unless defined $package;
 				my $arch = $rec->{Architecture} // $default_arch;
+				$extended_states{$package.':all'} = $rec;
 				$extended_states{$package.':'.$arch} = $rec;
 				$extended_states{$package} = $rec;
 				$rec = {};
@@ -106,6 +107,7 @@ if (defined $edpkgfile) {
 		my $package = $rec->{Package};
 		die "Missing package name in extended_states record.\n" unless defined $package;
 		my $arch = $rec->{Architecture} // $default_arch;
+		$extended_states{$package.':all'} = $rec;
 		$extended_states{$package.':'.$arch} = $rec;
 		$extended_states{$package} = $rec;
 		$rec = {};
