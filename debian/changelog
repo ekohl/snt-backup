@@ -1,3 +1,9 @@
+snt-backup (2.1-68) stable; urgency=medium
+
+  * dpkg-dump: fix auto-installed flag for multi-installed all-arch packages
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Fri, 24 Apr 2015 09:43:12 +0200
+
 snt-backup (2.1-67) stable; urgency=medium
 
   * remove strange space after 'xz'.
