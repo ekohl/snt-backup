@@ -183,6 +183,7 @@ install: build
 
 	# config files & libraries
 	for file in \
+		./etc/snt-backup/mysql/Default.conf \
 		./etc/snt-backup/mysql/mysql.exclude; \
 	do \
 		install -o root -g root -m 0644 -p root/$$file $(DESTDIR_MYSQL)/$$file; \

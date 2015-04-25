@@ -67,6 +67,24 @@ function mysql_backup {
 	# FIXME: This should be done more cleanly
 	if [ "${LOG_BIN_BASENAME}x" != '(No default value)x' -a "${LOG_BIN_BASENAME}x" != 'x' ]; then
 		# Binary logging is enabled; Backup all binary logs.
+		if [ ! -d "${SNAPSHOTDIR}/mysql/" ] ; then
+			mkdir "${SNAPSHOTDIR}/mysql/"
+		fi
+		SNAPFILE="${SNAPSHOTDIR}/mysql/binlogs.snap"
+
+		# pre dingen..
+		case "${TYPE}" in
+		full)
+			rm -f "${SNAPFILE}"
+			;;
+		incr)
+			;;
+		diff)
+			TMPFILE="`mktemp -q /tmp/${CONVNAME}.XXXXXXXXXX`"
+			cp "${SNAPFILE}" "${TMPFILE}"
+			SNAPFILE="${TMPFILE}"
+			;;
+		esac
 
 		if [ "${HOSTNAME_TAG}x" == "x" ]; then
 			TARFILE="${TODIR}/mysql_${DATEFIX}_binlogs.tar"
@@ -87,11 +105,23 @@ function mysql_backup {
 			sed 's:^:.:' '|' \
 			tar --create --file - \
 				--directory / \
+				--listed-incremental "${SNAPFILE}" \
 				--files-from - --no-recursion --no-wildcards \
 				--ignore-failed-read --blocking-factor=1 \
 			$COMPRESS $ENCRYPT \
 				|| {	touch "${SNAPSHOTDIR}/error"; \
 						echo 'mysql backup failed.'; }
+
+		# post dingen..
+		case "${TYPE}" in
+			full)
+				;;
+			incr)
+				;;
+			diff)
+				rm -f "${TMPFILE}"
+				;;
+		esac
 	fi
 }
 
@@ -100,9 +130,17 @@ function mysql_backup {
 #               aangeroepen.
 #
 function mysql_weekly {
-	true
+	. "${CONFDIR}/mysql/Default.conf"
+	SNAPFILE="${SNAPSHOTDIR}/mysql/binlogs.snap"
+	if [ "_${CYCLE}" = "_weekly" ] ; then
+		rm  "${SNAPFILE}"
+	fi
 }
 
 function mysql_monthly {
-	true
+	. "${CONFDIR}/mysql/Default.conf"
+	SNAPFILE="${SNAPSHOTDIR}/mysql/binlogs.snap"
+	if [ "_${CYCLE}" = "_monthly" ] ; then
+		rm  "${SNAPFILE}"
+	fi
 }
