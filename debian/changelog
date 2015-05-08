@@ -1,3 +1,9 @@
+snt-backup (2.1-69) stable; urgency=low
+
+  * change dependency from mysql-client to virtual-mysql-client
+
+ -- Robbert Müller <muller@muze.nl>  Fri, 08 May 2015 11:02:05 +0200
+
 snt-backup (2.1-68.1) stable; urgency=low
 
   * Add incremental backups for mysql binlogs
