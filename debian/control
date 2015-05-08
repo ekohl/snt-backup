@@ -61,7 +61,7 @@ Description: SNT backup scripts debian support
 
 Package: snt-backup-mysql
 Architecture: all
-Depends: snt-backup, mysql-client, ${misc:Depends}
+Depends: snt-backup, virtual-mysql-client , ${misc:Depends}
 Description: SNT backup scripts mysql support
  SNT backup script for dumping mysql tables
 
