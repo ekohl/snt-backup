@@ -157,7 +157,7 @@ function ariadne_weekly {
 			CONVNAME="${CONV}--`conv_ariadne "${line2}"`"
 			REVFILE="${SNAPSHOTDIR}/ariadne/${CONVNAME}.rev"
 			if [ -f "${REVFILE}" -a "_${CYCLE}" = "_weekly" ] ; then
-				rm "${REVFILE}" 
+				rm -f "${REVFILE}" 
 			fi
 		done
 	done
@@ -197,7 +197,7 @@ function ariadne_monthly {
 			CONVNAME="${CONV}--`conv_ariadne "${line2}"`"
 			REVFILE="${SNAPSHOTDIR}/ariadne/${CONVNAME}.rev"
 			if [ -f "${REVFILE}" -a "_${CYCLE}" = "_monthly" ] ; then
-				rm "${REVFILE}" 
+				rm -f "${REVFILE}" 
 			fi
 		done
 	done
