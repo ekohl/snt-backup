@@ -72,6 +72,13 @@ function mysql_backup {
 		fi
 		SNAPFILE="${SNAPSHOTDIR}/mysql/binlogs.snap"
 
+		# bij gebrek aan snap-file is dit per-definitie een full backup.
+		# (ook bij 'incr' en 'diff' backups willen we graag weten welke backups de full
+		#  backups zijn, ivm. backup cleanups)
+		if [ ! -f "${SNAPFILE}" ]; then
+			TYPE=full
+		fi
+
 		# pre dingen..
 		case "${TYPE}" in
 		full)
@@ -87,9 +94,9 @@ function mysql_backup {
 		esac
 
 		if [ "${HOSTNAME_TAG}x" == "x" ]; then
-			TARFILE="${TODIR}/mysql_${DATEFIX}_binlogs.tar"
+			TARFILE="${TODIR}/mysql_${DATEFIX}_binlogs_${TYPE}.tar"
 		else
-			TARFILE="${TODIR}/mysql_${DATEFIX}_${HOSTNAME_TAG}_binlogs.tar"
+			TARFILE="${TODIR}/mysql_${DATEFIX}_${HOSTNAME_TAG}_binlogs_${TYPE}.tar"
 		fi
 
 		# NOTE: bashism
@@ -133,7 +140,7 @@ function mysql_weekly {
 	. "${CONFDIR}/mysql/Default.conf"
 	SNAPFILE="${SNAPSHOTDIR}/mysql/binlogs.snap"
 	if [ "_${CYCLE}" = "_weekly" ] ; then
-		rm  "${SNAPFILE}"
+		rm -f "${SNAPFILE}"
 	fi
 }
 
@@ -141,6 +148,6 @@ function mysql_monthly {
 	. "${CONFDIR}/mysql/Default.conf"
 	SNAPFILE="${SNAPSHOTDIR}/mysql/binlogs.snap"
 	if [ "_${CYCLE}" = "_monthly" ] ; then
-		rm  "${SNAPFILE}"
+		rm -f "${SNAPFILE}"
 	fi
 }
