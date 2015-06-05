@@ -16,6 +16,10 @@ function pgsql_backup {
 		. "${CONFDIR}/pgsql/pgsql.conf"
 	fi
 
+	if [ "x$PG_BACKUP_DISABLED" != 'x' ]; then
+		return
+	fi
+
 	# do backup
 	PG_SH="su $PGUSER"
 	if [ "x$PGPASSFILE" != 'x' ]; then
@@ -59,38 +63,32 @@ function pgsql_backup {
 	    TOFILE="pgsql_${DATEFIX}_${HOSTNAME_TAG}.sql"
 	fi
 
-	PG_BIN=''
-	if [ -d '/usr/lib/postgresql/bin' ]; then
-		PG_BIN='/usr/lib/postgresql/bin'
-	elif [ -d '/usr/lib/postgresql/9.3/bin' ]; then
-		PG_BIN='/usr/lib/postgresql/9.3/bin'
-	elif [ -d '/usr/lib/postgresql/9.2/bin' ]; then
-		PG_BIN='/usr/lib/postgresql/9.2/bin'
-	elif [ -d '/usr/lib/postgresql/9.1/bin' ]; then
-		PG_BIN='/usr/lib/postgresql/9.1/bin'
-	elif [ -d '/usr/lib/postgresql/9.0/bin' ]; then
-		PG_BIN='/usr/lib/postgresql/9.0/bin'
-	elif [ -d '/usr/lib/postgresql/8.5/bin' ]; then
-		PG_BIN='/usr/lib/postgresql/8.5/bin'
-	elif [ -d '/usr/lib/postgresql/8.4/bin' ]; then
-		PG_BIN='/usr/lib/postgresql/8.4/bin'
-	elif [ -d '/usr/lib/postgresql/8.3/bin' ]; then
-		PG_BIN='/usr/lib/postgresql/8.3/bin'
-	elif [ -d '/usr/lib/postgresql/8.2/bin' ]; then
-		PG_BIN='/usr/lib/postgresql/8.2/bin'
-	elif [ -d '/usr/lib/postgresql/8.1/bin' ]; then
-		PG_BIN='/usr/lib/postgresql/8.1/bin'
-	elif [ -d '/usr/lib/postgresql/7.4/bin' ]; then
-		PG_BIN='/usr/lib/postgresql/7.4/bin'
-	else
-		touch "${SNAPSHOTDIR}/error"
-		echo "/usr/lib/postgresql/bin path not found!"
-		false
-	fi
+	/usr/bin/pg_lsclusters -h | {
+		PG_BIN=''
+		if [ -d '/usr/lib/postgresql/bin' ]; then
+			PG_BIN='/usr/lib/postgresql/bin'
+		fi
+		while read pg_version pg_cluster pg_port pg_status pg_owner pg_data_dir pg_logfile; do
+			if [ "$pg_status" = online ]; then
+				PG_BIN="/usr/lib/postgresql/$pg_version/bin"
+			fi
+		done
 
-	"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
-		$PG_SH -c "$PG_BIN/pg_dumpall -g ${PG_DUMPALL_OPTS}" $COMPRESS $ENCRYPT $BUFFER \
-		|| { touch "${SNAPSHOTDIR}/error"; echo 'pgsql dump failed.'; }
+		# on some systems, the pg_dumpall is globally available
+		if [ -z "$PG_BIN" -a -x '/usr/bin/pg_dumpall' ]; then
+			PG_BIN='/usr/bin'
+		fi
+
+		if [ -z "$PG_BIN" ]; then
+			touch "${SNAPSHOTDIR}/error"
+			echo "/usr/lib/postgresql/bin path not found!"
+			false
+		fi
+
+		"${BASEDIR}/bin/rmt-client.pl" "${TODIR}/${TOFILE}${C_TAG}${E_TAG}" \
+			$PG_SH -c "$PG_BIN/pg_dumpall -g ${PG_DUMPALL_OPTS}" $COMPRESS $ENCRYPT $BUFFER \
+			|| { touch "${SNAPSHOTDIR}/error"; echo 'pgsql dump failed.'; }
+	}
 }
 
 #
