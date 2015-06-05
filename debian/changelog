@@ -1,3 +1,16 @@
+snt-backup (2.1-70) stable; urgency=medium
+
+  * bugfixes in the incremental backups for mysql binlogs:
+    - remove snapfile with 'rm -f'
+    - add backup-type to binlogs filename
+    - set backup-type to 'full' when no snapfile exists
+  * remove snapfile with 'rm -f' in the ariadne plugin
+  * allow option to disable postgres-backups with variable PG_BACKUP_DISABLE
+  * add autodetection for the PG_BIN path
+  * fall back to /usr/bin/pg_dumpall if it exists
+
+ -- Bas van Sisseren <bas@quarantainenet.nl>  Fri, 05 Jun 2015 16:32:47 +0200
+
 snt-backup (2.1-69) stable; urgency=low
 
   * change dependency from mysql-client to virtual-mysql-client
