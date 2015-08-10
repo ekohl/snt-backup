@@ -131,7 +131,7 @@ sub parse_pkg {
 	my $arch = $pkg->{'Architecture'} // $default_arch;
 
 	my $package_arch = $package;
-	if (defined $pkg->{'Multi-Arch'}) {
+	if (defined $pkg->{'Multi-Arch'} || $arch ne $default_arch) {
 		$package_arch .= ':'.$arch;
 	}
 	die "No status defined for package $package_arch.\n"
