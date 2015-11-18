@@ -1,3 +1,9 @@
+snt-backup (2.1-72) stable; urgency=medium
+
+  * remove debconf support in snt-backup-server
+
+ -- Robbert Müller <muller@muze.nl>  Wed  18 Nov 2015 19:31:99 +0100
+
 snt-backup (2.1-71) stable; urgency=medium
 
   * [build-tar-exclude.pl] patch to use $ENV{CONFDIR} instead of
