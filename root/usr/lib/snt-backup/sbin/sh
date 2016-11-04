@@ -15,6 +15,9 @@ then
 	then
 		if [ "_$2" = '_/etc/rmt' -o "_$2" = '_/usr/libexec/rmt' ]
 		then
+			if [ ! -d "${HOME}/backups" ] ; then
+				mkdir "${HOME}/backups"
+			fi
 			cd "${HOME}/backups"
 			exec ${BASEDIR}/sbin/rmt-server.pl
 			echo 'rmt exec failed..' >&2
