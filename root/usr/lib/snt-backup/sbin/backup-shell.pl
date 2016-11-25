@@ -25,7 +25,7 @@ sub ls {
 }
 
 sub du {
-	exec("/usr/bin/du", "-b") or die "du exec failed.. $!";
+	exec("/usr/bin/du", "-sm") or die "du exec failed.. $!";
 }
 
 sub cat {
