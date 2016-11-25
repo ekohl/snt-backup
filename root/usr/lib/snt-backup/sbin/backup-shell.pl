@@ -3,6 +3,8 @@ use warnings;
 use strict;
 
 use Getopt::Std;
+use Cwd qw(getcwd abs_path);
+use File::Spec;
 use Data::Dumper;
 use Env qw( HOME BASEDIR BACKUP_LOCATION VERBOSE NO_ACT REPORT SPLITPATH EXTENDEDCMD );
 
@@ -20,12 +22,25 @@ sub ssh_command {
 	exit(1);
 }
 
+sub cleanPath {
+	my $path = shift @_;
+	my $cwd = getcwd();
+	$path = abs_path($cwd . "/" . $path);
+	if ( defined $path && $path =~ /^$cwd/ ) {
+		# path is below root
+		$path =~ s@^$cwd@/@;
+		$path = File::Spec->abs2rel( $path, '/' ) ;
+	} else {
+		$path = '.';
+	}
+	return $path;
+}
+
 sub ls {
 	my $path = shift @_;
 	# clean path parameter
 	if ( defined $path ) {
-		print Dumper($path);
-		# clean path
+		$path = cleanPath($path);
 		exec("/bin/ls", "-l", $path) or die "ls exec failed.. $!";
 	} else {
 		exec("/bin/ls", "-l" ) or die "ls exec failed.. $!";
