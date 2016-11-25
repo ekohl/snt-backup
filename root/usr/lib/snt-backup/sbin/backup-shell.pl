@@ -25,7 +25,7 @@ sub ls {
 }
 
 sub du {
-	exec("/usr/bin/du", "-b") or die "ssh_command exec failed.. $!";
+	exec("/usr/bin/du", "-b") or die "du exec failed.. $!";
 }
 
 sub cat {
