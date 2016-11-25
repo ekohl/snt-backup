@@ -21,7 +21,16 @@ sub ssh_command {
 }
 
 sub ls {
+	my $path = shift @_;
 	# clean path parameter
+	if ( defined $path ) {
+		print Dumper($path);
+		# clean path
+		exec("/bin/ls", "-l", $path) or die "ls exec failed.. $!";
+	} else {
+		exec("/bin/ls", "-l" ) or die "ls exec failed.. $!";
+	}
+
 }
 
 sub du {
