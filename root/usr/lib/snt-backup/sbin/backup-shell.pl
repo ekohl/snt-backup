@@ -54,6 +54,19 @@ sub du {
 
 sub cat {
 	# clean path parameter
+	my $path = shift @_;
+	# clean path parameter
+	if ( defined $path ) {
+		$path = cleanPath($path);
+		if ( -r $path && -f $path && -o $path) {
+			exec("/bin/cat", $path) or die "cat exec failed.. $!";
+		} else {
+			print "File not found\n";
+		}
+	} else {
+		print "File not found\n";
+	}
+	exit(1);
 }
 
 
