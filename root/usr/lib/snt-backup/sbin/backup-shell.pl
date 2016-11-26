@@ -79,18 +79,23 @@ getopts('c', \%opts);
 
 
 my $cmd = shift @ARGV;
-if ( grep( /^$cmd$/, keys %commands ) ) {
-	# move to the right place
-	prepare();
-	# execute
-	$commands{$cmd}(@ARGV);
-} elsif ( $EXTENDEDCMD eq "yes" &&  grep( /^$cmd$/, keys %extcommands ) ) {
-	# move to the right place
-	prepare();
-	# execute
-	$extcommands{$cmd}(@ARGV);
+if ( defined $cmd ) {
+	if ( grep( /^$cmd$/, keys %commands ) ) {
+		# move to the right place
+		prepare();
+		# execute
+		$commands{$cmd}(@ARGV);
+	} elsif ( $EXTENDEDCMD eq "yes" &&  grep( /^$cmd$/, keys %extcommands ) ) {
+		# move to the right place
+		prepare();
+		# execute
+		$extcommands{$cmd}(@ARGV);
+	} else {
+		print "Illigal command\n";
+		exit(1);
+	}
 } else {
-	print "Illigal command\n";
+	print "No command specified\n";
 	exit(1);
 }
 
