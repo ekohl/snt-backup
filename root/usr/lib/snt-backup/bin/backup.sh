@@ -97,7 +97,7 @@ rm -f "${SNAPSHOTDIR}/error"
 			# Als niet gedefinieerd is welke plugins we willen laden,
 			# dan laden we ze allemaal automagisch
 			# som alle uitvoerbare plugins in de plugins dir op.. (met +x)
-			PLUGINS="`cd "${BASEDIR}/plugins" && find . -type f -perm +100 -a ! -name '*.dpkg-*' | sed 's|^\./||'`"
+			PLUGINS="`cd "${BASEDIR}/plugins" && find . -type f -perm /100 -a ! -name '*.dpkg-*' | sed 's|^\./||'`"
 	else
 		# Anders halen we het uit de config
 		PLUGINS=""
